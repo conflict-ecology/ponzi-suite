@@ -9,6 +9,17 @@ mkdocs serve
 
 Pages are under `docs/`. Content that comes from code is generated at build time (`hooks/ponzi.py`), never copied into pages: the collections table and the extension schema; the API references of every Python distribution, read from their source, and of ponzi-visual, read from its TypeScript; the REST API table, from ponzi-server's `openapi.json`; and ponzi-core's store contracts and change requests. The build reads ponzi-core, ponzi-service and ponzi-visual from checkouts beside the suite (`$PONZI_CORE`, `$PONZI_SERVICE` and `$PONZI_VISUAL` override them), and the docs workflow lays them out the same way.
 
+## A development workstation
+
+For developing and testing PONZI on one machine, not for deploying it, two pixi tasks of this repository set up and start the whole system ([Install](docs/guides/install.md#for-development), [Quickstart](docs/guides/quickstart.md#development-on-your-own-home)):
+
+```
+pixi run dev-install         # clone the missing ponzi-core, ponzi-service, ponzi-visual beside the suite, install them
+pixi run dev-up              # the server, the client loop and the front end on the PONZI home, until Ctrl+C
+```
+
+The logic is in `scripts/`. The docs build stays on `requirements.txt` above, outside pixi.
+
 ## Contributing
 
 What is done and what is left is one checklist: [Roadmap](https://conflict-ecology.github.io/ponzi-suite/contributing/roadmap/) (ponzi-suite `docs/contributing/roadmap.md`). Pick an open item there.

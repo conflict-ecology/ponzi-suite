@@ -18,6 +18,8 @@ workspace/
 
 Then set up the logins the work needs: [Authentication](authentication.md).
 
+To set up a development workstation in one command instead, see [For development](#for-development).
+
 ## The client
 
 One pip command, in any Python 3.11 or later. `ponzi-spec` is named in the same command because it is not on PyPI:
@@ -66,6 +68,27 @@ pixi run dev                 # http://localhost:5173, against PONZI_URL (default
 ```
 
 `pixi run server` makes and serves a demo installation from the ponzi-service checkout beside it ([Quickstart](quickstart.md)).
+
+## For development
+
+On a workstation for developing and testing PONZI, not for deploying it, one command from ponzi-suite clones what is missing and installs it all:
+
+```
+git clone https://github.com/conflict-ecology/ponzi-suite
+cd ponzi-suite
+pixi run dev-install         # ponzi-core, ponzi-service, ponzi-visual beside the suite, each installed
+```
+
+It clones each of ponzi-core, ponzi-service and ponzi-visual that is not yet beside the suite (over https, the default branch; `PONZI_REF=TAG` for another), then installs the default environments of ponzi-core and ponzi-service and ponzi-visual's packages. A checkout that exists is used as it is, never pulled, reset or overwritten, and the installs follow its lock file (`pixi install --locked`), so running it again only checks and finishes.
+
+More environments are named in `PONZI_ENVS`, or as arguments:
+
+```
+PONZI_ENVS="ml isce3" pixi run dev-install
+pixi run dev-install ml      # the same, as arguments
+```
+
+`ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9; set `CONDA_OVERRIDE_CUDA=12.9` to install them anyway ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-on-your-own-home)).
 
 ## GPUs and CUDA
 

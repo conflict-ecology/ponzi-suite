@@ -1,0 +1,20 @@
+[workspace]
+name = "ponzi-suite"
+description = "PONZI: the docs and the files PONZI runs from; tasks that set up and start a development workstation"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+# Only what the scripts call; the code repositories have their own pixi workspaces. The docs build is not here: it
+# stays on requirements.txt (see the README).
+[dependencies]
+bash = ">=5"
+git = ">=2.40"
+curl = ">=8"
+
+[tasks]
+# For development and testing on one machine, not for deploying.
+# Clone the missing ponzi-core, ponzi-service and ponzi-visual beside the suite and install them. Extra pixi
+# environments: PONZI_ENVS="ml isce3", or as arguments (pixi run dev-install ml isce3).
+dev-install = "bash scripts/dev-install.sh"
+# ponzi-server on the PONZI home, the client loop (--executor local) and ponzi-visual's dev server, until Ctrl+C.
+dev-up = "bash scripts/dev-up.sh"

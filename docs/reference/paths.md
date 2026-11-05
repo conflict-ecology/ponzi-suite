@@ -42,7 +42,8 @@ Where PONZI keeps things on a machine, and the variables that move them. Secrets
     snapshots/<site>/<YYYY-MM-DDTHHMMSS>/   the last 10 snapshots
   logs/                                 every log PONZI writes to files (CR-064)
     slurm/<batch>/<stage>_<job>_<task>.out   the output of each SLURM task of a batch
-    client/                             the client loop's own log, when it runs as a SLURM job
+    client/                             the client loop's own log, when it runs as a SLURM job or under `pixi run dev-up`
+    server/, visual/                    the server's and the front end's logs under `pixi run dev-up`
 ```
 
 A home records its own files by paths relative to itself, so a home copied to another machine runs unchanged with the same repositories.
@@ -93,3 +94,5 @@ Config variables nest with a double underscore and rank below command-line flags
 | `PONZI_TIDE_WORKERS` | the TiDE forecaster | its data loader workers (default min(4, torch threads / 2)) |
 | `CONDA_OVERRIDE_CUDA` | pixi | install the `isce3` environment where no NVIDIA driver is found (`12.9`) |
 | `PONZI_URL` | ponzi-visual's dev server | the server it forwards to (default `http://127.0.0.1:8799`, the demo) |
+| `PONZI_ENVS`, `PONZI_REF` | ponzi-suite's `pixi run dev-install` | the extra environments to install, the branch or tag to clone ([For development](../guides/install.md#for-development)) |
+| `PONZI_SERVER_PORT`, `PONZI_VISUAL_PORT`, `PONZI_SERVER_HOST`, `PONZI_SERVER_SETTINGS`, `PONZI_WORKER_ID` | ponzi-suite's `pixi run dev-up` | its ports, the server's address and settings, the client loop's name ([Quickstart](../guides/quickstart.md#development-on-your-own-home)) |

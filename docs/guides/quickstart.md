@@ -37,3 +37,36 @@ pixi run ponzi-client --url http://127.0.0.1:8799 search --collections ponzi-eve
 3. **A watched area over two of the bursts, looked at once, and one run request over all five.** The worker ran their jobs, one per burst, through the server in the same process. Each ingested a store, onboarded it, ran the model, coded the p-values, detected events, tiled them onto Major TOM cells, and uploaded the final Items.
 
 To start over, remove `ponzi-visual/.e2e/demo`; the next `pixi run server` makes it again. The cache in `.e2e/demo/cache` can be removed at any time: content ids make every entry reproducible.
+
+## Development on your own home
+
+For developing and testing, not for deploying, one command from ponzi-suite starts the server, the client loop and the front end together, on the PONZI home instead of the demo. Install them first with `pixi run dev-install` ([Install](install.md#for-development)).
+
+```
+cd ponzi-suite
+pixi run dev-up              # the server on :8780, the client loop, the app on http://localhost:5180
+```
+
+- **The server** is `ponzi-server serve` on the PONZI home, listening on 127.0.0.1 only. On its first start it downloads the World Bank boundaries and the burst catalog in the background.
+- **The client loop** is `ponzi-client serve -- --executor local`: it claims the server's jobs and runs each on this machine. Its worker key is `$PONZI_HOME/keys/dev-worker.key`.
+- **The front end** is ponzi-visual's dev server, forwarding the API to this server.
+
+The first start makes the two keys it needs in `$PONZI_HOME/keys/`: `dev-worker.key` (scope `worker`) and `dev-browser.key` (`client:write`). A key file is never overwritten, so later starts use the same keys. The browser key is printed for you to enter in the app; the worker key is never shown. The logs are appended to `$PONZI_HOME/logs/server/`, `logs/client/` and `logs/visual/`. Ctrl+C stops all three, and when one of them stops, the others are stopped too.
+
+| Variable | Sets | Default |
+| --- | --- | --- |
+| `PONZI_HOME` | the home it runs on | `~/.ponzi` |
+| `PONZI_SERVER_PORT` | the server's port | `8780` |
+| `PONZI_VISUAL_PORT` | the app's port | `5180` |
+| `PONZI_SERVER_HOST` | the address the server listens on | `127.0.0.1` |
+| `PONZI_SERVER_SETTINGS` | a server settings file; its `public_url` is set to the server's address when it names none | none |
+| `PONZI_WORKER_ID` | the name the server records for the client loop | `dev-<host name>` |
+
+To keep a development home apart from your own, point `PONZI_HOME` elsewhere. To skip the downloads, give a settings file:
+
+```
+printf 'server:\n  fetch_boundaries: false\n  fetch_catalog: false\n' > /tmp/dev-server.yaml
+PONZI_HOME=/tmp/ponzi-dev PONZI_SERVER_SETTINGS=/tmp/dev-server.yaml pixi run dev-up
+```
+
+Runs and watched areas name a standard, and a new home has none: copy one into `$PONZI_HOME/standards` and start again ([Making a standard](standards.md)).
