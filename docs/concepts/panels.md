@@ -26,13 +26,19 @@ A panel is cited as `<id>@<version>` (`majortom-global@0.4.0`, [Naming](../refer
 
 | Step | What | Command |
 | --- | --- | --- |
-| spec | the builder's spec: cell source, classifiers, choice per stratum, split, window, coherence config, draw | (versioned data, with the panel's definition) |
+| spec | the builder's spec: cell source, classifiers, choice per stratum, split, default window, coherence config, draw | (versioned data, with the panel's definition) |
 | `panel-cells` | the candidate cells (Major TOM cells over the regions), one class per classifier, the cells chosen per stratum, their split | `ponzi-models panel-cells --spec S --out D` |
 | bursts | the bursts covering the cells, through the S1 workflow (coherence store and sidecar each) | the worker |
 | `panel-masks` | per cell and burst the processable pixels inside the cell; the quota per pixel stratum shared over the cell's bursts by area; a seeded draw; per burst a mask store with `cell_<split>` and `sample_<split>` layers | `ponzi-models panel-build --spec S --cells C --bursts B` |
 | `panel-assemble` | the built panel: record, cells, catalogue, draw table, coverage, content id; by default in `{home}/panels/<id>@<version>` | (same command) |
 
-`panel-build` cannot yet rebuild a panel from its definition: `majortom-global` gives each cell its own window, and a builder spec has one window.
+Each cell has a window: its own (`window_start`, `window_end` in the cells table) or the spec's. A catalogue row's window spans those of the cells it serves, and a burst's spans those of all its cells. A null run uses the burst's window for its split.
+
+`panel-build --definition DIR` builds a panel from its definition (ponzi-core CR-056). The definition gives the cells, their splits, strata, windows and bursts; a cell is drawn only in the bursts it names. The spec still gives the draw and must have the definition's id and version. What the definition does not give is not made up:
+
+- A cell with no outline has no box to draw in. The build refuses it unless `--without-outline drop` leaves it out. In `majortom-global` these are the 24 cells that were never delivered; none of their bursts has a coherence store or serves another cell.
+- The draw parameters and the coherence config come from the spec. No spec for `majortom-global` exists yet.
+- The stores come from the burst table, as for `--cells`.
 
 Defaults (the old Major-TOM panel's rules): settlement and climate classes per cell; two pixel strata, `built` and `land_nonbuilt`, cut from the sidecar's built-up and land layers; 1,000 pixels per stratum per cell. `split.assign` pins cells to a split (held-out cells).
 
@@ -44,4 +50,4 @@ Everything reads a built panel through `ponzi_models.panels.panel.Panel`. A pane
 
 ## Identity
 
-A panel's content id comes from its spec and the structural digests of every store it uses. Models and calibrations record the panel id and content id, so a model's manifest traces back to the cells and scenes behind it.
+A panel's content id comes from its spec and the structural digests of every store it uses. When the cells carry their own windows, it also takes the digest of the cells and their windows. Models and calibrations record the panel id and content id, so a model's manifest traces back to the cells and scenes behind it.
