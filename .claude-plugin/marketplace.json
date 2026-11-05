@@ -1,0 +1,11 @@
+{
+  "name": "ponzi",
+  "owner": {"name": "PONZI"},
+  "plugins": [
+    {
+      "name": "ponzi-dev",
+      "source": "./plugins/ponzi-dev",
+      "description": "Skills for working on the PONZI repositories."
+    }
+  ]
+}

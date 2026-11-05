@@ -1,0 +1,5 @@
+# The docs build. ponzi-spec is installed from the ponzi-core checkout beside this one:
+#   pip install -r requirements.txt -e ../ponzi-core/packages/spec
+mkdocs>=1.6,<2
+mkdocs-material>=9.5,<10
+mkdocstrings[python]>=0.26

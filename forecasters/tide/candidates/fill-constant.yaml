@@ -1,0 +1,24 @@
+# THE CONTROL of the candidates, not a registered model: tide-weather with everything the candidates have except
+# another fill (ponzi-core CR-016). A missing coherence of the past window is the CONSTANT 0.5 with the obs flags, as
+# in the registered fits.
+# The rest is forecasters/tide/weather.yaml, key for key. Common to the candidates and the control: the obs channels
+# of the future rows are what a run gives the model (constant 1), a missing covariate in a window is an error and
+# never a filled value (`strict_covariates`), in a run the model honours the run config's `context.min_support` as the
+# rolling fits do (`support: gated`; the fit itself does not filter on it, and its model card breaks the val loss down
+# by the number of observed values), and, as for every fit of this trainer, the anchors are those a run scores. So a
+# candidate against this fit differs in the fill alone; the registered model tide_c30_pdcompact_mt0.4 remains the
+# outside reference.
+# Fitted at two seeds: `training/train.py --seed 42` and `--seed 43` (the fits are tide-weather-fill-constant-seed42 and
+# _s43); the ten fits (with the candidates') are one array job, hpc/train_candidates.sbatch. The prepared files are
+# those of tide-weather.
+# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
+extends: ../weather.yaml
+fit_id: tide-weather-fill-constant
+formerly: tide_c30_pdcompact_constant
+missing:
+  fill: constant
+  value: 0.5
+  flag: true
+future_obs: one
+strict_covariates: true
+support: gated

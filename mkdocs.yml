@@ -1,0 +1,102 @@
+site_name: PONZI
+site_description: Change detection on SAR coherence time series
+# The site's address, the same as ponzi_spec.stac.DOCS_BASE (overhaul decision D15; ponzi-core CR-049)
+site_url: https://conflict-ecology.github.io/ponzi-suite/
+repo_name: conflict-ecology/ponzi-suite
+repo_url: https://github.com/conflict-ecology/ponzi-suite
+strict: true
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/brightness-7, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/brightness-4, name: Light mode}
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            members_order: source
+            docstring_style: sphinx
+
+hooks:
+  - hooks/ponzi.py
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc: {permalink: true}
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.details
+  - pymdownx.tasklist: {custom_checkbox: true}
+
+extra_css:
+  - stylesheets/diagrams.css
+
+extra_javascript:
+  - javascripts/flows.js
+
+nav:
+  - Home: index.md
+  - Concepts:
+      - concepts/index.md
+      - System overview: concepts/overview.md
+      - Terminology: concepts/terminology.md
+      - How PONZI works: concepts/workflows.md
+      - STAC profile: concepts/stac-profile.md
+      - Content ids: concepts/content-ids.md
+      - Manifests: concepts/manifests.md
+      - Stages: concepts/stages.md
+      - Configuration: concepts/configuration.md
+      - Coherence: concepts/coherence.md
+      - Panels: concepts/panels.md
+      - Grids: concepts/grids.md
+      - The worker: concepts/worker.md
+      - The service: concepts/service.md
+  - Guides:
+      - guides/index.md
+      - Quickstart: guides/quickstart.md
+      - Install: guides/install.md
+      - Making a standard: guides/standards.md
+      - Watched areas: guides/watched-areas.md
+      - Running on the cluster: guides/hpc.md
+  - Reference:
+      - reference/index.md
+      - ponzi-spec: reference/ponzi-spec.md
+      - REST API: reference/rest-api.md
+      - Store contracts: reference/contracts.md
+      - Naming: reference/naming.md
+      - The clients: reference/clients.md
+  - Contributing:
+      - contributing/index.md
+      - Roadmap: contributing/roadmap.md
+      - Change process: contributing/process.md
+      - A new stage: contributing/new-stage.md
+      - A new model: contributing/new-model.md
+  - For agents:
+      - agents/index.md
+      - Using PONZI: agents/usage.md
+      - Contributing: agents/contributing.md
+  - History:
+      - history/index.md
+      - The overhaul plan: history/overhaul-plan.md
+      - The system before the overhaul: history/current-system.md

@@ -1,0 +1,43 @@
+# PONZI
+
+> Change detection on Sentinel-1 SAR coherence time series: forecast the coherence of each new acquisition per burst, score the drop, calibrate it to p-values, date the changes as events. Four repositories: ponzi-core (computing), ponzi-service (server, worker, client), ponzi-visual (map front end), ponzi-suite (this site).
+
+Agents use PONZI through ponzi-client only. Agents change PONZI's code only under a signed-off change request, and do not commit or access clusters without the owner's approval.
+
+## For agents
+
+- [Using PONZI](agents/usage/): the client interface and its rules
+- [Contributing](agents/contributing/): checklists for code changes
+
+## Concepts
+
+- [System overview](concepts/overview/): components and data flow
+- [STAC profile](concepts/stac-profile/): collections, the PONZI extension, lineage links
+- [Content ids](concepts/content-ids/): identity and reuse
+- [Manifests](concepts/manifests/): provenance of an output
+- [Stages](concepts/stages/): replaceable units of work
+- [Configuration](concepts/configuration/): ponzi.yaml, paths, secrets
+- [Coherence](concepts/coherence/): how a coherence store is made
+- [Panels](concepts/panels/): the training and calibration set
+- [Grids](concepts/grids/): native for processing, Major TOM for outputs
+- [The worker](concepts/worker/): stages, identity, the cache, executors
+- [The service](concepts/service/): requests, jobs and leases, the scheduler, keys
+
+## Guides
+
+- [Quickstart](guides/quickstart/): the whole system on a laptop
+- [Making a standard](guides/standards/): the lifecycle on the CPU and at scale
+- [Watched areas](guides/watched-areas/): what a daily look computes
+- [Running on the cluster](guides/hpc/): SLURM, the profile, the approval gate
+
+## Reference
+
+- [ponzi-spec](reference/ponzi-spec/): shared schemas
+- [REST API](reference/rest-api/): /v1 endpoints
+- [Store contracts](reference/contracts/): store formats C1 to C26
+- [The clients](reference/clients/): Python, command line, TypeScript
+
+## Contributing
+
+- [Roadmap](contributing/roadmap/): what is done and what is left, as a checklist
+- [PONZI extension schema](schemas/ponzi/v0.1.0/schema.json)

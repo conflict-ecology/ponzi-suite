@@ -1,0 +1,58 @@
+# A CANDIDATE, not a registered model: ONE C 30 model for every situation a run meets, trained with the general
+# augmentation of training/augment.py. It is forecasters/tide/candidates/fill-previous.yaml (the spec of the
+# registered model tide_s1_mt04: the previous observed value with the obs flags, future obs as in a run, strict
+# covariates, support: gated) key for key, plus `augment`, five kinds, each hitting a training window with its own
+# probability, independently (so about 35 % of the windows stay as they are: 0.71 * 0.76 * 0.8 * 0.9 * 0.9, the
+# draws k = 0 and s = 5 changing nothing; the probabilities proposed by the owner, which put about two thirds of
+# the windows under at least one kind; lower them if the real setting suffers):
+#   truncate_context p 0.3, min_keep 1: a short history (the series starts k rows into the context, k uniform 0..29);
+#   unknown_future   p 0.3: the future covariate rows s..4 unknown (s uniform 1..5), stage s of progressive scoring
+#                    (ponzi-core CR-021, decision D1: the same model serves every stage);
+#   drop_acquisitions p 0.2, n 1 to 3: single missing acquisitions in the context;
+#   outage           p 0.1, length 2 to 6: consecutive missing acquisitions from a context row on (may straddle the
+#                    anchor);
+#   drop_baseline    p 0.1, the 1 or 2 longest baselines missing over 3 to 10 rows (pairs without a partner, as
+#                    around a sensor switch).
+# Each kind makes a window exactly what the library builds from an input where that situation is real (a missing
+# acquisition removes every pair that involves it; tested on the bytes). Nothing changes at inference except that
+# progressive scoring passes the unknown future rows as unknown (CR-021). The val loss and the selection are on the
+# real val windows; the model card's val_by_context, val_by_stage and val_by_scenario are the tables on which it is
+# compared with tide_s1_mt04 (training/eval_breakdowns.py on the registered artifact, same windows) and with the
+# context dropout candidate tide-weather-fill-previous-context-dropout.
+# Fitted at seed 42 (`training/train.py --seed 42`: the fit is tide-weather-fill-previous-augmented-seed42), one GPU task,
+# hpc/train_one.sbatch. The prepared files are those of tide-weather (augmentation is applied when batches
+# are gathered, so the prepared folder and its tag are the same).
+# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
+extends: ../weather.yaml
+fit_id: tide-weather-fill-previous-augmented
+formerly: tide_c30_pdcompact_previous_aug
+missing:
+  fill: previous
+  flag: true
+future_obs: one
+strict_covariates: true
+support: gated
+augment:
+- kind: truncate_context
+  p: 0.3
+  min_keep: 1
+- kind: unknown_future
+  p: 0.3
+- kind: drop_acquisitions
+  p: 0.2
+  n:
+  - 1
+  - 3
+- kind: outage
+  p: 0.1
+  length:
+  - 2
+  - 6
+- kind: drop_baseline
+  p: 0.1
+  baselines:
+  - 1
+  - 2
+  length:
+  - 3
+  - 10

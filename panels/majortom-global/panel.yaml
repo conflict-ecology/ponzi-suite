@@ -1,0 +1,47 @@
+# A panel definition (CR-046, CR-047; the rules: ponzi_spec.panel): the bursts and cells a model is trained,
+# validated and calibrated on. The folder is the panel's id; this file holds its version; git holds its history.
+# bursts.geojson and cells.geojson must match the sha256 below. Check it (from ponzi-core):
+#   pixi run ponzi-models panel-check ../ponzi-suite/panels/majortom-global
+# Everything made from it (coherence stores, sidecars, masks, the built panel) goes into the PONZI home.
+id: majortom-global
+version: 0.4.0
+description: >-
+  The Major TOM training panel: 239 cells of the 10 km Major TOM grid, stratified by climate and settlement, and the
+  487 Sentinel-1 bursts that cover them, each cell observed over three years with no event. The train split trains
+  a model, val checks it, and test is the calibration null (the independent locations whose scores give the
+  p-values).
+subpanels:
+  majortom: {cells: {train: 120, val: 40, test: 40}, note: 8 test cells per climate, 5 climates}
+  majortom-arid: {cells: {train: 23, val: 8, test: 8}, note: drylands only}
+splits:
+  cells: {train: 143, val: 48, test: 48}
+  bursts: {train: 285, val: 102, test: 99, mixed: 1}   # mixed: one burst whose cells are in two splits
+windows: >-
+  Per cell, 1 January of its hist_year to 31 December two years later (every cell of the upstream aois.csv follows
+  this; the 24 cells missing there take it from the rule). A burst's window spans its cells'.
+footprints:
+  source: OPERA burst database, burst_db 0.18.0, burst-id-geometries-simple-0.18.0.geojson.zip
+  sha256: e3a52b728ba4b117ac8f2357f638f26c9034816bf89c4f0c3391b2f6392230f7
+  note: >-
+    The burst map (burst_db 0.10.0, opera-burst-bbox-only.sqlite3) holds the same 1,127,661 burst ids, so every
+    burst here also has its fixed processing grid.
+outlines: >-
+  215 cells from the upstream aois.csv (the 10.68 km Major TOM tile); 24 never-delivered cells have none (their
+  tile is not a plain scaling of the grid cell, so it is not guessed).
+upstream:
+  name: Major TOM panel v0.4
+  builder: ponzi-paper majortom-package --request majortom_v4
+  panel_digest: 0281d85b2d9310043dc6ad987a099313
+  pinned_digest: b320f2f8a9661e0d47bb4fe5f164dced
+  request_config_digest: fa71e3fb75577a3600e018523e6c0eaa
+  registry_digest: c6a0f10b6e4d2a2847176501a6baea88
+  location: /storage/ceoas-scratch/barthelp/ponzi/data/artifact/majortom/v0.4 (HPC)
+  delivered_bursts: 396                     # in_v0_4_package: those with a coherence store upstream
+  coherence: gauss_w5x5_s1.0_ml6x3_vv       # the upstream stores' config, /storage/ceoas-scratch/scherc/cslc_archive
+  sources_sha256:
+    cells.parquet: 72dbb300ff7aef3a        # first 16 hex digits
+    aois.csv: 185bd8768f1758be
+    package.json: 1152cad5839b8399
+files:
+  bursts.geojson: e17f6fbd8487415c383d027a4711c89c1187f86e5f97743f3a646649f6168ca3
+  cells.geojson: b0f778aec201759e13258b6b6d90708bedc95f024959e07e02da1afc3c0719dd

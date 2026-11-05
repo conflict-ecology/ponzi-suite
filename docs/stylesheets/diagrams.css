@@ -1,0 +1,91 @@
+/* The diagrams of "How PONZI works": colours from the theme, so they read in light and dark mode. */
+:root {
+  --pz-ink: var(--md-default-fg-color);
+  --pz-muted: var(--md-default-fg-color--light);
+  --pz-line: var(--md-default-fg-color--lighter);
+  --pz-box: var(--md-code-bg-color);
+  --pz-accent: #e8590c;
+  --pz-accent-fill: rgba(232, 89, 12, 0.28);
+  --pz-blue-fill: rgba(28, 126, 214, 0.14);
+}
+[data-md-color-scheme="slate"] {
+  --pz-accent: #ff922b;
+  --pz-accent-fill: rgba(255, 146, 43, 0.32);
+  --pz-blue-fill: rgba(116, 192, 252, 0.16);
+}
+.pz-figure { overflow-x: auto; margin: 1em 0; }
+.pz-figure svg { width: 100%; max-width: 760px; min-width: 520px; height: auto; display: block; font-family: var(--md-text-font-family); }
+.pz-figure text { fill: var(--pz-ink); font-size: 12px; }
+.pz-figure .pz-small { font-size: 10.5px; fill: var(--pz-muted); }
+.pz-figure .pz-title { font-weight: 700; font-size: 13px; }
+.pz-figure .pz-box { fill: var(--pz-box); stroke: var(--pz-line); stroke-width: 1; }
+.pz-figure .pz-cell { fill: var(--pz-blue-fill); stroke: var(--pz-line); }
+.pz-figure .pz-pyr { fill: var(--pz-accent-fill); stroke: var(--pz-accent); stroke-width: 1.4; }
+.pz-figure .pz-ctx { fill: var(--pz-blue-fill); stroke: var(--pz-line); stroke-dasharray: 4 3; }
+.pz-figure .pz-arrow { stroke: var(--pz-muted); stroke-width: 1.4; fill: none; marker-end: url(#pz-head); }
+.pz-figure .pz-head { fill: var(--pz-muted); }
+.pz-figure .pz-gap { stroke: var(--pz-accent); stroke-width: 2; stroke-dasharray: 3 3; }
+
+/* The change map (javascripts/flows.js), after the PONZI Change Workflows page */
+:root {
+  --pz-c-accent: #c2410c; --pz-c-accent-soft: rgba(234, 88, 12, 0.14);
+  --pz-c-warn: #b45309; --pz-c-warn-soft: rgba(217, 119, 6, 0.14);
+  --pz-c-data: #6b4fa0; --pz-c-data-soft: rgba(107, 79, 160, 0.12);
+  --pz-c-gap: #dc2626; --pz-c-gap-soft: rgba(220, 38, 38, 0.10);
+  --pz-c-line: var(--md-default-fg-color--lighter); --pz-c-muted: var(--md-default-fg-color--light);
+  --pz-c-panel: var(--md-default-bg-color); --pz-c-fg: var(--md-default-fg-color); --pz-c-code: var(--md-code-bg-color);
+}
+[data-md-color-scheme="slate"] {
+  --pz-c-accent: #fb923c; --pz-c-accent-soft: rgba(251, 146, 60, 0.16);
+  --pz-c-warn: #fbbf24; --pz-c-warn-soft: rgba(251, 191, 36, 0.14);
+  --pz-c-data: #b197fc; --pz-c-data-soft: rgba(177, 151, 252, 0.14);
+  --pz-c-gap: #f87171; --pz-c-gap-soft: rgba(248, 113, 113, 0.12);
+}
+.pz-flows { margin: 1em 0 1.4em; display: grid; gap: 12px; }
+.pz-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.pz-tabs button { font: inherit; text-align: left; display: grid; border: 1px solid var(--pz-c-line); background: var(--pz-c-panel);
+  color: var(--pz-c-fg); border-radius: 8px; padding: 6px 11px; cursor: pointer; min-width: 9.5em; }
+.pz-tabs button:hover { border-color: var(--pz-c-accent); }
+.pz-tabs button[aria-selected="true"] { border-color: var(--pz-c-accent); background: var(--pz-c-accent-soft); }
+.pz-tabs button:focus-visible { outline: 2px solid var(--pz-c-accent); outline-offset: 2px; }
+.pz-tname { font-weight: 600; font-size: 0.72rem; } .pz-tfreq { font-family: var(--md-code-font-family); font-size: 0.6rem; color: var(--pz-c-muted); }
+.pz-board { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.pz-mapbox { overflow-x: auto; border: 1px solid var(--pz-c-line); border-radius: 10px; padding: 8px 6px; }
+.pz-map { display: block; width: 100%; min-width: 820px; height: auto; color: var(--pz-c-fg); font-family: var(--md-text-font-family); }
+.pz-side { border: 1px solid var(--pz-c-line); border-radius: 10px; padding: 12px 16px; display: grid; gap: 6px; }
+.pz-side .pz-std { font-family: var(--md-code-font-family); font-size: 0.62rem; letter-spacing: .04em; padding: 2px 9px; border-radius: 999px;
+  background: var(--pz-c-accent-soft); color: var(--pz-c-accent); width: max-content; }
+.md-typeset .pz-side h4 { margin: 0; font-size: 0.85rem; } .md-typeset .pz-side .pz-ex { margin: 0; color: var(--pz-c-muted); font-size: 0.72rem; }
+.md-typeset .pz-side ol { margin: 0 0 0 1.2em; font-size: 0.72rem; } .md-typeset .pz-side li { margin: 0.2em 0; }
+.pz-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.66rem; color: var(--pz-c-muted); }
+.pz-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.pz-sw { display: inline-block; width: 20px; height: 12px; border-radius: 3px; border: 1.5px solid var(--pz-c-line); }
+.pz-sw.pz-new { border-color: var(--pz-c-accent); background: var(--pz-c-accent-soft); }
+.pz-sw.pz-comp { border-color: var(--pz-c-warn); background: var(--pz-c-warn-soft); }
+.pz-sw.pz-reused { border-color: var(--pz-c-muted); border-style: dashed; }
+.pz-sw.pz-data { border-color: var(--pz-c-data); background: var(--pz-c-data-soft); }
+.pz-sw.pz-gap { border-color: var(--pz-c-gap); border-style: dashed; background: var(--pz-c-gap-soft); }
+.pz-sw.pz-todo { border-color: var(--pz-c-muted); border-style: dotted; }
+.pz-sw.pz-idle { opacity: .35; }
+.pz-sw.pz-path { border: 0; border-top: 2px solid var(--pz-c-fg); height: 0; border-radius: 0; }
+.pz-map text { fill: var(--pz-c-muted); font-size: 11.5px; }
+.pz-map .pz-head-text { font-family: var(--md-code-font-family); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.pz-map .pz-label { font-size: 13.5px; font-weight: 600; fill: var(--pz-c-fg); }
+.pz-map .pz-sub { font-family: var(--md-code-font-family); font-size: 11px; }
+.pz-map .pz-node rect { fill: var(--pz-c-panel); stroke: var(--pz-c-line); stroke-width: 1; transition: fill .2s, stroke .2s; }
+.pz-map .pz-band rect { fill: var(--pz-c-code); }
+.pz-map .pz-node { transition: opacity .2s; }
+.pz-map .pz-idle { opacity: .42; }
+.pz-map .pz-idle .pz-label { fill: var(--pz-c-muted); }
+.pz-map .pz-new rect { fill: var(--pz-c-accent-soft); stroke: var(--pz-c-accent); stroke-width: 2; } .pz-map .pz-new .pz-label { fill: var(--pz-c-accent); }
+.pz-map .pz-comp rect { fill: var(--pz-c-warn-soft); stroke: var(--pz-c-warn); stroke-width: 1.8; } .pz-map .pz-comp .pz-label { fill: var(--pz-c-warn); }
+.pz-map .pz-reused rect { stroke: var(--pz-c-muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.pz-map .pz-data rect { fill: var(--pz-c-data-soft); stroke: var(--pz-c-data); stroke-width: 1.6; } .pz-map .pz-data .pz-label { fill: var(--pz-c-data); }
+.pz-map .pz-gap rect { fill: var(--pz-c-gap-soft); stroke: var(--pz-c-gap); stroke-width: 2; stroke-dasharray: 6 3; } .pz-map .pz-gap .pz-label { fill: var(--pz-c-gap); }
+.pz-map .pz-todo rect { stroke: var(--pz-c-muted); stroke-width: 1.4; stroke-dasharray: 2 3; }
+.pz-map .pz-edge path { stroke: var(--pz-c-line); stroke-width: 1; transition: stroke .2s; }
+.pz-map .pz-edge { opacity: .5; }
+.pz-map .pz-edge.pz-on { opacity: 1; } .pz-map .pz-edge.pz-on path { stroke: var(--pz-c-fg); stroke-width: 1.7; }
+.pz-map .pz-edge.pz-on text { fill: var(--pz-c-fg); }
+.pz-map .pz-ah-on { fill: var(--pz-c-fg); } .pz-map .pz-ah-off { fill: var(--pz-c-line); }
+@media (prefers-reduced-motion: reduce) { .pz-map * { transition: none !important; } }
