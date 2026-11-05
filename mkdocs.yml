@@ -26,6 +26,15 @@ plugins:
       default_handler: python
       handlers:
         python:
+          # the source of every distribution, from the checkouts beside the suite (the docs CI lays them out the same)
+          paths:
+            - ../ponzi-core/packages/spec/src
+            - ../ponzi-core/packages/core/src
+            - ../ponzi-core/packages/pipeline/src
+            - ../ponzi-core/packages/models/src
+            - ../ponzi-service/packages/server/src
+            - ../ponzi-service/packages/worker/src
+            - ../ponzi-service/packages/client/src
           options:
             show_source: false
             show_root_heading: true
@@ -83,6 +92,14 @@ nav:
       - reference/index.md
       - ponzi-spec: reference/ponzi-spec.md
       - REST API: reference/rest-api.md
+      - API:
+          - ponzi: reference/api/ponzi.md
+          - ponzi-pipeline: reference/api/ponzi-pipeline.md
+          - ponzi-models: reference/api/ponzi-models.md
+          - ponzi-server: reference/api/ponzi-server.md
+          - ponzi-worker: reference/api/ponzi-worker.md
+          - ponzi-client: reference/api/ponzi-client.md
+          - ponzi-visual: reference/api/ponzi-visual.md
       - Store contracts: reference/contracts.md
       - Naming: reference/naming.md
       - The clients: reference/clients.md

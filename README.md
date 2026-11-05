@@ -7,7 +7,7 @@ pip install -r requirements.txt -e ../ponzi-core/packages/spec
 mkdocs serve
 ```
 
-Pages are under `docs/`. Content that comes from code (the collections table, the extension schema, the API reference) is generated at build time from the installed packages; do not copy it into pages. ponzi-core's store contracts and change requests are published as pages from the ponzi-core checkout beside the suite (`$PONZI_CORE` overrides it; `hooks/ponzi.py`), never copied.
+Pages are under `docs/`. Content that comes from code is generated at build time (`hooks/ponzi.py`), never copied into pages: the collections table and the extension schema; the API references of every Python distribution, read from their source, and of ponzi-visual, read from its TypeScript; the REST API table, from ponzi-server's `openapi.json`; and ponzi-core's store contracts and change requests. The build reads ponzi-core, ponzi-service and ponzi-visual from checkouts beside the suite (`$PONZI_CORE`, `$PONZI_SERVICE` and `$PONZI_VISUAL` override them), and the docs workflow lays them out the same way.
 
 ## Contributing
 

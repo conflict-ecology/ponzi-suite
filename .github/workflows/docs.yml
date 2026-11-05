@@ -10,25 +10,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # the four repositories side by side, as in a local checkout, so the docs read ../ponzi-core and the others
+      # by the same relative paths everywhere (mkdocs.yml, hooks/ponzi.py)
       - uses: actions/checkout@v4
-      # ponzi-core of the same owner, beside this repository, as in a local checkout
+        with:
+          path: ponzi-suite
+      # the three code repositories are private: each a read-only deploy key of that repository, its private half
+      # kept as a secret of this one
       - uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/ponzi-core
           path: ponzi-core
-          # ponzi-core is private: a read-only deploy key of ponzi-core, its private half kept as this secret
           ssh-key: ${{ secrets.PONZI_CORE_DEPLOY_KEY }}
           fetch-depth: 0   # ponzi-spec takes its version from its spec-v tags (CR-054)
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/ponzi-service
+          path: ponzi-service
+          ssh-key: ${{ secrets.PONZI_SERVICE_DEPLOY_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/ponzi-visual
+          path: ponzi-visual
+          ssh-key: ${{ secrets.PONZI_VISUAL_DEPLOY_KEY }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt -e ponzi-core/packages/spec
+      - run: pip install -r requirements.txt -e ../ponzi-core/packages/spec
+        working-directory: ponzi-suite
       - run: mkdocs build --strict
-        env:
-          PONZI_CORE: ${{ github.workspace }}/ponzi-core   # checked out inside the workspace above, not beside it
+        working-directory: ponzi-suite
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: ponzi-suite/site
   # publishes the site built above; only pushes to main, never pull requests
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
