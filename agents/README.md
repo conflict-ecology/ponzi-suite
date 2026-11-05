@@ -22,13 +22,7 @@ Claude Code resolves the path relative to the `CLAUDE.md` that contains it. With
 
 ## Skills
 
-Skills are packaged as the `ponzi-dev` plugin in `plugins/ponzi-dev/`, published through this repository's marketplace (`.claude-plugin/marketplace.json`). The shared `.claude/settings.json` in this repository registers the marketplace and enables the plugin, and each repository's `.claude` is a link to this one (kept out of git by `.git/info/exclude`), so nothing has to be installed by hand. Claude Code registers the marketplace once you trust the folder.
-
-To set up the links in a new checkout, from the folder holding the repositories:
-
-```
-for r in ponzi-core ponzi-service ponzi-visual; do ln -s ../ponzi-suite/.claude $r/.claude; echo .claude >> $r/.git/info/exclude; done
-```
+Skills are packaged as the `ponzi-dev` plugin in `plugins/ponzi-dev/`, published through this repository's marketplace (`.claude-plugin/marketplace.json`). The shared `.claude/settings.json` in this repository registers the marketplace and enables the plugin, and each repository's `.claude` is a link to this one (`../ponzi-suite/.claude`), committed in that repository, so nothing has to be installed by hand. Claude Code registers the marketplace once you trust the folder.
 
 | Skill | Use |
 | --- | --- |

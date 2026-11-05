@@ -3,7 +3,7 @@
 ## The data chain
 
 ```
-Sentinel-1 SLCs (ASF, CDSE)
+Sentinel-1 SLCs (ASF)
   → pair coherence per burst (ISCE3)            ponzi-pipeline
   → coherence store per burst (Zarr)            ponzi-pipeline
   → covariates sidecar (weather, built-up)      ponzi-pipeline
@@ -22,13 +22,84 @@ Models and calibrations are made by `ponzi-models` from panels: sets of pixels o
                      │ REST (the worker always asks; the server never calls out)
                 ponzi-worker  ── runs ──►  ponzi, ponzi-pipeline, ponzi-models
                      │
-                     └── locally, or through SLURM, or in a container
+                     └── locally, or through SLURM
 ```
 
 - **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It never imports the computing distributions.
-- **ponzi-worker** claims jobs from the server, runs the stages directly or through SLURM, keeps intermediate outputs in its own cache, and uploads only the final outputs.
+- **ponzi-worker** claims jobs from the server, runs the stages directly or through SLURM, keeps intermediate outputs in its own cache, and delivers only the final outputs: uploaded, or written into a folder the server also sees (set at the server's start).
 - **ponzi-client** (Python, and the `ponzi-client` command) is the only way to use the system from code. The front end has its own TypeScript client, generated from the server's committed OpenAPI document.
-- **ponzi-visual** shows bursts, watched areas and events on a map, and adds bursts to the watched areas.
+- **ponzi-visual** shows the watched areas and their outputs over time on a map, and makes new areas from an administrative boundary (or picked bursts), an orbit pass and a span.
+
+## Dependencies
+
+Which distribution needs which: solid arrows are install dependencies (`pyproject.toml`), dashed ones calls over the REST API at run time, dotted ones files read by path. `ponzi-models` and `ponzi-worker` also declare `ponzi` and `ponzi-spec` directly; the chart draws each dependency once.
+
+<div class="pz-figure" markdown="0">
+<svg viewBox="0 0 790 500" role="img" aria-label="The dependencies of the PONZI distributions: ponzi-spec at the base; ponzi, ponzi-pipeline and ponzi-models the computing toolkit; ponzi-worker installs them; ponzi-server and ponzi-client install ponzi-spec only; ponzi-visual calls the server over REST">
+<defs><marker id="pz-dep" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="pz-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<path class="pz-dep-line" d="M390,90 L390,158"/>
+<path class="pz-dep-line" d="M330,90 C330,180 230,190 210,258"/>
+<path class="pz-dep-line" d="M480,72 C540,90 560,140 600,158"/>
+<path class="pz-dep-line" d="M330,210 C300,230 250,235 230,258"/>
+<path class="pz-dep-line" d="M430,210 L430,348"/>
+<path class="pz-dep-line" d="M260,310 C280,330 300,330 320,348"/>
+<path class="pz-dep-line" d="M390,400 L390,438"/>
+<path class="pz-dep-line" d="M675,210 L675,438"/>
+<path class="pz-dep-line" d="M760,65 L775,65 L775,438"/>
+<path class="pz-dep-rest" d="M480,55 L588,55"/>
+<text class="pz-small" x="534" y="49" text-anchor="middle">REST</text>
+<path class="pz-dep-rest" d="M100,40 L100,18 L675,18 L675,38"/>
+<text class="pz-small" x="390" y="13" text-anchor="middle">REST, typed from the server's openapi.json</text>
+<path class="pz-dep-file" d="M300,185 L182,185"/>
+<text class="pz-small" x="241" y="179" text-anchor="middle">files by path</text>
+<rect class="pz-dep-vis" x="20" y="40" width="160" height="50" rx="7"/>
+<text class="pz-title" x="32" y="61">ponzi-visual</text>
+<text class="pz-small" x="32" y="78">map front end, TypeScript</text>
+<rect class="pz-dep-svc" x="300" y="40" width="180" height="50" rx="7"/>
+<text class="pz-title" x="312" y="61">ponzi-worker</text>
+<text class="pz-small" x="312" y="78">runs the stages</text>
+<rect class="pz-dep-svc" x="590" y="40" width="170" height="50" rx="7"/>
+<text class="pz-title" x="602" y="61">ponzi-server</text>
+<text class="pz-small" x="602" y="78">REST API, final outputs</text>
+<rect class="pz-dep-svc" x="590" y="160" width="170" height="50" rx="7"/>
+<text class="pz-title" x="602" y="181">ponzi-client</text>
+<text class="pz-small" x="602" y="198">Python client, httpx</text>
+<rect class="pz-dep-core" x="300" y="160" width="180" height="50" rx="7"/>
+<text class="pz-title" x="312" y="181">ponzi-models</text>
+<text class="pz-small" x="312" y="198">panels, training, registry</text>
+<rect class="pz-dep-suite" x="20" y="160" width="160" height="50" rx="7"/>
+<text class="pz-title" x="32" y="181">ponzi-suite</text>
+<text class="pz-small" x="32" y="198">panels, forecasters, configs</text>
+<rect class="pz-dep-core" x="110" y="260" width="180" height="50" rx="7"/>
+<text class="pz-title" x="122" y="281">ponzi-pipeline</text>
+<text class="pz-small" x="122" y="298">acquisition, ISCE3, onboard</text>
+<rect class="pz-dep-core" x="300" y="350" width="180" height="50" rx="7"/>
+<text class="pz-title" x="312" y="371">ponzi</text>
+<text class="pz-small" x="312" y="388">the algorithm</text>
+<rect class="pz-dep-core" x="20" y="440" width="757" height="44" rx="7"/>
+<text class="pz-title" x="34" y="460">ponzi-spec</text>
+<text class="pz-small" x="34" y="476">the shared schemas every Python part installs: REST models, STAC, content ids, manifests, stages, home, naming (pydantic, PyYAML only)</text>
+<rect class="pz-dep-core" x="560" y="280" width="16" height="12" rx="3"/>
+<text class="pz-small" x="584" y="290">ponzi-core</text>
+<rect class="pz-dep-svc" x="560" y="300" width="16" height="12" rx="3"/>
+<text class="pz-small" x="584" y="310">ponzi-service</text>
+<rect class="pz-dep-vis" x="560" y="320" width="16" height="12" rx="3"/>
+<text class="pz-small" x="584" y="330">ponzi-visual</text>
+<rect class="pz-dep-suite" x="560" y="340" width="16" height="12" rx="3"/>
+<text class="pz-small" x="584" y="350">ponzi-suite</text>
+<path class="pz-dep-line" d="M560,366 L576,366"/>
+<text class="pz-small" x="584" y="370">installs</text>
+<path class="pz-dep-rest" d="M560,386 L576,386"/>
+<text class="pz-small" x="584" y="390">calls at run time</text>
+<path class="pz-dep-file" d="M560,406 L576,406"/>
+<text class="pz-small" x="584" y="410">reads files by path</text>
+</svg>
+</div>
+
+- `ponzi-spec` is the one distribution every other part depends on, and it holds no computing code, so the server and the clients install it without the scientific stack.
+- Only the worker installs the computing distributions; the server never imports `ponzi`, `ponzi-pipeline` or `ponzi-models`.
+- ponzi-visual installs nothing of PONZI: its client is generated from the server's committed OpenAPI document (`npm run gen`).
+- Optional parts: `ponzi[tide]` and `ponzi-models[train]` add torch (the `ml` and `ml-gpu` environments); ISCE3 comes from conda-forge only, in the `isce3` environment, as version 0.25.22 in its CUDA 12.9 build ([Install](../guides/install.md)).
 
 ## What holds it together
 

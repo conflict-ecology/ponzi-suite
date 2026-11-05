@@ -6,7 +6,7 @@ Each installation (a laptop, a cluster account, a cloud deployment) has one `pon
 
 ```yaml
 roots:                          # plain paths or URIs: file://, s3://, gs://
-  data: /storage/ponzi/data     # required
+  data: /storage/ponzi/data     # default the PONZI home ($PONZI_HOME, else ~/.ponzi)
   cache: /storage/ponzi/cache   # default {data}/cache
   registry: s3://bucket/registry  # default {data}/registry
   scratch: /tmp/ponzi           # default {data}/tmp
@@ -35,7 +35,15 @@ Code never holds a hostname, a cluster path or a user name. A location is a `pat
 
 ## Secrets
 
-Keys and credentials (Earthdata, CDSE, the Copernicus CDS, wandb, the server key) are read from the environment or from the dotenv file `credentials.file` names, never from `ponzi.yaml`.
+Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are read from the environment or from the files their own tools read, never from `ponzi.yaml`. Earthdata, for the ASF downloads, comes from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or else from the `urs.earthdata.nasa.gov` entry of the netrc file (`$NETRC`, else `~/.netrc`). The CDS reads `~/.cdsapirc`. `credentials.file` names a dotenv file for them, but no command reads it yet.
+
+## The PONZI home
+
+Everything an installation computes lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). Its layout is fixed (`Layout`): `server/`, `keys/`, `standards/`, `outputs/`, `catalog/`, `cache/`, `registry/`, `panels/` and `downloads/` (`slc/`, `orbits/`, `dem/`). The server and the worker create it when they start. The repositories hold only code and the files PONZI runs from, so a home copied to another machine runs unchanged with the same repositories.
+
+## Composition
+
+Run configs, fit specs, recipes, standards, panel specs, and coherence and onboarding configs compose (`ponzi_spec.compose`). `extends:` names a file, or a list of files merged in order, relative to the file that writes it, at the top of a document or opening any mapping inside one. Mappings merge key by key; lists, values and null replace what the base had; the file's own keys win. A config is validated and hashed as composed, so a composed file and its flat equal have the same hash.
 
 ## Other configs
 

@@ -14,4 +14,5 @@
 - **Executors.**
     - `local` runs each job in the worker's process.
     - `slurm` runs one array per step, behind the approval gate ([Running on the cluster](../guides/hpc.md)).
-- **The loop** (`ponzi-worker serve`) claims jobs from the server, runs them, heartbeats meanwhile, uploads the final Items' assets (a store as a zip), and completes the job with the Items and their manifests.
+- **The home.** The worker's home is the deployment config's `roots.data` when that is a local path, else the PONZI home, so a worker on the server's machine shares the server's home. The cache defaults to `{home}/cache`. `ponzi-worker serve` downloads the OPERA burst map into the home when it starts (`--no-fetch` skips it), and a job's `burst_map`, `slc_dir`, `orbit_dir` and `dem_dir`, when unset, come from the home.
+- **The loop** (`ponzi-worker serve`) claims jobs from the server, runs them, heartbeats meanwhile, delivers the final Items' assets (a store as a zip) the way the lease says, and completes the job with the Items and their manifests. In `upload` mode it uploads them; in `path` mode it writes them itself to `<root>/<item_id>/<asset>`, a folder the server sees at the same path.

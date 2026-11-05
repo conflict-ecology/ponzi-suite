@@ -13,6 +13,7 @@ Checklists for agents that change PONZI's code. People follow the same rules in 
 
 - [ ] Imports follow the layering: `ponzi-spec` imports no ponzi distribution; `ponzi` does not import `ponzi_pipeline` or `ponzi_models`; the service and the front end import no computing distribution.
 - [ ] No hostnames, cluster paths or user names in code; paths through `pathlib` and `ponzi_spec.paths`.
+- [ ] No data in a code repository: the files PONZI runs from (panels, forecasters, run configs, test cases) go in ponzi-suite, and everything computed goes in the PONZI home (`~/.ponzi`, or `$PONZI_HOME`).
 - [ ] Every new function has a concise docstring.
 - [ ] Identity params (hashed) and request params (not hashed) are kept apart.
 - [ ] Golden files are never regenerated to make a test pass.

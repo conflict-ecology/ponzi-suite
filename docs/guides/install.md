@@ -1,15 +1,15 @@
 # Install
 
-Every distribution installs with pip from its repository. `<org>` is the GitHub owner of the repositories.
+Every distribution installs with pip from its repository, under the GitHub organisation `conflict-ecology`.
 
 | Distribution | Install | Notes |
 | --- | --- | --- |
-| `ponzi-spec` | `pip install "ponzi-spec @ git+https://github.com/<org>/ponzi-core@<tag>#subdirectory=packages/spec"` | pydantic and PyYAML only |
-| `ponzi` | `pip install "ponzi @ git+https://github.com/<org>/ponzi-core@<tag>#subdirectory=packages/core"` | add `[tide]` for the TiDE forecaster (torch), `[grid]` for geometry, `[stac]` for STAC Items of the stores (install `ponzi-spec` first: it is not on PyPI) |
-| `ponzi-pipeline` | `pip install "ponzi-pipeline @ git+https://github.com/<org>/ponzi-core@<tag>#subdirectory=packages/pipeline"` | after `ponzi`; add `[asf]` for discovery and downloads, `[dem]` for DEMs; the coherence chain and the onboarding |
-| `ponzi-models` | `pip install "ponzi-models @ git+https://github.com/<org>/ponzi-core@<tag>#subdirectory=packages/models"` | after `ponzi-spec`, `ponzi[grid]` and `ponzi-pipeline`; add `[train]` for the trainer (torch, wandb). Gives the command `ponzi-models` |
+| `ponzi-spec` | `pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/spec"` | pydantic and PyYAML only |
+| `ponzi` | `pip install "ponzi @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/core"` | after `ponzi-spec`, which it depends on (it is not on PyPI); add `[tide]` for the TiDE forecaster (torch), `[grid]` for geometry |
+| `ponzi-pipeline` | `pip install "ponzi-pipeline @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/pipeline"` | after `ponzi`; add `[asf]` for discovery and downloads, `[dem]` for DEMs; the coherence chain and the onboarding |
+| `ponzi-models` | `pip install "ponzi-models @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/models"` | after `ponzi-spec`, `ponzi[grid]` and `ponzi-pipeline`; add `[train]` for the trainer (torch, wandb). Gives the command `ponzi-models` |
 
-The other distributions follow the same form as they arrive (`packages/server`, `packages/worker`, `packages/client` in ponzi-service).
+The service's distributions install the same way from ponzi-service (`packages/server`, `packages/worker`, `packages/client`). They are at 0.1.0 and not yet released.
 
 ## Development environments
 

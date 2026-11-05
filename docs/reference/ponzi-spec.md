@@ -30,6 +30,26 @@ The shared schemas. Generated from the docstrings of the installed package.
 
 ::: ponzi_spec.paths
 
+## The PONZI home
+
+::: ponzi_spec.home
+
+## Composition
+
+::: ponzi_spec.compose
+
+## Naming
+
+::: ponzi_spec.naming
+
+## Panel definitions
+
+::: ponzi_spec.panel
+
+## Burst catalog
+
+::: ponzi_spec.catalog
+
 ## REST API models
 
 ::: ponzi_spec.api

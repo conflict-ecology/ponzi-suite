@@ -11,3 +11,5 @@
 - [Panels](panels.md): the pinned set of pixels models are trained and calibrated on.
 - [Grids](grids.md): native grids for processing, Major TOM cells for outputs.
 - [Coherence](coherence.md): how a burst's coherence store is made.
+- [The worker](worker.md): how workflows are planned, cached and run.
+- [The service](service.md): the server and its clients.

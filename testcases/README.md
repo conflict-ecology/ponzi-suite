@@ -9,7 +9,7 @@ path, and a file builds on another with `extends:` (`ponzi_spec.compose`).
       recipe.yaml      its detection recipe (ponzi.products.DetectionRecipe fields)
       area.yaml        where and when: aoi_id, geometry (WKT), burst_ids, event_start, event_end, source
       forecaster.yaml  its model's forecaster, when it has its own (ponzi_models.training.fit_spec)
-      run_config.yaml  its run config (C10), when there is one
+      run_config.yaml  its run config (C4), when there is one
       standard.yaml    its standard, when there is one
 
 Cases:

@@ -18,13 +18,13 @@ A stage's identity version (in its content ids) is separate: it is raised whenev
 
 ## What is locked
 
-- Golden files under `tests/data/` lock the numbers of the algorithm. Never regenerate one to make a test pass unless the change request says results change.
+- Golden files under `packages/core/tests/data/` lock the numbers of the algorithm. Never regenerate one to make a test pass unless the change request says results change.
 - The hashing rule of content ids is fixed by a test.
 - Each repository has a layering test: the import direction between distributions and subpackages, and no heavy import (torch, the geospatial stack) where it does not belong.
 
 ## Compatibility
 
-A standard names the minimum versions of the distributions it needs. The compatibility matrix (which `ponzi`, `ponzi-pipeline`, `ponzi-models` and API versions work together) is kept on this site as distributions are released.
+A standard names the minimum versions of the distributions it needs (`requires`); nothing checks them yet. The compatibility matrix (which `ponzi`, `ponzi-pipeline`, `ponzi-models` and API versions work together) is to be kept on this site as distributions are released; there is none yet.
 
 ## Style
 

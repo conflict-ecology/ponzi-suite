@@ -18,7 +18,7 @@ The rehearsal runs the functions of the real lifecycle on the synthetic world (`
 | Prepare, train, export | `training.prepare`, `train.train_fit(device="cpu")`, `export.export_fit` | `prepare`, `train` on `ceoas-gpu`, `export` |
 | Register | `register_model.register` | `register-model` |
 | Null | `null_runs.run_burst` on the test bursts, both layers | `null-runs` (an array job) |
-| Calibrate | `null_rows.collect`, `build.build`, `register_calibration.register` | `null-rows`, `calibrate`, `register-calibration` |
+| Calibrate | `null_rows.collect`, `build.build`, `register_calibration.register` | `null-rows`, `calibrate` (for staged runs, `calibrate-staged` on `null-runs --staged`), `register-calibration` |
 | Bundle | `Standard(...).check(registry)` | `check-standard` |
 
 Its registry (`<out>/registry`) and its standard (`<out>/standards/`) behave like real ones, and the worker runs them.
@@ -31,7 +31,7 @@ pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY --out 
     --set start_date=2025-01-01
 ```
 
-This writes the standard as the server runs it. The steps are:
+This writes the standard as the server runs it. `burst_map`, `slc_dir`, `orbit_dir` and `dem_dir` can be left out: a worker fills those it is not given from its PONZI home (`{home}/catalog/` and `{home}/downloads/`). The steps are:
 
 1. The coherence chain, either way:
     - `--source pipeline`: `discover`, `dem`, `coherence` (one job per pair), `assemble`;
@@ -43,6 +43,6 @@ This writes the standard as the server runs it. The steps are:
 6. `detect`.
 7. `tile`.
 
-Copy the file into the server's `standards` folder and restart the server. `ponzi-client standards` then lists it.
+Copy the file into the server's `standards` folder (`{home}/standards` by default) and restart the server. `ponzi-client standards` then lists it.
 
 The open work for the first real standard is on the [roadmap](../contributing/roadmap.md#phase-8b-the-first-standard).

@@ -29,4 +29,4 @@ steps:
   stage: {name: detect, version: '1'}
 ```
 
-The server serves it at `/v1/manifests/{content_id}` (from phase 7).
+The server serves it at `/v1/manifests/{content_id}`, as JSON, or as this yaml with `?format=yaml`.

@@ -7,8 +7,10 @@
     - A claim is atomic and leases only jobs whose stages the worker has.
     - A lease expires unless the worker heartbeats it, and a heartbeat may move the job to `running` or `awaiting_approval`.
     - An expired lease returns the job to the queue, and the job fails after its attempts.
-    - A completion of a done job is a no-op. A completion pointing at an asset that was never uploaded is refused.
-- **The scheduler** makes watched areas' jobs ([Watched areas](../guides/watched-areas.md)).
+    - A completion of a done job is a no-op. A completion pointing at an asset that was never uploaded (or, in `path` mode, at no file under the outputs root) is refused.
+- **Outputs.** The server's settings fix at startup how final assets reach it (`outputs: {mode, root}`), and every lease carries it. In `upload` mode (the default) the worker uploads them; in `path` mode the server and its workers see one folder at one path, the worker writes the files there itself, and uploads are refused. Either way the stored Item points at `/v1/assets/<item_id>/<asset>` on the server, and the outputs folder defaults to `{home}/outputs` (`{data}/assets` when the settings name `data` but no root).
+- **The catalogs.** The burst catalog and the administrative boundaries (World Bank Official Boundaries, levels 0 to 2) are downloaded and built into `{home}/catalog` on the first start, in the background. Until they are ready, their routes answer 503.
+- **The scheduler** makes watched areas' jobs ([Watched areas](../guides/watched-areas.md)). An area is given as bursts, or as a boundary with an orbit pass, from which the server picks the bursts of that pass meeting the boundary; `start_date` and `end_date` bound the days it watches.
 - **Keys** are scoped (`worker`, `client:read`, `client:write`, `admin`) and kept as hashes. Errors are RFC 9457 problems. The OpenAPI document is committed, and the TypeScript client is generated from it.
 
 **`ponzi-client`** (Python, and the `ponzi-client` command) is the only way agents reach the system. The front end reaches it the same way through its own TypeScript client, generated from the same OpenAPI document. See [The clients](../reference/clients.md).

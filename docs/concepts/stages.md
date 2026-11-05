@@ -16,20 +16,23 @@ An implementation is an object with a `spec` and a `run(inputs, params, request,
 
 ## The stages of the S1 workflow
 
-| Stage | From | To | Distribution |
+The stages ponzi-worker registers, each a thin adapter over the distribution named:
+
+| Stage | From | To | Over |
 | --- | --- | --- | --- |
-| `discover` | burst ids, span | `s1-slc` | ponzi-pipeline |
-| `pairs` | `s1-slc` | `ponzi-pairs` | ponzi-pipeline |
-| `acquire` | `s1-slc`, `s1-orbit` | local files in the worker cache | ponzi-pipeline |
-| `dem` | burst footprint | `ponzi-dem` | ponzi-pipeline |
-| `coherence` | SLCs, orbits, DEM, a pair | `ponzi-coherence-pair` | ponzi-pipeline |
-| `assemble` | pair coherence of a burst | `ponzi-coherence` | ponzi-pipeline |
-| `validate` | `ponzi-coherence` | a report | ponzi |
-| `onboard` | `ponzi-coherence` | `ponzi-sidecar`, `ponzi-sample` | ponzi-pipeline |
-| `run` | coherence, sidecar, model | `ponzi-run` | ponzi |
-| `pvalues` | `ponzi-run`, calibration | `ponzi-pvalues` | ponzi |
+| `discover` | a burst id and span (ASF search) | `ponzi-pairs`: the acquisitions and their pyramid pairs | ponzi-pipeline |
+| `dem` | the burst's box | `ponzi-dem` | ponzi-pipeline |
+| `coherence` | `ponzi-dem`, `ponzi-pairs` (one job per pair; it downloads the pair's SLCs and orbits) | `ponzi-coherence-pair` | ponzi-pipeline |
+| `assemble` | `ponzi-pairs`, `ponzi-coherence-pair` | `ponzi-coherence`, with the engine report | ponzi-pipeline |
+| `ingest-coherence` | a coherence store made elsewhere | `ponzi-coherence` | ponzi-worker |
+| `onboard` | `ponzi-coherence` | `ponzi-sidecar` | ponzi-pipeline |
+| `run` | `ponzi-coherence`, `ponzi-sidecar`; the model through the run config | `ponzi-run` | ponzi |
+| `ingest-calibration` | a calibration file | `ponzi-calibrations` | ponzi-worker |
+| `pvalues` | `ponzi-run`, `ponzi-calibrations` | `ponzi-pvalues` | ponzi |
 | `detect` | `ponzi-pvalues`, `ponzi-run` | `ponzi-events` | ponzi |
-| `tile` | `ponzi-events` | `ponzi-events-cell`, one per Major TOM cell | ponzi |
+| `tile` | `ponzi-pvalues`, `ponzi-run` | `ponzi-events-cell`, one per Major TOM cell | ponzi |
+
+`ponzi-pipeline`'s own commands split the chain further (`pairs` and `acquire` apart from `discover` and `coherence`, [Coherence](coherence.md)); `ponzi-worker stages` lists the stages installed.
 
 A workflow is an ordered list of stage references, named by a standard. To add a stage, see [A new stage](../contributing/new-stage.md).
 

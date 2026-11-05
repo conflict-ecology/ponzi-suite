@@ -12,6 +12,6 @@ The system is four repositories:
 | [ponzi-suite](https://github.com/conflict-ecology/ponzi-suite) | this site | documentation for people and agents, and the files PONZI runs from: panels, forecasters, run configs, test cases |
 
 !!! note "Status"
-    The system is being rebuilt as packages (the overhaul). Available now: `ponzi-spec` 0.1.0, the `ponzi` library (with STAC Items for its stores and models named by registry reference) `ponzi-pipeline` 0.2.0 (the coherence chain and the onboarding of a store) and `ponzi-models` 0.1.0 (panels, training, calibration, the registry, standards). Pages for the parts still to come say which phase brings them.
+    The system is being rebuilt as packages (the overhaul). Available now, in ponzi-core: `ponzi-spec` 0.4.0 (the shared schemas, the API models, the PONZI home, composable yaml, naming), the `ponzi` library (its version comes from ponzi-core's git tags, the latest `v0.2.4`), `ponzi-pipeline` 0.2.0 (the coherence chain and the onboarding of a store) and `ponzi-models` 0.3.0 (panels, training, calibration, the registry, standards). In ponzi-service, `ponzi-server`, `ponzi-worker` and `ponzi-client` are at 0.1.0, not yet released. What is left is on the [roadmap](contributing/roadmap.md).
 
 Start with [how PONZI works](concepts/workflows.md) and the [system overview](concepts/overview.md). Agents start at [For agents](agents/index.md).

@@ -7,7 +7,7 @@ pip install -r requirements.txt -e ../ponzi-core/packages/spec
 mkdocs serve
 ```
 
-Pages are under `docs/`. Content that comes from code (the collections table, the extension schema, the API reference) is generated at build time from the installed packages; do not copy it into pages.
+Pages are under `docs/`. Content that comes from code (the collections table, the extension schema, the API reference) is generated at build time from the installed packages; do not copy it into pages. ponzi-core's store contracts and change requests are published as pages from the ponzi-core checkout beside the suite (`$PONZI_CORE` overrides it; `hooks/ponzi.py`), never copied.
 
 ## Contributing
 
@@ -20,8 +20,10 @@ The suite also holds the files PONZI runs from, versioned here because ponzi-cor
 | Folder | What | Used by |
 | --- | --- | --- |
 | `panels/<id>/` | panel definitions: `panel.yaml` (version and the files' sha256), `bursts.geojson`, `cells.geojson`. The first is `majortom-global@0.4.0`. | `ponzi-models panel-check ../ponzi-suite/panels/majortom-global`; the rules are `ponzi_spec.panel` |
-| `forecasters/<forecaster>/` | what a model is trained as: `tide/weather.yaml` (the forecaster `tide-weather`) and its `candidates/`, named by the convention of `ponzi_spec.naming` | `ponzi-models train --spec ../ponzi-suite/forecasters/tide/candidates/fill-previous.yaml` |
+| `forecasters/<family>/` | what a model is trained as: `tide/weather.yaml` (the forecaster `tide-weather`) and its `candidates/`, named by the convention of `ponzi_spec.naming` | `ponzi-models train --spec ../ponzi-suite/forecasters/tide/candidates/fill-previous.yaml` |
 | `run_configs/` | run configs (contract C4) | `ponzi run --config ../ponzi-suite/run_configs/exp_b5h5_base.yaml` |
 | `testcases/<case>/` | test locations: an area, a recipe, its forecaster. The first is `gaza`. | `ponzi detect ... --recipe ../ponzi-suite/testcases/gaza/recipe.yaml` |
 
 Forecasters, panels and models are named by one convention, [docs/reference/naming.md](docs/reference/naming.md) (`ponzi_spec.naming`). ponzi-core's tests check these files (`test_panels.py`, `test_testcases.py`, `test_training_missing.py`, `test_suite_names.py`). They find the suite as `$PONZI_SUITE`, else `ponzi-suite/` beside ponzi-core.
+
+The instructions AI coding agents follow in every PONZI repository are in `agents/` (see `agents/README.md`); each repository's `CLAUDE.md` imports its file from there.

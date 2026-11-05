@@ -12,7 +12,7 @@ Every burst-level Item carries the ESA Sentinel-1 burst id and footprint. Watche
 
 ## Extensions
 
-Standard extensions wherever they fit: `sat`, `sar`, `proj`, `file` (size and checksum per asset), `processing`, `version`, `datacube` (Zarr dimensions), `mlm` (models), `label` (labels).
+Standard extensions wherever they fit. In use: `sat` (a burst's orbit, below) and `proj` (its grid). Planned, not yet written by any code: `sar`, `file` (size and checksum per asset), `processing`, `version`, `datacube` (Zarr dimensions), `mlm` (models), `label` (labels).
 
 ### A burst's orbit (`sat`)
 
