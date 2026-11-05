@@ -12,7 +12,8 @@ Each distribution has its own [SemVer](https://semver.org):
 - **MINOR**: a new opt-in capability; every existing config gives the same bytes.
 - **PATCH**: fixes and speed-ups shown bit-identical by the tests.
 - A change that alters numbers for an existing config is marked **RESULTS-CHANGING** and is at least MINOR.
-- Below 1.0, `0.y` counts as the major version: a calibration made with another `0.y` of `ponzi` is refused.
+- Below 1.0, `0.y` counts as the major version: a calibration made with another `0.y` of `ponzi` is refused, and every output a distribution computes gets a new content id.
+- Each distribution of ponzi-core takes its version from its own git tags: `vX.Y.Z` for `ponzi`, `spec-vX.Y.Z`, `pipeline-vX.Y.Z` and `models-vX.Y.Z` for the others (hatch-vcs, CR-054). An untagged commit carries the distance from the last tag and the commit, such as `0.2.5.dev3+gabc1234`.
 
 A stage's identity version (in its content ids) is separate: it is raised whenever the stage's output bytes may change, see [Content ids](../concepts/content-ids.md).
 
