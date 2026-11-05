@@ -40,6 +40,9 @@ Where PONZI keeps things on a machine, and the variables that move them. Secrets
     profiles/<site>.yaml                the current profile
     profiles/<site>-<version>.yaml      every version made
     snapshots/<site>/<YYYY-MM-DDTHHMMSS>/   the last 10 snapshots
+  logs/                                 every log PONZI writes to files (CR-064)
+    slurm/<batch>/<stage>_<job>_<task>.out   the output of each SLURM task of a batch
+    client/                             the client loop's own log, when it runs as a SLURM job
 ```
 
 A home records its own files by paths relative to itself, so a home copied to another machine runs unchanged with the same repositories.
@@ -52,7 +55,6 @@ A home records its own files by paths relative to itself, so a home copied to an
 | `~/.netrc` | Earthdata and Earth Data Hub logins | `NETRC` |
 | `~/.cdsapirc` | the Copernicus CDS key | the CDS client's own |
 | a server settings file | the server's database, outputs, burst catalog and boundaries; every field has a default under `$PONZI_HOME` | `ponzi-server serve --settings FILE` |
-| `{roots.data}/logs` | SLURM task logs on a cluster (the site file's `logs`) | the site file |
 | ponzi-suite (beside the code repositories) | panels, forecasters, run configs, standards, test cases: the files PONZI runs from | where it is checked out |
 | `<repo>/.pixi/envs/<env>` | the pixi environments of a checkout (`default`, `ml`, `ml-gpu`, `isce3`) | `pixi install` |
 

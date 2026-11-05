@@ -24,10 +24,18 @@ ponzi-worker batch BATCH            # how far it got: job records in the cache, 
 #SBATCH --partition=<partition> --account=<account>
 #SBATCH --cpus-per-task=1 --mem=2G
 #SBATCH --time=<the longest your partition allows>
-#SBATCH --output=%x_%j.out
 export PONZI_KEY_FILE=~/ponzi-worker.key          # a worker key (Authentication)
 ponzi-client serve --worker-id <name> -- --executor slurm --site <site>
 ```
+
+Submit it with its log in the home, beside the tasks' logs (`#SBATCH` lines do not expand variables, so the folder is given on the command line):
+
+```
+mkdir -p "$PONZI_HOME/logs/client"
+sbatch --output="$PONZI_HOME/logs/client/%x_%j.out" client.sbatch
+```
+
+On the login node instead, send its output to the same folder: `ponzi-client serve ... >> "$PONZI_HOME/logs/client/serve.log" 2>&1`.
 
 Before relying on it, check on your cluster:
 
@@ -39,6 +47,10 @@ Before relying on it, check on your cluster:
 Restarting is safe. When the loop's job ends (its time limit, a node failure, maintenance), the job it held returns to the server's queue once its lease expires; a restarted loop claims it again, finds every finished output in the cache, and does not submit a batch twice. To restart it automatically, use `scrontab` where the cluster enables it, or a cron entry on the login node that submits the job again when `squeue` no longer shows it.
 
 One loop carries out one job at a time. More loops, each with its own `--worker-id`, carry out jobs side by side.
+
+## Logs
+
+Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM task's output in `logs/slurm/<batch>/<stage>_<job>_<task>.out`, the folder made when the batch is rendered, and the client loop's in `logs/client/`. `batch.json` in `$PONZI_HOME/cache/slurm/<batch>/` names its log folder, and `ponzi-worker batch` reads the failed tasks from `sacct`. On a cluster, `$PONZI_HOME` is the home of the cluster's `ponzi.yaml` (`roots.data`), so the logs sit on the shared file system with the cache.
 
 ## How a batch is made
 
