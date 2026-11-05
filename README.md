@@ -21,7 +21,7 @@ The suite also holds the files PONZI runs from, versioned here because ponzi-cor
 | --- | --- | --- |
 | `panels/<id>/` | panel definitions: `panel.yaml` (version and the files' sha256), `bursts.geojson`, `cells.geojson`. The first is `majortom-global@0.4.0`. | `ponzi-models panel-check ../ponzi-suite/panels/majortom-global`; the rules are `ponzi_spec.panel` |
 | `forecasters/<family>/` | what a model is trained as: `tide/weather.yaml` (the forecaster `tide-weather`) and its `candidates/`, named by the convention of `ponzi_spec.naming` | `ponzi-models train --spec ../ponzi-suite/forecasters/tide/candidates/fill-previous.yaml` |
-| `run_configs/` | run configs (contract C4) | `ponzi run --config ../ponzi-suite/run_configs/exp_b5h5_base.yaml` |
+| `run_configs/` | run configs (contract C4) | `ponzi run --config ../ponzi-suite/run_configs/rolling-ols-pyramid.yaml` |
 | `testcases/<case>/` | test locations: an area, a recipe, its forecaster. The first is `gaza`. | `ponzi detect ... --recipe ../ponzi-suite/testcases/gaza/recipe.yaml` |
 | `standards/` | standard versions, `<id>-<version>.yaml`. The first is the draft `s1-general-1.0.0.yaml`. | `ponzi-models check-standard ../ponzi-suite/standards/s1-general-1.0.0.yaml` |
 

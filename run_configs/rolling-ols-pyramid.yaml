@@ -1,5 +1,6 @@
-# Generated from experiments.yaml by `ponzi-paper campaign`; do not edit directly.
-# The generator never deletes: drop a stale config by hand.
+# rolling-ols-pyramid: the reference run config. The rolling OLS forecaster, scored on the pyramid (baselines 12 to 60 days,
+# horizon 5). Named by ponzi_spec.naming (CR-058); formerly exp_b5h5_base, the monorepo's name. The name is a label
+# and is not part of the config hash.
 schema_version: 1
 context: {C: 30, min_support: 6}
 forecaster: {name: rolling_ols, params: {harmonic_order: 0, pooled: false}}
