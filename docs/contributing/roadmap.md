@@ -59,7 +59,7 @@ repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyram
 - [ ] **Submit the reference.** HPC, approval given.
     - Before submitting:
         - the overhauled ponzi-core is on the lab share, with `pixi install -e isce3`;
-        - Earthdata credentials are in `~/.config/ponzi/credentials.env`.
+        - Earthdata credentials come from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else from `~/.netrc` (CR-044).
         - No repeat_ccd checkout: the kit carries the five modules it calls, verbatim at `5250ac4` (`repeat_ccd_5250ac4/SOURCE.md`).
     - Commands, from the kit's folder on the login node:
       ```

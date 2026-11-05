@@ -11,7 +11,6 @@ roots:                          # plain paths or URIs: file://, s3://, gs://
   registry: s3://bucket/registry  # default {data}/registry
   scratch: /tmp/ponzi           # default {data}/tmp
 server: {url: https://ponzi.example.org, key_env: PONZI_KEY}
-credentials: {file: ~/.config/ponzi/credentials.env}
 cluster_profile: ceoas@2026.11  # workers on a SLURM cluster
 ```
 
@@ -23,7 +22,6 @@ cluster_profile: ceoas@2026.11  # workers on a SLURM cluster
 | --- | --- |
 | `PONZI_ROOTS__DATA`, `PONZI_ROOTS__CACHE`, ... | `roots.*` |
 | `PONZI_SERVER__URL`, `PONZI_SERVER__KEY_ENV` | `server.*` |
-| `PONZI_CREDENTIALS__FILE` | `credentials.file` |
 | `PONZI_CLUSTER_PROFILE` | `cluster_profile` |
 | `PONZI_DATA_ROOT`, `PONZI_MODEL_REGISTRY` | older aliases of `roots.data` and `roots.registry`, below the names above |
 
@@ -35,7 +33,7 @@ Code never holds a hostname, a cluster path or a user name. A location is a `pat
 
 ## Secrets
 
-Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are read from the environment or from the files their own tools read, never from `ponzi.yaml`. Earthdata, for the ASF downloads, comes from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or else from the `urs.earthdata.nasa.gov` entry of the netrc file (`$NETRC`, else `~/.netrc`). The CDS reads `~/.cdsapirc`. `credentials.file` names a dotenv file for them, but no command reads it yet.
+Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are read from the environment or from the files their own tools read, never from `ponzi.yaml`. Earthdata, for the ASF downloads, comes from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or else from the `urs.earthdata.nasa.gov` entry of the netrc file (`$NETRC`, else `~/.netrc`). The CDS reads `~/.cdsapirc`. The config has no credentials section: the former `credentials.file`, which no command read, is refused with this answer (CR-059).
 
 ## The PONZI home
 
