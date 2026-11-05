@@ -50,6 +50,12 @@ The shared schemas. Generated from the docstrings of the installed package.
 
 ::: ponzi_spec.catalog
 
+## Cluster profiles
+
+::: ponzi_spec.cluster
+
+::: ponzi_spec.cluster.create
+
 ## REST API models
 
 ::: ponzi_spec.api

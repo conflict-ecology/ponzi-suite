@@ -111,20 +111,22 @@ flowchart LR
   suite["ponzi-suite<br/>panels, forecasters,<br/>run configs, test cases"]
   visual["ponzi-visual<br/>map: boundaries, areas,<br/>outputs over time"]
   server[("ponzi-server<br/>areas, jobs, leases,<br/>final outputs")]
-  worker["ponzi-worker<br/>runs the stages,<br/>caches by content id"]
+  client["ponzi-client serve<br/>the long-running loop"]
+  worker["ponzi-worker job<br/>short calls: runs the stages,<br/>caches by content id"]
   home[("PONZI home<br/>~/.ponzi")]
   data[("ASF, Copernicus DEM,<br/>weather, GHSL")]
   visual -- "areas: boundary, orbit, days" --> server
   server -- "outputs, boundaries" --> visual
-  server -- "jobs (lease)" --> worker
-  worker -- "final assets: upload or shared path" --> server
+  server -- "jobs (lease)" --> client
+  client -- "one call per step" --> worker
+  client -- "final assets: upload or shared path" --> server
   data --> worker
   worker --- home
   server --- home
   suite -. "paths given to the commands" .-> worker
 ```
 
-The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. The worker claims a job, runs its workflow, and keeps every output in its cache by content id, so the same work is never done twice. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([The service](service.md), [The worker](worker.md)).
+The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([The service](service.md), [The worker](worker.md)).
 
 ## One burst under a standard
 

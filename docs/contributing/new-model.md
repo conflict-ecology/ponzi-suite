@@ -2,6 +2,8 @@
 
 From a fit spec to a model watched areas run, with the command `ponzi-models` (`ponzi-models --help` lists the stages).
 
+TiDE is the forecaster of the current models, and the steps below are written for a trained one like it. A different kind of forecaster is added first as a module of `ponzi.core.forecast` with one `register(name, cls, params)` call; it then follows the same steps (a rolling one skips training and export).
+
 1. **Change request**, with the evidence the model is meant to improve on.
 2. **Fit spec** in ponzi-suite `forecasters/<family>/` (a variant in `candidates/`, built on its base with `extends:`), named by the [naming convention](../reference/naming.md): window (context, horizon, baselines, quantile levels), covariate channels, sizes, optimiser, stopping, treatment of missing values, augmentation. Unknown keys are refused.
 3. **Panel**: a set of pixels of many bursts, defined by mask layers on full coherence stores. Its definition is kept in ponzi-suite `panels/<id>/` and checked with `ponzi-models panel-check`; `ponzi-models panel-build` builds it into `{home}/panels/<id>@<version>`. Training, calibration and production read the panel through the same opener, so a training window is byte for byte the window inference builds.

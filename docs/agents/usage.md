@@ -1,10 +1,26 @@
 # Using PONZI (agents)
 
-## The rule
+## Two modes
 
-Use PONZI only through `ponzi-client`: the Python package or its command line. Do not import `ponzi`, `ponzi_pipeline` or `ponzi_models`, do not read or write the server's storage or a worker's cache directly (both are in a PONZI home), and do not submit cluster jobs. Those are the worker's job, behind the server.
+Which one applies depends on whether a PONZI server is running for you:
 
-## What you can do
+| | Client mode | Local mode |
+| --- | --- | --- |
+| **When** | a server is running and you have its URL and a key | no server: PONZI is installed on this machine (a checkout of ponzi-core, and of ponzi-service for the worker) |
+| **Through** | `ponzi-client`, the Python package or its command line | the commands of ponzi-core (`ponzi`, `ponzi-pipeline`, `ponzi-models`) and `ponzi-worker run` |
+| **Results land** | on the server, found by search | in this machine's PONZI home (`{home}/cache`, [Paths](../reference/paths.md)) |
+
+Check first: `ponzi-client standards` answers in client mode; a connection error or no `server.url` means there is no server. When a server is running, use client mode, even on the server's own machine.
+
+## Client mode
+
+`ponzi-client` is a REST client, so it needs a running server: `--url` or `server.url` of `ponzi.yaml`, and a key in `PONZI_KEY` or the file `$PONZI_KEY_FILE` ([Authentication](../guides/authentication.md)). In this mode:
+
+- Do not import `ponzi`, `ponzi_pipeline` or `ponzi_models`; the server's workers compute.
+- Do not read or write the server's storage or a worker's cache directly (both are in a PONZI home).
+- Do not submit cluster jobs. Those are the worker's job, behind the server.
+
+### What you can do
 
 | Task | Client call (Python) | Command | Notes |
 | --- | --- | --- | --- |
@@ -20,9 +36,31 @@ Use PONZI only through `ponzi-client`: the Python package or its command line. D
 | Explain a result | `c.manifest(content_id)` | `ponzi-client manifest CID --yaml` | the provenance, see [Manifests](../concepts/manifests.md) |
 | Fetch a result's file | `c.download(item, "events", "out/")` | `ponzi-client download COLLECTION ID events out/` | a zipped store comes back unpacked |
 
+## Local mode
+
+With no server, PONZI runs on this machine from its own commands. Use a standard's workflow rather than calling the stages one by one where you can: it computes what a server's worker would, with the same content ids, in the local cache.
+
+| Task | Command | Notes |
+| --- | --- | --- |
+| See the stages | `ponzi-worker stages` | the stages installed, with their inputs and params |
+| Run a workflow on bursts | `ponzi-worker run WORKFLOW.yaml --each burst=t028_058198_iw3,... --set start_date=... --set end_date=...` | locally by default; a standard's workflow comes from `ponzi-models standard-workflow`; outputs are cached by content id, so a second run reuses them |
+| Try it without computing | `ponzi-worker run WORKFLOW.yaml ... --dry-run` | the jobs and which are already cached |
+| Explain a result | `ponzi-worker manifest CONTENT_ID --json` | the provenance from the local cache |
+| One step of the data chain | `ponzi-pipeline discover`, `acquire`, `dem`, `coherence`, `assemble`, `onboard` | `ponzi-pipeline` with no argument lists them; `acquire` needs Earthdata ([Authentication](../guides/authentication.md)) |
+| A forecast run on a store | `ponzi run ...` | needs a run config of a registered model; `ponzi --help` lists the commands |
+| Check or rehearse a standard | `ponzi-models check-standard FILE`, `ponzi-models rehearse --out DIR` | the rehearsal is synthetic and runs on the CPU in seconds |
+| Look up a burst or a boundary | the burst catalog in `{home}/catalog/bursts.sqlite3` | read only |
+
+In local mode:
+
+- Work only in this machine's PONZI home and in a scratch folder; do not edit the files of ponzi-suite (panels, forecasters, run configs, standards) to make a run go.
+- Do not use `--executor slurm` or `sbatch` yourself: an agent submits cluster work only by asking for it through a server in client mode, or with the owner's approval.
+- Do not train, export or register models, or file calibrations, unless the owner asks: they change the registry every later run reads.
+- Downloads (`acquire`, the weather) are large and count against the owner's quotas: say how many acquisitions a run will fetch before starting it, and use `--dry-run` first.
+
 ## Rules of thumb
 
 - Identify results by content id, not by path; paths differ between installations.
 - Before submitting, search: an identical request costs nothing the second time, but it is still a request.
-- A run needs a standard; do not compose configs yourself.
+- A run needs a standard; do not compose configs yourself (in either mode).
 - Report a failure with the job id and the `Problem` body the server returned.

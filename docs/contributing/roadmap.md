@@ -12,7 +12,7 @@ Pick an open item, read the pages it links to, and follow the [change process](p
 
 !!! warning "Before you take an HPC item"
     - Nothing is submitted to a cluster without the owner's approval.
-    - Scripts are rendered and shown first: `ponzi-worker run --executor slurm` renders them, and `ponzi-worker approve` shows the job count, runtime and resources, then asks.
+    - Render and show the scripts first: `ponzi-worker run --executor slurm --dry-run` gives the job count, runtime and resources without submitting.
     - Never submit from a machine outside the cluster or from a CI runner.
 
 !!! note "Before you take any item"
@@ -73,23 +73,22 @@ repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyram
 
 ## Phase 8: the SLURM executor
 
-- [x] The cluster profile (`ceoas`), the script template, batches with dependencies, the approval gate, status from the cache and `sacct`, and `serve --executor slurm`.
+- [x] The cluster profile (`ceoas`), the script template, batches with dependencies, status from the cache and `sacct`, and the SLURM route of `ponzi-worker job` under `ponzi-client serve` (CR-063).
     - The rendered scripts match the 12 reference scripts (`test_slurm.py`).
     - A fake `sbatch` runs them locally, and the result equals the direct calls.
 - [x] The release environments `default`, `ml`, `ml-gpu` and `isce3` in ponzi-service's `pixi.toml`.
 - [ ] **Install a ponzi-service release on the lab share.** HPC, owner.
     - Tag ponzi-core and ponzi-service. Check both out under `$LAB/ponzi-service-releases/<release>/` (ponzi-core beside it), then run `pixi install` for each of the four environments.
     - Done when the site file's `release` names it, a new snapshot's `releases.txt` lists it (the profile then has no release warning), and `ponzi-worker stages` runs with each environment's Python.
-- [ ] **First approved worker batch.** HPC, owner.
-    - Render one burst of the rehearsal standard with `ponzi-worker run ... --executor slurm`, approve it, and watch it with `ponzi-worker batch`.
+- [ ] **First worker batch.** HPC, owner.
+    - Run one burst of the rehearsal standard with `ponzi-worker run ... --executor slurm` (after a `--dry-run`), and watch it with `ponzi-worker batch`.
     - Done when the batch's job records are in the shared cache and the outputs equal a local run of the same workflow.
-- [x] Profiles are made from a snapshot of the cluster and a site file. The worker makes its own when it starts with `--executor slurm` and saves it under `~/.config/ponzi-service/`. The shipped `ceoas@2026.10.27` is made from the snapshot of that day.
+- [x] Profiles are made from a snapshot of the cluster and a site file. The worker makes its own when it starts with `--executor slurm` and saves it in its home, `{home}/cluster/` (CR-061: the code is `ponzi_spec.cluster`, in ponzi-core). The shipped `ceoas@2026.10.27` is made from the snapshot of that day.
 - [ ] **Measure the stages not measured yet.** HPC.
     - These are `ingest-*`, `onboard`, `run`, `pvalues`, `detect`, `tile`, `discover`, `dem` and `assemble`.
-    - After the first batches, restart the worker: its new snapshot holds the completed `ponzi-<stage>` jobs, and those stages take their memory and walltime from them.
+    - After the first batches, run `ponzi-worker profile --site ceoas`: its new snapshot holds the completed `ponzi-<stage>` jobs, and those stages take their memory and walltime from them.
     - Done when every stage's resources come from a measurement.
-- [ ] **Decide whether watched-area batches need approval each time.** Owner.
-    - Today every batch stops for approval. That includes a watched area's daily update, which comes in several batches: the per-pair coherence jobs are known only once discovery ran.
+- [x] Watched-area batches need no approval (owner, 2026-11-05, CR-062): the worker submits what it claims; the work is authorised by the request or area made through the client.
 
 ## Phase 8b: the first standard
 
@@ -219,4 +218,3 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 | D12 | Raster display | a `visual` COG per events Item, in-browser first |
 | D13 | Where the registry lives | served by ponzi-server from its storage; the worker caches artifacts by digest |
 | new | The default platforms | S1A only until S1C's series is long enough |
-| new | Standing approval for watched-area batches | approval per batch until the first month of updates has been watched |

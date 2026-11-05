@@ -85,6 +85,7 @@ nav:
       - guides/index.md
       - Quickstart: guides/quickstart.md
       - Install: guides/install.md
+      - Authentication: guides/authentication.md
       - Making a standard: guides/standards.md
       - Watched areas: guides/watched-areas.md
       - Running on the cluster: guides/hpc.md
@@ -103,6 +104,8 @@ nav:
       - Store contracts: reference/contracts.md
       - Naming: reference/naming.md
       - The clients: reference/clients.md
+      - Paths and environment variables: reference/paths.md
+      - References: reference/references.md
   - Contributing:
       - contributing/index.md
       - Roadmap: contributing/roadmap.md

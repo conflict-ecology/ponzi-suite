@@ -1,13 +1,15 @@
 # Running on the cluster (SLURM)
 
-The worker renders SLURM job scripts from a **cluster profile**: versioned data, `ponzi_worker/profiles/ceoas.yaml`. A profile holds the partitions, the Python of each environment of a ponzi-service release, the scratch redirects, and the resources of each stage. Nothing is submitted without approval.
+The worker renders SLURM job scripts from a **cluster profile**: versioned data, made by ponzi-core's `ponzi_spec.cluster` (shipped: `ponzi_spec/cluster/profiles/ceoas.yaml`). A profile holds the partitions, the Python of each environment of a ponzi-service release, the scratch redirects, and the resources of each stage.
+
+Work is asked for through the server, by a request or a watched area made with ponzi-client (or ponzi-visual). `ponzi-client serve` claims it; that loop is the only long-running process, on the login node or wherever the server can be reached. For each job it calls `ponzi-worker job`, a short command that renders the job's next batch and submits it, or checks the batch already running, and exits. The SLURM tasks invoke the core commands; when the last is done the client delivers the outputs (CR-062, CR-063).
 
 ```
-ponzi-worker run WORKFLOW.yaml --executor slurm --each burst=t028_058198_iw3,t028_058199_iw3 --print-scripts
+ponzi-client serve --worker-id login -- --executor slurm --site ceoas   # the loop: claims jobs, calls ponzi-worker job
+ponzi-worker run WORKFLOW.yaml --executor slurm --each burst=t028_058198_iw3,t028_058199_iw3   # one workflow, no server
+ponzi-worker run WORKFLOW.yaml --executor slurm ... --dry-run --print-scripts   # render and show; submit nothing
 # (on a machine without SLURM, add --profile ceoas to render with the shipped profile)
-ponzi-worker approve BATCH          # the arrays, tasks, resources, cpu-hours and walltime; then asks
 ponzi-worker batch BATCH            # how far it got: job records in the cache, failures from sacct
-ponzi-worker serve --worker-id login --executor slurm   # jobs from the server; each batch waits for approval
 ```
 
 ## How a batch is made
@@ -15,27 +17,27 @@ ponzi-worker serve --worker-id login --executor slurm   # jobs from the server; 
 - **Arrays.** Each step of the workflows becomes one array job, with one task per job that isn't cached. A job shared by several workflows, such as one calibration's ingest, is one task.
 - **Dependencies.** Each array runs `afterok` the arrays it reads from.
 - **Tasks.** Each task runs `python -m ponzi_worker.node` against the shared cache, under the job's lock. It writes the same records as the local executor.
-- **Later steps.** A step known only once others ran waits for the next batch, which needs its own approval. That covers the per-pair coherence jobs after discovery, and anything after `tile`.
+- **Later steps.** A step known only once others ran waits for the next batch, which the worker renders and submits when the one before is done. That covers the per-pair coherence jobs after discovery, and anything after `tile`.
 
 ## The profile
 
 A profile is made, not written by hand, from two inputs:
 
 - **A snapshot of the cluster**: read-only SLURM queries of the partitions, the nodes with their cpus, memory, GPUs and state, your accounts, the limits, and your recent jobs.
-- **A site file**, shipped in the worker as `profiles/sites/<site>.yaml`. It holds what a snapshot cannot say: the roots, the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
+- **A site file**, shipped in ponzi-spec as `ponzi_spec/cluster/sites/<site>.yaml`, or any file given to `--site`. It holds what a snapshot cannot say: the roots, the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
 
-The worker makes its profile when it starts. `serve` and `run` with `--executor slurm` and no `--profile` take the snapshot on the login node, make the profile of `--site` (default `ceoas`), and save both under `~/.config/ponzi-service/` (`$XDG_CONFIG_HOME/ponzi-service/` when that is set):
+The worker uses the site's current profile and makes one when there is none. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `{home}/cluster/profiles/<site>.yaml` (`--site`, default `ceoas`); with none, they take the snapshot on the login node, make the profile, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `ponzi-worker profile --site ceoas` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `roots.data` of the cluster's `ponzi.yaml`, typically the shared scratch root; with no `roots.data` it is `$PONZI_HOME`, else `~/.ponzi` in your cluster home folder. The `roots` of the site file are where the SLURM jobs work and do not choose this folder:
 
 ```
-~/.config/ponzi-service/
+{home}/cluster/
   profiles/ceoas.yaml                    the current profile
   profiles/ceoas-<version>.yaml          every version made
   snapshots/ceoas/<YYYY-MM-DDTHHMMSS>/   the last 10 snapshots
 ```
 
-A restart on an unchanged cluster keeps the current version, so batches waiting for approval keep their ids. A changed cluster, such as a node going down, gives a new version named by the day (`2026.11.05`, then `2026.11.05.2`). `--profile NAME|FILE` uses a given profile instead.
+Remaking the profile of an unchanged cluster keeps its version, so a batch already rendered keeps its id and is not submitted twice. A changed cluster, such as a node going down, gives a new version named by the day (`2026.11.05`, then `2026.11.05.2`). `--profile NAME|FILE` uses a given profile instead.
 
-By hand, `bash snapshot.sh ceoas` (in ponzi-service's `packages/worker/reference/clusters/`) takes the same snapshot on the login node, and `ponzi-worker profile --snapshot DIR --site ceoas --out FILE` makes the profile from it anywhere.
+By hand, `bash snapshot.sh ceoas` (in ponzi-core's `packages/spec/src/ponzi_spec/cluster/`) takes the same snapshot on the login node, and `ponzi-worker profile --snapshot DIR --site ceoas --out FILE` makes the profile from it anywhere; `python -m ponzi_spec.cluster.create` does the same without the worker.
 
 From the snapshot, the profile takes:
 

@@ -5,7 +5,7 @@ Every distribution installs with pip from its repository, under the GitHub organ
 | Distribution | Install | Notes |
 | --- | --- | --- |
 | `ponzi-spec` | `pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/spec"` | pydantic and PyYAML only |
-| `ponzi` | `pip install "ponzi @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/core"` | after `ponzi-spec`, which it depends on (it is not on PyPI); add `[tide]` for the TiDE forecaster (torch), `[grid]` for geometry |
+| `ponzi` | `pip install "ponzi @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/core"` | after `ponzi-spec`, which it depends on (it is not on PyPI); add `[tide]` for the TiDE forecaster, the current one (torch), `[grid]` for geometry |
 | `ponzi-pipeline` | `pip install "ponzi-pipeline @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/pipeline"` | after `ponzi`; add `[asf]` for discovery and downloads, `[dem]` for DEMs; the coherence chain and the onboarding |
 | `ponzi-models` | `pip install "ponzi-models @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/models"` | after `ponzi-spec`, `ponzi[grid]` and `ponzi-pipeline`; add `[train]` for the trainer (torch, wandb). Gives the command `ponzi-models` |
 
@@ -29,6 +29,10 @@ The `isce3` environment requires ISCE3's CUDA build at one version: `isce3 = { v
 ```
 pixi run -e isce3 python -c "import isce3.cuda.core as c; print(c.get_device_count())"
 ```
+
+## Credentials
+
+Downloads, weather and the server each need a login before anything runs: see [Authentication](authentication.md).
 
 ## Checking an install
 

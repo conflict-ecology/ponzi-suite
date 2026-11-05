@@ -33,11 +33,11 @@ Code never holds a hostname, a cluster path or a user name. A location is a `pat
 
 ## Secrets
 
-Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are read from the environment or from the files their own tools read, never from `ponzi.yaml`. Earthdata, for the ASF downloads, comes from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or else from the `urs.earthdata.nasa.gov` entry of the netrc file (`$NETRC`, else `~/.netrc`). The CDS reads `~/.cdsapirc`. The config has no credentials section: the former `credentials.file`, which no command read, is refused with this answer (CR-059).
+Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are read from the environment or from the files their own tools read, never from `ponzi.yaml`. Earthdata, for the ASF downloads, comes from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or else from the `urs.earthdata.nasa.gov` entry of the netrc file (`$NETRC`, else `~/.netrc`). The CDS reads `~/.cdsapirc`. The config has no credentials section: the former `credentials.file`, which no command read, is refused with this answer (CR-059). [Authentication](../guides/authentication.md) says what each credential is for and where it goes.
 
 ## The PONZI home
 
-Everything an installation computes lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). Its layout is fixed (`Layout`): `server/`, `keys/`, `standards/`, `outputs/`, `catalog/`, `cache/`, `registry/`, `panels/` and `downloads/` (`slc/`, `orbits/`, `dem/`). The server and the worker create it when they start. The repositories hold only code and the files PONZI runs from, so a home copied to another machine runs unchanged with the same repositories.
+Everything an installation computes lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). These docs write it `{home}`. A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path; `roots.data` itself defaults to the PONZI home, so without a config `{home}` is `~/.ponzi` for the worker too ([The worker](worker.md)). Its full structure and every environment variable are in [Paths and environment variables](../reference/paths.md). Its layout is fixed (`Layout`): `server/`, `keys/`, `standards/`, `outputs/`, `catalog/`, `cache/`, `registry/`, `panels/`, `downloads/` (`slc/`, `orbits/`, `dem/`) and `cluster/` (the SLURM profiles a worker makes, CR-061). The server and the worker create it when they start. The repositories hold only code and the files PONZI runs from, so a home copied to another machine runs unchanged with the same repositories.
 
 ## Composition
 

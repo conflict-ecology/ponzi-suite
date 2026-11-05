@@ -19,7 +19,7 @@ c.manifest(items[0].properties["ponzi:content_id"])
 c.download(items[0], "events", "out/")               # a zipped store comes back unpacked
 ```
 
-Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the server's problem. The worker's own calls are `claim`, `heartbeat`, `upload`, `complete` and `fail`.
+Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the server's problem. The loop's calls are `claim`, `heartbeat`, `upload`, `complete` and `fail`, made by `ponzi-client serve` (`ponzi_client.serve`) with a `worker` key.
 
 ## The command line: `ponzi-client`
 

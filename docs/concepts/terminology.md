@@ -69,7 +69,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
-| **forecaster** | a kind of forecasting method, the code that predicts coherence (`tide`, `rolling_ols`) | a model |
+| **forecaster** | a kind of forecasting method, the code that predicts coherence (`tide`, `rolling_ols`, `stored`, `external`); TiDE is the current one, and others can be registered | a model |
 | **fit spec** | a forecaster file: everything one training fixes (C, H, inputs, missing values, augmentation, seed) | a run config |
 | **candidate** | a fit spec being compared with the base (`candidates/`), not a registered model | |
 | **fit** | one training of a fit spec on a panel; `-seed43` for another seed | |
@@ -84,7 +84,7 @@ Each step makes the next thing from the one before, with one command:
 
 | Step | Command | Makes | Example |
 | --- | --- | --- | --- |
-| 1. Choose a forecaster | | the kind of method | `tide`, the TiDE neural network (`ponzi.core.forecast`) |
+| 1. Choose a forecaster | | the kind of method | `tide`, the TiDE neural network, the current one (`ponzi.core.forecast`) |
 | 2. Write a fit spec | | what one training fixes: context, horizon, inputs, missing values, augmentation, seed | `forecasters/tide/weather.yaml`, named `tide-weather` |
 | 3. Train | `ponzi-models train` | a **fit**: the trained weights of the spec on a panel, as a checkpoint | `tide-weather`, or `tide-weather-seed43` at another seed |
 | 4. Export | `ponzi-models export` | an **artifact**: the fit as self-contained TorchScript with its `meta.json` (window layout, channels, scalers, missing values) | a `torchscript/` folder; inference needs nothing else |
@@ -120,11 +120,11 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
 | **server** | keeps the areas, requests, jobs and final outputs; computes nothing | the worker |
-| **worker** | claims jobs, runs their stages, saves the outputs | |
-| **client** | the Python `ponzi-client`, or ponzi-visual in the browser | |
+| **worker** | `ponzi-worker job`: one short call on one job, run by the client loop; runs the stages or their SLURM jobs, keeps the outputs in its cache | the client loop |
+| **client** | the Python `ponzi-client`, or ponzi-visual in the browser; `ponzi-client serve` is the client loop, the only long-running process | |
 | **request** | a one-off run of bursts under a standard | an area (which keeps making jobs) |
 | **job** | one unit the server hands out: a workflow for one burst and span | a run |
-| **lease** | a worker's hold on a job, renewed by heartbeats | |
+| **lease** | the client loop's hold on a job, renewed by heartbeats | |
 | **home** | the folder everything computed lives in, `~/.ponzi` or `$PONZI_HOME` | a repository |
 | **cache** | the worker's store of outputs by content id, `{home}/cache` | |
 | **Item**, **collection**, **asset** | a STAC record of one output, its kind (`ponzi-run`), and one of its files ([STAC profile](stac-profile.md)) | |
