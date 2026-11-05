@@ -21,6 +21,14 @@ The rehearsal runs the functions of the real lifecycle on the synthetic world (`
 | Calibrate | `null_rows.collect`, `build.build`, `register_calibration.register` | `null-rows`, `calibrate` (for staged runs, `calibrate-staged` on `null-runs --staged`), `register-calibration` |
 | Bundle | `Standard(...).check(registry)` | `check-standard` |
 
+The checks of a standard (ponzi-core CR-055):
+
+- **The registry:** the model, its weights by reference, its run config, and the calibrations, each made for that run config on the standard's `panel`. The model was trained on that panel.
+- **The panel:** with the built panel in the home, no training or validation cell of the model is a test cell of the panel, the calibrations' null.
+- **`requires`:** the installed distributions meet it. A worker also refuses a job of a standard whose `requires` its own versions do not meet.
+- **The version before it:** `check-standard` finds the previous version beside the file. Within a major, nothing that changes the runs may change (workflow, coherence and onboarding configs, panel, model, run config). Within a minor, only the description and `requires`.
+- **Drafts:** a draft (`status: draft`) is checked for its form only, and `standard-workflow` refuses it. The first standard, ponzi-suite `standards/s1-general-1.0.0.yaml`, is a draft.
+
 Its registry (`<out>/registry`) and its standard (`<out>/standards/`) behave like real ones, and the worker runs them.
 
 ## From bundle to server

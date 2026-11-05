@@ -23,6 +23,7 @@ The suite also holds the files PONZI runs from, versioned here because ponzi-cor
 | `forecasters/<family>/` | what a model is trained as: `tide/weather.yaml` (the forecaster `tide-weather`) and its `candidates/`, named by the convention of `ponzi_spec.naming` | `ponzi-models train --spec ../ponzi-suite/forecasters/tide/candidates/fill-previous.yaml` |
 | `run_configs/` | run configs (contract C4) | `ponzi run --config ../ponzi-suite/run_configs/exp_b5h5_base.yaml` |
 | `testcases/<case>/` | test locations: an area, a recipe, its forecaster. The first is `gaza`. | `ponzi detect ... --recipe ../ponzi-suite/testcases/gaza/recipe.yaml` |
+| `standards/` | standard versions, `<id>-<version>.yaml`. The first is the draft `s1-general-1.0.0.yaml`. | `ponzi-models check-standard ../ponzi-suite/standards/s1-general-1.0.0.yaml` |
 
 Forecasters, panels and models are named by one convention, [docs/reference/naming.md](docs/reference/naming.md) (`ponzi_spec.naming`). ponzi-core's tests check these files (`test_panels.py`, `test_testcases.py`, `test_training_missing.py`, `test_suite_names.py`). They find the suite as `$PONZI_SUITE`, else `ponzi-suite/` beside ponzi-core.
 

@@ -136,12 +136,11 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - repeat_ccd's CDSE search and downloads, not yet ported. Done when `discover` and `coherence` can take CDSE as the source.
 - [ ] **Publish `s1-general@1.0.0`.** Owner.
     - Steps: `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`{home}/standards` by default).
-- [ ] **Enforce a standard's `requires`.** laptop.
-    - A standard names the minimum versions it needs (`requires`), but nothing checks them.
-- [ ] **A standard names its panel.** laptop.
-    - A calibration is meaningful only with the panel whose test split made its null, and a standard does not say which panel that is.
-- [ ] **Library versions in content ids.** laptop.
-    - A content id holds the stage's identity version, not the versions of the libraries that ran it.
+    - The draft is ponzi-suite `standards/s1-general-1.0.0.yaml` (CR-055); it waits for its model and calibrations.
+- [x] **Enforce a standard's `requires`.** `check-standard` and the worker check it (CR-055).
+- [x] **A standard names its panel.** The model and the calibrations must match it; no training cell may be a test cell (CR-055).
+- [x] **Versions are held against the one before.** Within a major the runs may not change, within a minor the outputs (CR-055).
+- [x] **Library versions in content ids.** The majors of the code that computes a stage (CR-054).
 
 ## Phase 9: watched areas
 
