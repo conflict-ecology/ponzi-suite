@@ -54,10 +54,10 @@ A profile is made, not written by hand, from two inputs:
 - **A snapshot of the cluster**: read-only SLURM queries of the partitions, the nodes with their cpus, memory, GPUs and state, your accounts, the limits, and your recent jobs.
 - **A site file**, shipped in ponzi-spec as `ponzi_spec/cluster/sites/<site>.yaml`, or any file given to `--site`. It holds what a snapshot cannot say: the roots, the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
 
-The worker uses the site's current profile and makes one when there is none. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `{home}/cluster/profiles/<site>.yaml` (`--site`, default `ceoas`); with none, they take the snapshot on the login node, make the profile, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `ponzi-worker profile --site ceoas` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `roots.data` of the cluster's `ponzi.yaml`, typically the shared scratch root; with no `roots.data` it is `$PONZI_HOME`, else `~/.ponzi` in your cluster home folder. The `roots` of the site file are where the SLURM jobs work and do not choose this folder:
+The worker uses the site's current profile and makes one when there is none. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml` (`--site`, default `ceoas`); with none, they take the snapshot on the login node, make the profile, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `ponzi-worker profile --site ceoas` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `roots.data` of the cluster's `ponzi.yaml`, typically the shared scratch root; with no `roots.data` it is `$PONZI_HOME`, else `~/.ponzi` in your cluster home folder. The `roots` of the site file are where the SLURM jobs work and do not choose this folder:
 
 ```
-{home}/cluster/
+$PONZI_HOME/cluster/
   profiles/ceoas.yaml                    the current profile
   profiles/ceoas-<version>.yaml          every version made
   snapshots/ceoas/<YYYY-MM-DDTHHMMSS>/   the last 10 snapshots

@@ -8,7 +8,7 @@ Which one applies depends on whether a PONZI server is running for you:
 | --- | --- | --- |
 | **When** | a server is running and you have its URL and a key | no server: PONZI is installed on this machine (a checkout of ponzi-core, and of ponzi-service for the worker) |
 | **Through** | `ponzi-client`, the Python package or its command line | the commands of ponzi-core (`ponzi`, `ponzi-pipeline`, `ponzi-models`) and `ponzi-worker run` |
-| **Results land** | on the server, found by search | in this machine's PONZI home (`{home}/cache`, [Paths](../reference/paths.md)) |
+| **Results land** | on the server, found by search | in this machine's PONZI home (`$PONZI_HOME/cache`, [Paths](../reference/paths.md)) |
 
 Check first: `ponzi-client standards` answers in client mode; a connection error or no `server.url` means there is no server. When a server is running, use client mode, even on the server's own machine.
 
@@ -49,7 +49,7 @@ With no server, PONZI runs on this machine from its own commands. Use a standard
 | One step of the data chain | `ponzi-pipeline discover`, `acquire`, `dem`, `coherence`, `assemble`, `onboard` | `ponzi-pipeline` with no argument lists them; `acquire` needs Earthdata ([Authentication](../guides/authentication.md)) |
 | A forecast run on a store | `ponzi run ...` | needs a run config of a registered model; `ponzi --help` lists the commands |
 | Check or rehearse a standard | `ponzi-models check-standard FILE`, `ponzi-models rehearse --out DIR` | the rehearsal is synthetic and runs on the CPU in seconds |
-| Look up a burst or a boundary | the burst catalog in `{home}/catalog/bursts.sqlite3` | read only |
+| Look up a burst or a boundary | the burst catalog in `$PONZI_HOME/catalog/bursts.sqlite3` | read only |
 
 In local mode:
 

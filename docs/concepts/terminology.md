@@ -76,7 +76,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **artifact** | the exported fit of a trained forecaster: for TiDE, the default, a TorchScript folder with its `meta.json` | a model (the artifact plus its registry entry) |
 | **model** | a registered artifact with its run config and model card, `tide-weather--majortom-global-0.4.0` | a forecaster |
 | **run config** | how a model is run: C, H, scoring, aggregation, state machine (C4); its hash is fixed when the model is registered | a run request (C4a: paths, dates and options of one run) |
-| **registry** | the folder of models and their calibrations, `{home}/registry` | the server's database |
+| **registry** | the folder of models and their calibrations, `$PONZI_HOME/registry` | the server's database |
 
 ### From forecaster to model, step by step
 
@@ -88,7 +88,7 @@ Each step makes the next thing from the one before, with one command. The exampl
 | 2. Write a fit spec | | what one training fixes: context, horizon, inputs, missing values, augmentation, seed | `forecasters/tide/weather.yaml`, named `tide-weather` |
 | 3. Train | `ponzi-models train` | a **fit**: the trained weights of the spec on a panel, as a checkpoint | `tide-weather`, or `tide-weather-seed43` at another seed |
 | 4. Export | `ponzi-models export` | an **artifact**: the fit in a self-contained form; for TiDE, TorchScript with its `meta.json` (window layout, channels, scalers, missing values) | a `torchscript/` folder; inference needs nothing else |
-| 5. Register | `ponzi-models register-model` | a **model**: the artifact filed with one run config and a model card | `tide-weather--majortom-global-0.4.0` in `{home}/registry` |
+| 5. Register | `ponzi-models register-model` | a **model**: the artifact filed with one run config and a model card | `tide-weather--majortom-global-0.4.0` in `$PONZI_HOME/registry` |
 
 Only a model can be used: calibrations are made for it, and run configs and standards name it as `registry:<model id>@sha256:<digest>`. Two things follow from the steps:
 
@@ -100,7 +100,7 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
 | **panel** (definition) | the git-tracked set of cells and bursts in `panels/<id>/`, `majortom-global@0.4.0` | a built panel |
-| **built panel** | the panel's stores, masks and draw, made into `{home}/panels/<id>@<version>` | |
+| **built panel** | the panel's stores, masks and draw, made into `$PONZI_HOME/panels/<id>@<version>` | |
 | **split** | train, val or test; test is the calibration null | |
 | **calibration** | the mapping from scores to codes, filed under one model for one run config | a recipe |
 | **plain**, **ceiling** calibration | against the whole null, or against the null of the pixel's ceiling class | the ceiling score (which the ceiling calibration uses) |
@@ -126,7 +126,7 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 | **job** | one unit the server hands out: a workflow for one burst and span | a run |
 | **lease** | the client loop's hold on a job, renewed by heartbeats | |
 | **home** | the folder everything computed lives in, `~/.ponzi` or `$PONZI_HOME` | a repository |
-| **cache** | the worker's store of outputs by content id, `{home}/cache` | |
+| **cache** | the worker's store of outputs by content id, `$PONZI_HOME/cache` | |
 | **Item**, **collection**, **asset** | a STAC record of one output, its kind (`ponzi-run`), and one of its files ([STAC profile](stac-profile.md)) | |
 | **manifest** | the readable provenance of an output: every step and input that made it ([Manifests](manifests.md)) | |
 

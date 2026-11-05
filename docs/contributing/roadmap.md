@@ -83,7 +83,7 @@ repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyram
 - [ ] **First worker batch.** HPC, owner.
     - Run one burst of the rehearsal standard with `ponzi-worker run ... --executor slurm` (after a `--dry-run`), and watch it with `ponzi-worker batch`.
     - Done when the batch's job records are in the shared cache and the outputs equal a local run of the same workflow.
-- [x] Profiles are made from a snapshot of the cluster and a site file. The worker makes its own when it starts with `--executor slurm` and saves it in its home, `{home}/cluster/` (CR-061: the code is `ponzi_spec.cluster`, in ponzi-core). The shipped `ceoas@2026.10.27` is made from the snapshot of that day.
+- [x] Profiles are made from a snapshot of the cluster and a site file. The worker makes its own when it starts with `--executor slurm` and saves it in its home, `$PONZI_HOME/cluster/` (CR-061: the code is `ponzi_spec.cluster`, in ponzi-core). The shipped `ceoas@2026.10.27` is made from the snapshot of that day.
 - [ ] **Measure the stages not measured yet.** HPC.
     - These are `ingest-*`, `onboard`, `run`, `pvalues`, `detect`, `tile`, `discover`, `dem` and `assemble`.
     - After the first batches, run `ponzi-worker profile --site ceoas`: its new snapshot holds the completed `ponzi-<stage>` jobs, and those stages take their memory and walltime from them.
@@ -134,7 +134,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [ ] **The CDSE download route.** local, then HPC.
     - repeat_ccd's CDSE search and downloads, not yet ported. Done when `discover` and `coherence` can take CDSE as the source.
 - [ ] **Publish `s1-general@1.0.0`.** Owner.
-    - Steps: `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`{home}/standards` by default).
+    - Steps: `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`$PONZI_HOME/standards` by default).
     - The draft is ponzi-suite `standards/s1-general-1.0.0.yaml` (CR-055); it waits for its model and calibrations.
 - [x] **Enforce a standard's `requires`.** `check-standard` and the worker check it (CR-055).
 - [x] **A standard names its panel.** The model and the calibrations must match it; no training cell may be a test cell (CR-055).

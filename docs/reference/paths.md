@@ -4,7 +4,7 @@ Where PONZI keeps things on a machine, and the variables that move them. Secrets
 
 ## The PONZI home
 
-`{home}` in these docs is the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path, and `roots.data` defaults to the PONZI home, so without a config it is `~/.ponzi` for every part. The server and the worker make the folders when they start; nothing needs setting up by hand.
+`$PONZI_HOME` in these docs is the PONZI home: the variable when it is set, else `~/.ponzi` (`ponzi_spec.home`). A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path, and `roots.data` defaults to the PONZI home, so without a config it is `~/.ponzi` for every part; where a worker's `roots.data` is set, read `$PONZI_HOME` in a worker's paths as that folder. The server and the worker make the folders when they start; nothing needs setting up by hand.
 
 ```
 ~/.ponzi/                               $PONZI_HOME, or the worker's roots.data
@@ -51,7 +51,7 @@ A home records its own files by paths relative to itself, so a home copied to an
 | `./ponzi.yaml`, `~/.config/ponzi/config.yaml` | the deployment config, the first found of `--config`, `$PONZI_CONFIG`, `./ponzi.yaml`, `$XDG_CONFIG_HOME/ponzi/config.yaml` | `--config`, `PONZI_CONFIG`, `XDG_CONFIG_HOME` |
 | `~/.netrc` | Earthdata and Earth Data Hub logins | `NETRC` |
 | `~/.cdsapirc` | the Copernicus CDS key | the CDS client's own |
-| a server settings file | the server's database, outputs, burst catalog and boundaries; every field has a default under `{home}` | `ponzi-server serve --settings FILE` |
+| a server settings file | the server's database, outputs, burst catalog and boundaries; every field has a default under `$PONZI_HOME` | `ponzi-server serve --settings FILE` |
 | `{roots.data}/logs` | SLURM task logs on a cluster (the site file's `logs`) | the site file |
 | ponzi-suite (beside the code repositories) | panels, forecasters, run configs, standards, test cases: the files PONZI runs from | where it is checked out |
 | `<repo>/.pixi/envs/<env>` | the pixi environments of a checkout (`default`, `ml`, `ml-gpu`, `isce3`) | `pixi install` |
@@ -64,7 +64,7 @@ A home records its own files by paths relative to itself, so a home copied to an
 | --- | --- | --- |
 | `PONZI_HOME` | the PONZI home | `~/.ponzi` |
 | `PONZI_CONFIG` | the deployment config file | the lookup above |
-| `PONZI_ROOTS__DATA`, `PONZI_ROOTS__CACHE`, `PONZI_ROOTS__REGISTRY`, `PONZI_ROOTS__SCRATCH` | `roots.*` of the config | `{home}`, `{data}/cache`, `{data}/registry`, `{data}/tmp` |
+| `PONZI_ROOTS__DATA`, `PONZI_ROOTS__CACHE`, `PONZI_ROOTS__REGISTRY`, `PONZI_ROOTS__SCRATCH` | `roots.*` of the config | `$PONZI_HOME`, `{data}/cache`, `{data}/registry`, `{data}/tmp` |
 | `PONZI_SERVER__URL`, `PONZI_SERVER__KEY_ENV` | `server.*` of the config | |
 | `PONZI_CLUSTER_PROFILE` | `cluster_profile` of the config | |
 | `PONZI_DATA_ROOT`, `PONZI_MODEL_REGISTRY` | older names of `roots.data` and the registry, below the names above | |
