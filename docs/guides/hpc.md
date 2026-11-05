@@ -100,7 +100,3 @@ A root missing from the file systems, or a release not installed, becomes a warn
 The tests use a made-up cluster: `test_profile_create.py` makes profiles from a small synthetic snapshot and site file, and `test_slurm.py` renders and runs batches from a made-up profile with a fake `sbatch`. Nothing of a real cluster is in any repository.
 
 The stages that never ran on the cluster keep the site's requests until a snapshot holds their jobs. Measuring them is on the [roadmap](../contributing/roadmap.md#phase-8-the-slurm-executor).
-
-## The port reference (phase 0)
-
-[ponzi-core `packages/pipeline/reference/phase0`](https://github.com/conflict-ecology/ponzi-core/tree/main/packages/pipeline/reference/phase0) holds repeat_ccd's own ISCE3 functions on one burst, with every intermediate kept. The check, `ponzi-pipeline port-check`, compares the port with it stage by stage on the bytes. Its README gives the three jobs and their resources.

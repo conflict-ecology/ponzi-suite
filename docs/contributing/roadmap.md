@@ -11,7 +11,7 @@ Pick an open item, read the pages it links to, and follow the [change process](p
 - **owner:** needs a decision or an approval from the owner.
 
 !!! warning "Before you take an HPC item"
-    - Nothing is submitted to a cluster without the owner's approval.
+    - A rule for contributors and agents: you submit nothing to a cluster yourself without the owner's approval. The worker itself submits the work it claims, with no approval step (CR-062).
     - Render and show the scripts first: `ponzi-worker run --executor slurm --dry-run` gives the job count, runtime and resources without submitting.
     - Never submit from a machine outside the cluster or from a CI runner.
 
@@ -40,7 +40,7 @@ pixi run dev           # another shell: http://localhost:5173
 
 | Phase | What | State |
 | --- | --- | --- |
-| 0 | Port reference (ISCE3, repeat_ccd's code) | kit ready, **not yet run** (HPC) |
+| 0 | ISCE3 reference comparison | dropped by the owner on 2026-11-05; no further steps |
 | 1 to 5b | Spec, core, models, pipeline, panels, grids | done |
 | 6 | Worker, local executor | done |
 | 7 | Server, Python client | done |
@@ -49,27 +49,7 @@ pixi run dev           # another shell: http://localhost:5173
 | 9 | Watched areas | done |
 | 10 | ponzi-visual | done; browser end-to-end tests open |
 | 11 | Docs | done; docstring backlog open |
-| 12 | Retire the old repositories | check in place; archiving open (owner) |
-
-## Phase 0: the port reference
-
-repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyramid pairs from 2025-03-07). The port is then compared with them stage by stage. This was approved by the owner on 2026-10-23 (D16). The kit is in [ponzi-core `packages/pipeline/reference/phase0`](https://github.com/conflict-ecology/ponzi-core/tree/main/packages/pipeline/reference/phase0).
-
-- [x] Driver, pairs and job files; `ponzi-pipeline port-check`. Tested locally: `test_port_check.py`, and every repeat_ccd call it makes binds.
-- [ ] **Submit the reference.** HPC, approval given.
-    - Before submitting:
-        - the overhauled ponzi-core is on the lab share, with `pixi install -e isce3`;
-        - Earthdata credentials come from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else from `~/.netrc` (CR-044).
-        - No repeat_ccd checkout: the kit carries the five modules it calls, verbatim at `5250ac4` (`repeat_ccd_5250ac4/SOURCE.md`).
-    - Commands, from the kit's folder on the login node:
-      ```
-      j=$(sbatch --parsable setup.sbatch)
-      sbatch --dependency=afterok:$j pairs.sbatch
-      ```
-    - Done when `$DR/reference/phase0/reference.json` exists.
-- [ ] **Run the check.** HPC.
-    - Command: `sbatch check.sbatch`.
-    - Done when `port_check.json` says `"equal": true`. Otherwise: open a change request with the stage and pair that differ, and the size of the difference.
+| 12 | Retire the old repositories | archiving open (owner) |
 
 ## Phase 8: the SLURM executor
 
@@ -130,9 +110,9 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - Either S1A only, which is a 12-day series, or S1A with S1C. Today it is S1A.
     - Done when the decision is recorded in the plan and `CoherenceConfig`'s default follows it.
 - [ ] **Set the grid default (D9).** Owner.
-    - The default is set with the first standard; 40 m (repeat_ccd's posting) is the starting point.
+    - The default is set with the first standard; 40 m, the posting in use today, is the starting point.
 - [ ] **The CDSE download route.** local, then HPC.
-    - repeat_ccd's CDSE search and downloads, not yet ported. Done when `discover` and `coherence` can take CDSE as the source.
+    - A CDSE fallback search and download when ASF misses a burst. Done when `discover` and `coherence` can take CDSE as the source.
 - [ ] **Publish `s1-general@1.0.0`.** Owner.
     - Steps: `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`$PONZI_HOME/standards` by default).
     - The draft is ponzi-suite `standards/s1-general-1.0.0.yaml` (CR-055); it waits for its model and calibrations.
@@ -200,14 +180,12 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 
 ## Phase 12: retire the old repositories
 
-- [x] Nothing of the four distributions imports, edits `sys.path` for, or names a path inside ponzi-models (as a repository), ponzi-apps, ponzi-paper or the monorepo (`test_retired.py`).
-- [x] Nothing needs a repeat_ccd checkout. The phase 0 kit carries its own verbatim copy of the five modules it calls, checked against their git blob ids, and `test_retired.py` holds that no file asks for a checkout.
 - [ ] **Move the model jobs off the old repository.** Owner.
-    - The candidate fits on the v0.4 panel still run from ponzi-models' `hpc/` job files and its lab-share clone. The new chain does not read that panel (D6), so those jobs end with the old repository.
+    - The candidate fits on the v0.4 panel still run from the old repository's job files and its lab-share clone. The new chain does not read that panel (D6), so those jobs end with the old repository.
     - Done when the owner has stopped the v0.4 candidates or recorded their results, and the lab-share clone is no longer used.
 - [ ] **Archive the repositories.** Owner.
-    - Archive ponzi-models (the repository), ponzi-apps and ponzi-paper on GitHub. Leave the old registry and archive stores untouched and unused.
-    - The archived repository keeps the history the old registry entries name (each records the ponzi-models commit that made it), so archive rather than delete it on GitHub. Local clones of ponzi-models and repeat_ccd can be removed.
+    - Archive the old repositories on GitHub. Leave the old registry and archive stores untouched and unused.
+    - The old registry entries name commits of the old repository that made them, so archive rather than delete it on GitHub. Local clones of the old repositories can be removed.
     - Done when they are read-only and every README points to ponzi-core.
 
 ## Decisions still open

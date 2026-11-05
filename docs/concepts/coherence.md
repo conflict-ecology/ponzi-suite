@@ -1,6 +1,6 @@
 # Coherence
 
-PONZI makes its own coherence stores (`ponzi-pipeline`, from repeat_ccd's ISCE3 chain).
+PONZI makes its own coherence stores with `ponzi-pipeline`, an ISCE3 chain run burst by burst.
 
 ## A burst's series
 

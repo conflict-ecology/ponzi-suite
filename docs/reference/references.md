@@ -33,7 +33,6 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
 - **s1-reader** and **COMPASS**, the OPERA readers and geocoding of Sentinel-1 bursts, beside ISCE3. [opera-adt/s1-reader](https://github.com/opera-adt/s1-reader), [opera-adt/COMPASS](https://github.com/opera-adt/COMPASS)
 - **asf_search**, the search and download client of ASF. [asfadmin/Discovery-asf_search](https://github.com/asfadmin/Discovery-asf_search)
 - **dem_stitcher**, the DEM tiles stitched over a burst. [ACCESS-Cloud-Based-InSAR/dem-stitcher](https://github.com/ACCESS-Cloud-Based-InSAR/dem-stitcher)
-- **repeat_ccd**, by Corey Scher, from which the acquisition, orbit and ISCE3 coherence code of `ponzi-pipeline` was ported.
 - **STAC**, the SpatioTemporal Asset Catalog specification every output is recorded in ([STAC profile](../concepts/stac-profile.md)). [stacspec.org](https://stacspec.org)
 - **Zarr**, the format of the stores. [zarr.dev](https://zarr.dev)
 - **PyTorch**, the training and the TorchScript artifacts of TiDE, the default forecaster; optional (`ponzi[tide]`). [pytorch.org](https://pytorch.org)

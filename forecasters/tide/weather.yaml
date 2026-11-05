@@ -1,9 +1,9 @@
 # The fit spec of the registered model tide_c30_pdcompact_mt0.4 (run config mon_b5h5_d38pc04_mean): fitted from
 # scratch on the Major-TOM package v0.4 (the same spec on v0.2 gave tide_c30_pdcompact_mt0.2, the base of the Gaza
-# fit). The keys below are the monorepo's configs/fm/tide_c30_pdcompact.yaml, unchanged.
+# fit). The keys below are the spec that fit was trained with, unchanged.
 # Decision 35: the weather levels (soil moisture, snow depth, snow cover) plus the COMPACT set of their sidecar pair
 # differences at the five baselines, covariate layer norm off.
-# A RECORD OF HISTORY: the registered fit was trained by the monorepo's trainer on every anchor with a full
+# A RECORD OF HISTORY: the registered fit was trained by an earlier trainer on every anchor with a full
 # context and horizon, a missing covariate filled with 0 (`anchors: all`). This trainer builds only the anchors a
 # run scores, so a re-fit of this spec with the current code differs from the registered fit in that rule (in
 # Major-TOM v0.2: the last two anchors of one train burst of 188). The treatment of missing values is unchanged:

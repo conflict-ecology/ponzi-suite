@@ -1,5 +1,5 @@
 # rolling-ols-pyramid: the reference run config. The rolling OLS forecaster, scored on the pyramid (baselines 12 to 60 days,
-# horizon 5). Named by ponzi_spec.naming (CR-058); formerly exp_b5h5_base, the monorepo's name. The name is a label
+# horizon 5). Named by ponzi_spec.naming (CR-058); formerly exp_b5h5_base. The name is a label
 # and is not part of the config hash.
 schema_version: 1
 context: {C: 30, min_support: 6}

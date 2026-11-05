@@ -30,7 +30,7 @@ outlines: >-
   tile is not a plain scaling of the grid cell, so it is not guessed).
 upstream:
   name: Major TOM panel v0.4
-  builder: ponzi-paper majortom-package --request majortom_v4
+  builder: majortom-package --request majortom_v4
   panel_digest: 0281d85b2d9310043dc6ad987a099313
   pinned_digest: b320f2f8a9661e0d47bb4fe5f164dced
   request_config_digest: fa71e3fb75577a3600e018523e6c0eaa
