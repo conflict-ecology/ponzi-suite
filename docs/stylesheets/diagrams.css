@@ -1,5 +1,7 @@
-/* The diagrams of "How PONZI works": colours from the theme, so they read in light and dark mode. */
-:root {
+/* The diagrams of "How PONZI works": colours from the theme, so they read in light and dark mode. They are set on the
+   element that carries data-md-color-scheme, where Material sets its own colours per scheme: set on :root they would
+   keep the light scheme's values in dark mode. */
+[data-md-color-scheme] {
   --pz-ink: var(--md-default-fg-color);
   --pz-muted: var(--md-default-fg-color--light);
   --pz-line: var(--md-default-fg-color--lighter);
@@ -27,7 +29,7 @@
 .pz-figure .pz-gap { stroke: var(--pz-accent); stroke-width: 2; stroke-dasharray: 3 3; }
 
 /* The change map (javascripts/flows.js), after the PONZI Change Workflows page */
-:root {
+[data-md-color-scheme] {
   --pz-c-accent: #c2410c; --pz-c-accent-soft: rgba(234, 88, 12, 0.14);
   --pz-c-warn: #b45309; --pz-c-warn-soft: rgba(217, 119, 6, 0.14);
   --pz-c-data: #6b4fa0; --pz-c-data-soft: rgba(107, 79, 160, 0.12);

@@ -27,7 +27,7 @@ Agents use PONZI through ponzi-client only. Agents change PONZI's code only unde
 
 ## Guides
 
-- [Quickstart](guides/quickstart/): the whole system on a laptop
+- [Quickstart](guides/quickstart/): the whole system on one machine
 - [Install](guides/install/): the distributions and their environments
 - [Making a standard](guides/standards/): the lifecycle on the CPU and at scale
 - [Watched areas](guides/watched-areas/): what a daily look computes

@@ -1,4 +1,4 @@
-# Quickstart: the whole system on a laptop
+# Quickstart: the whole system on one machine
 
 The demo makes a working installation on local disk, with no cluster, no GPU and no network beyond package downloads:
 

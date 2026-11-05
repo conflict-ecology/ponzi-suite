@@ -2,7 +2,7 @@
 
 ## The deployment config
 
-Each installation (a laptop, a cluster account, a cloud deployment) has one `ponzi.yaml`. Every distribution reads it the same way (`ponzi_spec.config.load_config`).
+Each installation (a local machine, a cluster account, a cloud deployment) has one `ponzi.yaml`. Every distribution reads it the same way (`ponzi_spec.config.load_config`).
 
 ```yaml
 roots:                          # plain paths or URIs: file://, s3://, gs://
@@ -29,7 +29,7 @@ Other `PONZI_*` variables belong to individual commands (for example the run's a
 
 ## Paths
 
-Code never holds a hostname, a cluster path or a user name. A location is a `pathlib.Path` when local and a URI string when remote (`ponzi_spec.paths`: `is_local`, `to_path`, `join`), so the same installation works on a laptop, a cluster and object storage by changing the config only.
+Code never holds a hostname, a cluster path or a user name. A location is a `pathlib.Path` when local and a URI string when remote (`ponzi_spec.paths`: `is_local`, `to_path`, `join`), so the same installation works on a local machine, a cluster and object storage by changing the config only.
 
 ## Secrets
 

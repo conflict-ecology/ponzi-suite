@@ -4,7 +4,7 @@ The worker renders SLURM job scripts from a **cluster profile**: versioned data,
 
 ```
 ponzi-worker run WORKFLOW.yaml --executor slurm --each burst=t028_058198_iw3,t028_058199_iw3 --print-scripts
-# (on the laptop, which has no SLURM, add --profile ceoas to render with the shipped profile)
+# (on a machine without SLURM, add --profile ceoas to render with the shipped profile)
 ponzi-worker approve BATCH          # the arrays, tasks, resources, cpu-hours and walltime; then asks
 ponzi-worker batch BATCH            # how far it got: job records in the cache, failures from sacct
 ponzi-worker serve --worker-id login --executor slurm   # jobs from the server; each batch waits for approval
@@ -54,7 +54,7 @@ It refuses a profile that cannot run:
 
 A root missing from the file systems, or a release not installed, becomes a warning in the file. The version is the snapshot's date.
 
-The shipped `ceoas` profile, which the laptop and the tests render with, is made this way from the snapshot of 2026-10-27, and `test_profile_create.py` checks that it is exactly what the command makes. Its site file follows the job files of the system before the overhaul (ponzi-models `hpc/*.sbatch` and repeat_ccd's array scripts). `test_slurm.py` checks that the rendered scripts match those references: partition, account, excluded nodes (plus those down in the snapshot), GPUs, cpus, memory, walltime, throttle, roots, environment, exports and log folder.
+The shipped `ceoas` profile, which machines without SLURM and the tests render with, is made this way from the snapshot of 2026-10-27, and `test_profile_create.py` checks that it is exactly what the command makes. Its site file follows the job files of the system before the overhaul (ponzi-models `hpc/*.sbatch` and repeat_ccd's array scripts). `test_slurm.py` checks that the rendered scripts match those references: partition, account, excluded nodes (plus those down in the snapshot), GPUs, cpus, memory, walltime, throttle, roots, environment, exports and log folder.
 
 The stages that never ran on the cluster keep the site's requests until a snapshot holds their jobs. Measuring them is on the [roadmap](../contributing/roadmap.md#phase-8-the-slurm-executor).
 

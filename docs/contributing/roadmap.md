@@ -6,14 +6,14 @@ Pick an open item, read the pages it links to, and follow the [change process](p
 
 **Labels:**
 
-- **laptop:** runs on any machine; the tests use synthetic data.
+- **local:** runs on any machine with the repositories checked out; the tests use synthetic data.
 - **HPC:** needs the cluster.
 - **owner:** needs a decision or an approval from the owner.
 
 !!! warning "Before you take an HPC item"
     - Nothing is submitted to a cluster without the owner's approval.
     - Scripts are rendered and shown first: `ponzi-worker run --executor slurm` renders them, and `ponzi-worker approve` shows the job count, runtime and resources, then asks.
-    - Never submit from a laptop or a CI runner.
+    - Never submit from a machine outside the cluster or from a CI runner.
 
 !!! note "Before you take any item"
     Code changes are reviewed and committed by the owner (decision D10). Leave your work uncommitted in the working tree, or on a branch the owner asked for.
@@ -28,7 +28,7 @@ cd ponzi-service && pixi install && pixi run test        # worker, server, clien
 cd ponzi-visual  && pixi run install && pixi run test    # front end; pixi run e2e against a real server
 ```
 
-The whole system on one laptop, with a standard made on the CPU and the registry on disk:
+The whole system on one machine, with a standard made on the CPU and the registry on disk:
 
 ```
 cd ponzi-visual && pixi run install
@@ -44,7 +44,7 @@ pixi run dev           # another shell: http://localhost:5173
 | 1 to 5b | Spec, core, models, pipeline, panels, grids | done |
 | 6 | Worker, local executor | done |
 | 7 | Server, Python client | done |
-| 8 | SLURM executor | done on the laptop; first real submission open (HPC) |
+| 8 | SLURM executor | done locally; first real submission open (HPC) |
 | 8b | First standard | done on the CPU with synthetic data; the real standard is open (HPC) |
 | 9 | Watched areas | done |
 | 10 | ponzi-visual | done; browser end-to-end tests open |
@@ -55,7 +55,7 @@ pixi run dev           # another shell: http://localhost:5173
 
 repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyramid pairs from 2025-03-07). The port is then compared with them stage by stage. This was approved by the owner on 2026-10-23 (D16). The kit is in [ponzi-core `packages/pipeline/reference/phase0`](https://github.com/conflict-ecology/ponzi-core/tree/main/packages/pipeline/reference/phase0).
 
-- [x] Driver, pairs and job files; `ponzi-pipeline port-check`. Tested on the laptop: `test_port_check.py`, and every repeat_ccd call it makes binds.
+- [x] Driver, pairs and job files; `ponzi-pipeline port-check`. Tested locally: `test_port_check.py`, and every repeat_ccd call it makes binds.
 - [ ] **Submit the reference.** HPC, approval given.
     - Before submitting:
         - the overhauled ponzi-core is on the lab share, with `pixi install -e isce3`;
@@ -120,11 +120,11 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - The owner sets the benchmark the first standard must meet. Done when a report shows the standard meeting it.
     - There is no benchmark command yet.
 - [ ] **Weather in the onboarding.**
-    - laptop: the code exists.
+    - local: the code exists.
     - HPC: needs the network and CDS or EDH credentials.
     - A TiDE standard needs the ERA5 series in its sidecars, so the standard's `onboarding` lists `weather` and `pairdiff`, not only `mask`.
     - Done when a TiDE standard runs through the worker on a real burst.
-- [ ] **Model stages as worker stages.** laptop.
+- [ ] **Model stages as worker stages.** local.
     - `prepare`, `train`, `export`, `null-runs`, `null-rows` and `calibrate` run today as `ponzi-models` commands. Making them stages, with content ids, would put the lifecycle itself in the cache and its manifests.
     - Done when `ponzi-models rehearse` can be expressed as a worker workflow.
 - [ ] **Decide the default platforms.** Owner.
@@ -132,7 +132,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - Done when the decision is recorded in the plan and `CoherenceConfig`'s default follows it.
 - [ ] **Set the grid default (D9).** Owner.
     - The default is set with the first standard; 40 m (repeat_ccd's posting) is the starting point.
-- [ ] **The CDSE download route.** laptop, then HPC.
+- [ ] **The CDSE download route.** local, then HPC.
     - repeat_ccd's CDSE search and downloads, not yet ported. Done when `discover` and `coherence` can take CDSE as the source.
 - [ ] **Publish `s1-general@1.0.0`.** Owner.
     - Steps: `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`{home}/standards` by default).
@@ -173,14 +173,14 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] Tests:
     - unit tests on the server's own answers (fixtures from `ponzi-worker demo --fixtures`);
     - an end-to-end run against a real server (`pixi run e2e`).
-- [ ] **Browser end-to-end tests.** laptop.
+- [ ] **Browser end-to-end tests.** local.
     - Playwright on the built app against the demo server: select a burst, create an area, open a manifest.
     - Done when it runs in CI.
 - [ ] **Publish ponzi-visual's client to npm.** Needs the package name, the npm organisation and a publishing token.
-- [ ] **Raster display (D12).** laptop.
+- [ ] **Raster display (D12).** local.
     - A `visual` COG per events Item, drawn in the browser; a tiling endpoint only if that is slow.
     - Done when the Results tab can show the events raster of a cell.
-- [ ] **Burst catalog updates.** laptop.
+- [ ] **Burst catalog updates.** local.
     - burst_db publishes new versions. The server's own catalog is built from the file pinned in `ponzi_spec.catalog` (burst_db 0.18.0); a new pin makes the server rebuild it. Or run `pixi run catalog VERSION` in ponzi-visual (or `ponzi-pipeline burst-catalog`) and give the file as the server's `bursts`.
     - Done when the server's `/v1/bursts/summary` names the new source.
 - [ ] **Map tiles in production.** Owner.
@@ -191,10 +191,10 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] Pages for the quickstart, standards, watched areas, the HPC route, the worker, the service and the clients. This roadmap.
 - [x] The store contracts checked against the code, and published with the change requests from ponzi-core at build time (CR-050).
 - [x] Every public function has a docstring in ponzi-service, ponzi-spec and ponzi-pipeline. The tests hold that, and a ratchet in ponzi-core (`test_docstrings.py`) holds the rest.
-- [ ] **Burn down the docstring backlog.** laptop.
+- [ ] **Burn down the docstring backlog.** local.
     - 179 names in `ponzi` and `ponzi_models`, listed in `packages/core/tests/data/docstring_allowlist.txt`. Document a module, take its names off the list, and run `pixi run test`.
     - Done when the list is empty.
-- [ ] **Link check in CI.** laptop.
+- [ ] **Link check in CI.** local.
     - Add a link checker to the docs workflow. Done when broken links fail the build.
 - [ ] **Hosting (D15).** Owner.
     - The organisation is `conflict-ecology` and the site's address is `https://conflict-ecology.github.io/ponzi-suite` (CR-049); the docs workflow deploys Pages on a push to main. Left: the repositories and Pages on GitHub. The setup instructions are given to the owner separately and are never part of a repository.
