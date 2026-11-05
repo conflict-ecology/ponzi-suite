@@ -11,7 +11,7 @@ roots:                          # plain paths or URIs: file://, s3://, gs://
   registry: s3://bucket/registry  # default {data}/registry
   scratch: /tmp/ponzi           # default {data}/tmp
 server: {url: https://ponzi.example.org, key_env: PONZI_KEY}
-cluster_profile: ceoas@2026.11  # workers on a SLURM cluster
+cluster_profile: mycluster@2026.11.05  # workers on a SLURM cluster
 ```
 
 **Where it is read from**: the first file that exists of `--config`, `$PONZI_CONFIG`, `./ponzi.yaml`, `$XDG_CONFIG_HOME/ponzi/config.yaml` (default `~/.config`).

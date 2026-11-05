@@ -1,14 +1,14 @@
 # Running on the cluster (SLURM)
 
-The worker renders SLURM job scripts from a **cluster profile**: versioned data, made by ponzi-core's `ponzi_spec.cluster` (shipped: `ponzi_spec/cluster/profiles/ceoas.yaml`). A profile holds the partitions, the Python of each environment of a ponzi-service release, the scratch redirects, and the resources of each stage.
+The worker renders SLURM job scripts from a **cluster profile**: versioned data, made on the cluster by ponzi-core's `ponzi_spec.cluster` from the cluster's site file. No cluster's profile is shipped (CR-065). A profile holds the partitions, the Python of each environment of a ponzi-service release, the scratch redirects, and the resources of each stage.
 
 Work is asked for through the server, by a request or a watched area made with ponzi-client (or ponzi-visual). `ponzi-client serve` claims it; that loop is the only long-running process, on the login node or wherever the server can be reached. For each job it calls `ponzi-worker job`, a short command that renders the job's next batch and submits it, or checks the batch already running, and exits. The SLURM tasks invoke the core commands; when the last is done the client delivers the outputs (CR-062, CR-063).
 
 ```
-ponzi-client serve --worker-id login -- --executor slurm --site ceoas   # the loop: claims jobs, calls ponzi-worker job
+ponzi-client serve --worker-id login -- --executor slurm   # the loop: claims jobs, calls ponzi-worker job
 ponzi-worker run WORKFLOW.yaml --executor slurm --each burst=t028_058198_iw3,t028_058199_iw3   # one workflow, no server
 ponzi-worker run WORKFLOW.yaml --executor slurm ... --dry-run --print-scripts   # render and show; submit nothing
-# (on a machine without SLURM, add --profile ceoas to render with the shipped profile)
+# (on a machine without SLURM, add --profile FILE to render with a profile made on the cluster)
 ponzi-worker batch BATCH            # how far it got: job records in the cache, failures from sacct
 ```
 
@@ -64,20 +64,21 @@ Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM t
 A profile is made, not written by hand, from two inputs:
 
 - **A snapshot of the cluster**: read-only SLURM queries of the partitions, the nodes with their cpus, memory, GPUs and state, your accounts, the limits, and your recent jobs.
-- **A site file**, shipped in ponzi-spec as `ponzi_spec/cluster/sites/<site>.yaml`, or any file given to `--site`. It holds what a snapshot cannot say: the roots, the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
+- **A site file**, written once for the cluster at `$PONZI_HOME/cluster/sites/<site>.yaml` (or any file given to `--site`). It holds what a snapshot cannot say: the roots, the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
 
-The worker uses the site's current profile and makes one when there is none. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml` (`--site`, default `ceoas`); with none, they take the snapshot on the login node, make the profile, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `ponzi-worker profile --site ceoas` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `roots.data` of the cluster's `ponzi.yaml`, typically the shared scratch root; with no `roots.data` it is `$PONZI_HOME`, else `~/.ponzi` in your cluster home folder. The `roots` of the site file are where the SLURM jobs work and do not choose this folder:
+Every job checks for the profile first. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml`; with none, they take the snapshot on the login node, make the profile from it and the site file, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `--site` names the site; with one site file in `$PONZI_HOME/cluster/sites/`, it is that one, and with none the job fails saying where to write it. `ponzi-worker profile` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `roots.data` of the cluster's `ponzi.yaml`, typically the shared scratch root; with no `roots.data` it is `$PONZI_HOME`, else `~/.ponzi` in your cluster home folder. The `roots` of the site file are where the SLURM jobs work and do not choose this folder:
 
 ```
 $PONZI_HOME/cluster/
-  profiles/ceoas.yaml                    the current profile
-  profiles/ceoas-<version>.yaml          every version made
-  snapshots/ceoas/<YYYY-MM-DDTHHMMSS>/   the last 10 snapshots
+  sites/<site>.yaml                      the site file, written for the cluster
+  profiles/<site>.yaml                   the current profile
+  profiles/<site>-<version>.yaml         every version made
+  snapshots/<site>/<YYYY-MM-DDTHHMMSS>/  the last 10 snapshots
 ```
 
-Remaking the profile of an unchanged cluster keeps its version, so a batch already rendered keeps its id and is not submitted twice. A changed cluster, such as a node going down, gives a new version named by the day (`2026.11.05`, then `2026.11.05.2`). `--profile NAME|FILE` uses a given profile instead.
+Remaking the profile of an unchanged cluster keeps its version, so a batch already rendered keeps its id and is not submitted twice. A changed cluster, such as a node going down, gives a new version named by the day (`2026.11.05`, then `2026.11.05.2`). `--profile FILE` uses a given profile instead.
 
-By hand, `bash snapshot.sh ceoas` (in ponzi-core's `packages/spec/src/ponzi_spec/cluster/`) takes the same snapshot on the login node, and `ponzi-worker profile --snapshot DIR --site ceoas --out FILE` makes the profile from it anywhere; `python -m ponzi_spec.cluster.create` does the same without the worker.
+By hand, `ROOTS=... RELEASES=... bash snapshot.sh <site>` (in ponzi-core's `packages/spec/src/ponzi_spec/cluster/`) takes the same snapshot on the login node, and `ponzi-worker profile --snapshot DIR --site <site> --out FILE` makes the profile from it anywhere; `python -m ponzi_spec.cluster.create` does the same without the worker.
 
 From the snapshot, the profile takes:
 
@@ -96,7 +97,7 @@ It refuses a profile that cannot run:
 
 A root missing from the file systems, or a release not installed, becomes a warning in the file. The version is the snapshot's date.
 
-The shipped `ceoas` profile, which machines without SLURM and the tests render with, is made this way from the snapshot of 2026-10-27, and `test_profile_create.py` checks that it is exactly what the command makes. Its site file follows the job files of the system before the overhaul (ponzi-models `hpc/*.sbatch` and repeat_ccd's array scripts). `test_slurm.py` checks that the rendered scripts match those references: partition, account, excluded nodes (plus those down in the snapshot), GPUs, cpus, memory, walltime, throttle, roots, environment, exports and log folder.
+The tests use a made-up cluster: `test_profile_create.py` makes profiles from a small synthetic snapshot and site file, and `test_slurm.py` renders and runs batches from a made-up profile with a fake `sbatch`. Nothing of a real cluster is in any repository.
 
 The stages that never ran on the cluster keep the site's requests until a snapshot holds their jobs. Measuring them is on the [roadmap](../contributing/roadmap.md#phase-8-the-slurm-executor).
 

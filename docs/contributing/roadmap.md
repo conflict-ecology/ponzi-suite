@@ -73,7 +73,7 @@ repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyram
 
 ## Phase 8: the SLURM executor
 
-- [x] The cluster profile (`ceoas`), the script template, batches with dependencies, status from the cache and `sacct`, and the SLURM route of `ponzi-worker job` under `ponzi-client serve` (CR-063).
+- [x] The cluster profile, the script template, batches with dependencies, status from the cache and `sacct`, and the SLURM route of `ponzi-worker job` under `ponzi-client serve` (CR-063).
     - The rendered scripts match the 12 reference scripts (`test_slurm.py`).
     - A fake `sbatch` runs them locally, and the result equals the direct calls.
 - [x] The release environments `default`, `ml`, `ml-gpu` and `isce3` in ponzi-service's `pixi.toml`.
@@ -83,10 +83,10 @@ repeat_ccd's own ISCE3 functions run on one burst (`t028_058198_iw3`, five pyram
 - [ ] **First worker batch.** HPC, owner.
     - Run one burst of the rehearsal standard with `ponzi-worker run ... --executor slurm` (after a `--dry-run`), and watch it with `ponzi-worker batch`.
     - Done when the batch's job records are in the shared cache and the outputs equal a local run of the same workflow.
-- [x] Profiles are made from a snapshot of the cluster and a site file. The worker makes its own when it starts with `--executor slurm` and saves it in its home, `$PONZI_HOME/cluster/` (CR-061: the code is `ponzi_spec.cluster`, in ponzi-core). The shipped `ceoas@2026.10.27` is made from the snapshot of that day.
+- [x] Profiles are made from a snapshot of the cluster and a site file, both in the home: `$PONZI_HOME/cluster/sites/<site>.yaml` is written once for the cluster, and every job makes the profile when it is missing (CR-061, CR-065). No cluster's profile is shipped.
 - [ ] **Measure the stages not measured yet.** HPC.
     - These are `ingest-*`, `onboard`, `run`, `pvalues`, `detect`, `tile`, `discover`, `dem` and `assemble`.
-    - After the first batches, run `ponzi-worker profile --site ceoas`: its new snapshot holds the completed `ponzi-<stage>` jobs, and those stages take their memory and walltime from them.
+    - After the first batches, run `ponzi-worker profile`: its new snapshot holds the completed `ponzi-<stage>` jobs, and those stages take their memory and walltime from them.
     - Done when every stage's resources come from a measurement.
 - [x] Watched-area batches need no approval (owner, 2026-11-05, CR-062): the worker submits what it claims; the work is authorised by the request or area made through the client.
 
@@ -110,7 +110,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - Needs per-cell windows in the builder first: `majortom-global` gives a window per cell, and a `PanelSpec` has one (CR-047).
     - Done when the `Panel` reader opens it and its split matches the spec.
 - [ ] **Train on the GPU.** HPC.
-    - Steps: `ponzi-models prepare`, then `train`, on `ceoas-gpu` (job resources from the profile's `train` entry), then `export` and `register-model`.
+    - Steps: `ponzi-models prepare`, then `train`, on the cluster's GPU partition (job resources from the profile's `train` entry), then `export` and `register-model`.
     - Done when the model card is in the registry and its artifact digest is verified.
 - [ ] **Null and calibration at scale.** HPC.
     - Steps: `null-runs` (an array over the test bursts, both layers), `null-rows`, `calibrate`, `register-calibration`. The standard's staged runs need the staged pair as well: `null-runs --staged`, then `calibrate-staged`.

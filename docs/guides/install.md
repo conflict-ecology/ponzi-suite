@@ -1,43 +1,104 @@
 # Install
 
-Every distribution installs with pip from its repository, under the GitHub organisation `conflict-ecology`.
+Pick the line that matches what you want to do; each needs only what it says.
 
-| Distribution | Install | Notes |
+| You want to | Install | You get |
 | --- | --- | --- |
-| `ponzi-spec` | `pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/spec"` | pydantic and PyYAML only |
-| `ponzi` | `pip install "ponzi @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/core"` | after `ponzi-spec`, which it depends on (it is not on PyPI); add `[tide]` for the TiDE forecaster, the default (torch; not needed for other forecasters), `[grid]` for geometry |
-| `ponzi-pipeline` | `pip install "ponzi-pipeline @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/pipeline"` | after `ponzi`; add `[asf]` for discovery and downloads, `[dem]` for DEMs; the coherence chain and the onboarding |
-| `ponzi-models` | `pip install "ponzi-models @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/models"` | after `ponzi-spec`, `ponzi[grid]` and `ponzi-pipeline`; add `[train]` for the trainer (torch, wandb). Gives the command `ponzi-models` |
+| use a running PONZI server from Python or a shell | [the client](#the-client) (pip) | `ponzi-client` |
+| run PONZI on this machine, without a server | [ponzi-core](#ponzi-core) (pixi) | `ponzi`, `ponzi-pipeline`, `ponzi-models` |
+| run the service: a server, the client loop, the worker | [ponzi-service](#ponzi-service) (pixi) | `ponzi-server`, `ponzi-client`, `ponzi-worker`, and ponzi-core's commands |
+| see it in the browser | [ponzi-visual](#ponzi-visual) (pixi) | the map front end, against a server |
 
-The service's distributions install the same way from ponzi-service (`packages/server`, `packages/worker`, `packages/client`). They are at 0.1.0 and not yet released.
-
-## Development environments
-
-ponzi-core uses [pixi](https://pixi.sh) for its development environments:
-
-| Environment | Holds | For |
-| --- | --- | --- |
-| `default` | the library, the tests, the geospatial stack; never torch | `pixi run test` |
-| `ml` | default plus torch (CPU) | TiDE tests, CPU evaluation |
-| `ml-gpu` | default plus torch 2.14.1 from conda-forge in its CUDA 12.9 build, wandb | GPU training |
-| `isce3` | default plus ISCE3 0.25.22, CUDA 12.9 build, with s1reader, COMPASS, dem_stitcher, GDAL, asf_search from conda-forge | the ISCE3 coherence backend (`pixi run -e isce3 test-pipeline`) |
-
-Both GPU environments use CUDA 12.9 and need an NVIDIA driver for it (575 or later). `ml-gpu` takes torch from conda-forge, not PyPI: conda-forge's CUDA 12.9 build has kernels from SM 5.0 up, so it runs on every GPU of the cluster, the GTX 1080 Ti (SM 6.1) included, where PyTorch's own cu128 and cu129 wheels dropped Pascal. CUDA 13 would drop the 1080 Ti and the V100 (SM below 7.5).
-
-ISCE3 and its companions are published on conda-forge only, so the ISCE3 backend of `ponzi-pipeline` runs in the `isce3` environment; everything else installs with pip.
-
-The `isce3` environment requires ISCE3's CUDA build at one version: `isce3 = { version = "==0.25.22", build = "py312cuda129*_cuda" }` with `cuda-version = "12.9.*"`, and the lock file holds the exact build (`py312cuda129h43e19af_0_cuda`), the same in ponzi-core and ponzi-service. CUDA 12.9, not 13: CUDA 13 dropped Pascal, and the cluster's `ayaya` nodes are GTX 1080 Ti, as for `ml-gpu`. The environment declares CUDA 12.9 as a system requirement, so it installs where an NVIDIA driver supports CUDA 12.9 (driver 575 or later). On a machine without one (a CI runner), set `CONDA_OVERRIDE_CUDA=12.9` to install it. To check that ISCE3 sees a GPU:
+The repositories are under the GitHub organisation `conflict-ecology`. The pixi installs expect them checked out side by side, as ponzi-service and ponzi-visual use the code of the checkouts beside them:
 
 ```
+workspace/
+  ponzi-core/  ponzi-service/  ponzi-visual/  ponzi-suite/
+```
+
+Then set up the logins the work needs: [Authentication](authentication.md).
+
+## The client
+
+One pip command, in any Python 3.11 or later. `ponzi-spec` is named in the same command because it is not on PyPI:
+
+```
+pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@main#subdirectory=packages/spec" \
+            "ponzi-client @ git+https://github.com/conflict-ecology/ponzi-service@main#subdirectory=packages/client"
+```
+
+It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [The clients](../reference/clients.md).
+
+## ponzi-core
+
+```
+cd ponzi-core
+pixi install                 # the default environment: ponzi-spec, ponzi, ponzi-pipeline, ponzi-models
+pixi run test                # optional: the fast tests
+pixi run ponzi --help
+```
+
+The other environments are installed only when asked for (`pixi install -e NAME`, or the first `pixi run -e NAME ...`):
+
+| Environment | Adds | For |
+| --- | --- | --- |
+| `default` | the geospatial stack; never torch | everything that needs no GPU and no ISCE3 |
+| `ml` | torch on the CPU | the TiDE forecaster (the default) on the CPU, the rehearsal's tiny fit |
+| `ml-gpu` | torch 2.14.1 from conda-forge, CUDA 12.9 build; wandb | training on a GPU |
+| `isce3` | ISCE3 0.25.22, CUDA 12.9 build, with s1reader, COMPASS, dem_stitcher, GDAL, asf_search | the coherence chain from SLCs |
+
+## ponzi-service
+
+```
+cd ponzi-service
+pixi install                 # ponzi-server, ponzi-client, ponzi-worker, with ponzi-core's distributions from ../ponzi-core
+pixi run test                # optional
+```
+
+It has the same four environments as ponzi-core; the worker's stages run in the one a stage declares, and a cluster's release installs all four. How the pieces run together: [Quickstart](quickstart.md) on one machine, [Running on the cluster](hpc.md).
+
+## ponzi-visual
+
+```
+cd ponzi-visual
+pixi run install             # Node and the front end's packages
+pixi run dev                 # http://localhost:5173, against PONZI_URL (default the local demo server)
+```
+
+`pixi run server` makes and serves a demo installation from the ponzi-service checkout beside it ([Quickstart](quickstart.md)).
+
+## GPUs and CUDA
+
+`ml-gpu` and `isce3` use CUDA 12.9 and need an NVIDIA driver for it (575 or later); pixi refuses to install them on a machine without one. On such a machine (a CI runner, a laptop), `CONDA_OVERRIDE_CUDA=12.9` installs them anyway.
+
+- **Why 12.9.** CUDA 13 dropped GPUs below compute capability 7.5, so the cluster's GTX 1080 Ti (6.1) and V100 (7.0) nodes would be lost.
+- **Why conda-forge torch.** PyTorch's own CUDA 12.8 and 12.9 wheels dropped Pascal; conda-forge's CUDA 12.9 build has kernels from SM 5.0 up, so it runs on every GPU of the cluster.
+- **Why pixi for ISCE3.** ISCE3 and its companions are published on conda-forge only. Its version and build are pinned (`isce3 ==0.25.22`, build `py312cuda129*_cuda`), and the lock files of ponzi-core and ponzi-service hold the same exact build.
+
+To check that the GPU is seen:
+
+```
+pixi run -e ml-gpu python -c "import torch; print(torch.cuda.is_available())"
 pixi run -e isce3 python -c "import isce3.cuda.core as c; print(c.get_device_count())"
 ```
 
-## Credentials
+## Without pixi
 
-Downloads, weather and the server each need a login before anything runs: see [Authentication](authentication.md).
+Each distribution also installs with pip from its folder (`packages/<name>` of its repository), but pip cannot find the PONZI distributions it depends on, which are not on PyPI: name them all in one command, at one ref of each repository (a tag or `main`). The computing distributions need the conda-forge stack for ISCE3 and are not supported this way.
+
+| Distribution | Folder | Depends on | Extras |
+| --- | --- | --- | --- |
+| `ponzi-spec` | ponzi-core `packages/spec` | | |
+| `ponzi` | ponzi-core `packages/core` | `ponzi-spec` | `tide` (torch), `grid` (shapely, pyproj) |
+| `ponzi-pipeline` | ponzi-core `packages/pipeline` | `ponzi` | `asf`, `dem` |
+| `ponzi-models` | ponzi-core `packages/models` | `ponzi-spec`, `ponzi[grid]`, `ponzi-pipeline` | `train` (torch, wandb) |
+| `ponzi-client` | ponzi-service `packages/client` | `ponzi-spec` | |
+| `ponzi-server` | ponzi-service `packages/server` | `ponzi-spec` | |
+| `ponzi-worker` | ponzi-service `packages/worker` | all of the above but the server | |
 
 ## Checking an install
 
 ```
 python -c "import ponzi_spec; print(ponzi_spec.__version__)"
+ponzi-client --help
 ```

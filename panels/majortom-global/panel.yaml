@@ -35,9 +35,9 @@ upstream:
   pinned_digest: b320f2f8a9661e0d47bb4fe5f164dced
   request_config_digest: fa71e3fb75577a3600e018523e6c0eaa
   registry_digest: c6a0f10b6e4d2a2847176501a6baea88
-  location: /storage/ceoas-scratch/barthelp/ponzi/data/artifact/majortom/v0.4 (HPC)
+  location: artifact/majortom/v0.4 under the cluster's data root (HPC)
   delivered_bursts: 396                     # in_v0_4_package: those with a coherence store upstream
-  coherence: gauss_w5x5_s1.0_ml6x3_vv       # the upstream stores' config, /storage/ceoas-scratch/scherc/cslc_archive
+  coherence: gauss_w5x5_s1.0_ml6x3_vv       # the upstream stores' config, in the coherence archive on the cluster
   sources_sha256:
     cells.parquet: 72dbb300ff7aef3a        # first 16 hex digits
     aois.csv: 185bd8768f1758be

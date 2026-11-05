@@ -15,7 +15,7 @@ The rehearsal runs the functions of the real lifecycle on the synthetic world (`
 | Step | Function | At scale (HPC) |
 | --- | --- | --- |
 | Bursts and panel | `synthetic.build_panel` | `ponzi-models panel-cells`, `panel-build` on ISCE3 stores |
-| Prepare, train, export | `training.prepare`, `train.train_fit(device="cpu")`, `export.export_fit` | `prepare`, `train` on `ceoas-gpu`, `export` |
+| Prepare, train, export | `training.prepare`, `train.train_fit(device="cpu")`, `export.export_fit` | `prepare`, `train` on the cluster's GPU partition (the site file's `gpu` role), `export` |
 | Register | `register_model.register` | `register-model` |
 | Null | `null_runs.run_burst` on the test bursts, both layers | `null-runs` (an array job) |
 | Calibrate | `null_rows.collect`, `build.build`, `register_calibration.register` | `null-rows`, `calibrate` (for staged runs, `calibrate-staged` on `null-runs --staged`), `register-calibration` |
