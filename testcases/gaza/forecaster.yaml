@@ -3,7 +3,7 @@
 # The fit spec of the registered model tide_c30_gaza_f1p_mt0.2 (run config mon_b5h5_d38f1p_mean), the model of
 # the Gaza releases. The keys below are the spec that fit was trained with, unchanged (the artifact's meta.json says
 # package v0.2 and the model card names this init_from; the same fit on v0.4 is not registered).
-# Decision 38 round 2, F1p: a fine-tune of tide-weather fitted on package v0.2 (init_from), three epochs at
+# F1p: a fine-tune of tide-weather fitted on package v0.2 (init_from), three epochs at
 # a third of the learning rate, with the windows of the Gaza outside-Strip sample stores (extra_samples) that end
 # before 2023-10-07 as half of every epoch, the last epoch kept.
 # A RECORD OF HISTORY: the registered fit was trained by an earlier trainer on every anchor with a full

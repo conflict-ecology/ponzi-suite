@@ -1,10 +1,9 @@
 # A CANDIDATE, not a registered model: forecasters/tide/candidates/fill-previous-augmented.yaml (the spec of the
-# registered augmented model tide_s1_mt04_aug) key for key, plus the Sentinel-1 moisture covariate of decision 49
+# registered augmented model tide_s1_mt04_aug) key for key, plus a Sentinel-1 moisture covariate
 # (owner 2026-10-16: the rain-onset false alarms of Tehran; the registered models have no precipitation input):
 #   s1_pd_vv_db_{12,24,36,48,60}d, the pair differences of the burst's non-built median VV backscatter (dB), one
-#   series per burst, from the extra sidecars <burst>_s1.zarr of the old repository's
-#   ops/side_analyses/sar_soil_moisture/s1_sidecar.py ($PONZI_DATA_ROOT/side/sar_sm/sidecars, 396 package v0.4
-#   bursts and 11 Gaza ones). Label free: a scene-wide wetting moves the burst median, a local change does not.
+#   series per burst, from the extra sidecars <burst>_s1.zarr
+#   ($PONZI_DATA_ROOT/side/sar_sm/sidecars, 396 package v0.4 bursts and 11 Gaza ones). Label free: a scene-wide wetting moves the burst median, a local change does not.
 # Prepared, fitted and run with the extra sidecars (train_prepare.sbatch, train_one.sbatch and null_runs.sbatch with
 # EXTRA_DIR=$PONZI_DATA_ROOT/side/sar_sm/sidecars; a run with RunRequest.extra_sidecar). An AOI needs its own S1
 # sidecars (Tehran: not yet made). Fitted at seeds 42 and 43, compared with tide_s1_mt04_aug on the model card's
