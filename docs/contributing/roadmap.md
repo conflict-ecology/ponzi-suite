@@ -177,7 +177,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [ ] **Browser end-to-end tests.** laptop.
     - Playwright on the built app against the demo server: select a burst, create an area, open a manifest.
     - Done when it runs in CI.
-    - The package name, the npm organisation and the publishing token.
+- [ ] **Publish ponzi-visual's client to npm.** Needs the package name, the npm organisation and a publishing token.
 - [ ] **Raster display (D12).** laptop.
     - A `visual` COG per events Item, drawn in the browser; a tiling endpoint only if that is slow.
     - Done when the Results tab can show the events raster of a cell.

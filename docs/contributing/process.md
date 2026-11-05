@@ -20,7 +20,7 @@ A stage's identity version (in its content ids) is separate: it is raised whenev
 
 - Golden files under `packages/core/tests/data/` lock the numbers of the algorithm. Never regenerate one to make a test pass unless the change request says results change.
 - The hashing rule of content ids is fixed by a test.
-- Each repository has a layering test: the import direction between distributions and subpackages, and no heavy import (torch, the geospatial stack) where it does not belong.
+- ponzi-core and ponzi-service have layering tests: the import direction between distributions and subpackages, and no heavy import (torch, the geospatial stack) where it does not belong. ponzi-visual has none yet.
 
 ## Compatibility
 
