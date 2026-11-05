@@ -107,7 +107,7 @@ Which distribution needs which: solid arrows are install dependencies (`pyprojec
 - `ponzi-spec` is the one distribution every other part depends on, and it holds no computing code, so the server and the clients install it without the scientific stack.
 - Only the worker installs the computing distributions; the server never imports `ponzi`, `ponzi-pipeline` or `ponzi-models`.
 - ponzi-visual installs nothing of PONZI: its client is generated from the server's committed OpenAPI document (`npm run gen`).
-- Optional parts: `ponzi[tide]` and `ponzi-models[train]` add torch (the `ml` and `ml-gpu` environments); ISCE3 comes from conda-forge only, in the `isce3` environment, as version 0.25.22 in its CUDA 12.9 build ([Install](../guides/install.md)).
+- Optional parts: `ponzi[tide]` and `ponzi-models[train]` add torch (the `ml` environment on the CPU; `ml-gpu`, conda-forge torch in its CUDA 12.9 build); ISCE3 comes from conda-forge only, in the `isce3` environment, as version 0.25.22 in its CUDA 12.9 build ([Install](../guides/install.md)).
 
 ## What holds it together
 

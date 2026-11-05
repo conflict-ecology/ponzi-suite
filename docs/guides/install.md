@@ -19,8 +19,10 @@ ponzi-core uses [pixi](https://pixi.sh) for its development environments:
 | --- | --- | --- |
 | `default` | the library, the tests, the geospatial stack; never torch | `pixi run test` |
 | `ml` | default plus torch (CPU) | TiDE tests, CPU evaluation |
-| `ml-gpu` | torch 2.6 with CUDA 12.4, wandb | GPU training |
+| `ml-gpu` | default plus torch 2.14.1 from conda-forge in its CUDA 12.9 build, wandb | GPU training |
 | `isce3` | default plus ISCE3 0.25.22, CUDA 12.9 build, with s1reader, COMPASS, dem_stitcher, GDAL, asf_search from conda-forge | the ISCE3 coherence backend (`pixi run -e isce3 test-pipeline`) |
+
+Both GPU environments use CUDA 12.9 and need an NVIDIA driver for it (575 or later). `ml-gpu` takes torch from conda-forge, not PyPI: conda-forge's CUDA 12.9 build has kernels from SM 5.0 up, so it runs on every GPU of the cluster, the GTX 1080 Ti (SM 6.1) included, where PyTorch's own cu128 and cu129 wheels dropped Pascal. CUDA 13 would drop the 1080 Ti and the V100 (SM below 7.5).
 
 ISCE3 and its companions are published on conda-forge only, so the ISCE3 backend of `ponzi-pipeline` runs in the `isce3` environment; everything else installs with pip.
 
