@@ -69,7 +69,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
-| **forecaster** | a kind of model (`tide`, `rolling_ols`); also its file in `forecasters/` | a model |
+| **forecaster** | a kind of forecasting method, the code that predicts coherence (`tide`, `rolling_ols`) | a model |
 | **fit spec** | a forecaster file: everything one training fixes (C, H, inputs, missing values, augmentation, seed) | a run config |
 | **candidate** | a fit spec being compared with the base (`candidates/`), not a registered model | |
 | **fit** | one training of a fit spec on a panel; `-seed43` for another seed | |
@@ -77,6 +77,23 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **model** | a registered artifact with its run config and model card, `tide-weather--majortom-global-0.4.0` | a forecaster |
 | **run config** | how a model is run: C, H, scoring, aggregation, state machine (C4); its hash is fixed when the model is registered | a run request (C4a: paths, dates and options of one run) |
 | **registry** | the folder of models and their calibrations, `{home}/registry` | the server's database |
+
+### From forecaster to model, step by step
+
+Each step makes the next thing from the one before, with one command:
+
+| Step | Command | Makes | Example |
+| --- | --- | --- | --- |
+| 1. Choose a forecaster | | the kind of method | `tide`, the TiDE neural network (`ponzi.core.forecast`) |
+| 2. Write a fit spec | | what one training fixes: context, horizon, inputs, missing values, augmentation, seed | `forecasters/tide/weather.yaml`, named `tide-weather` |
+| 3. Train | `ponzi-models train` | a **fit**: the trained weights of the spec on a panel, as a checkpoint | `tide-weather`, or `tide-weather-seed43` at another seed |
+| 4. Export | `ponzi-models export` | an **artifact**: the fit as self-contained TorchScript with its `meta.json` (window layout, channels, scalers, missing values) | a `torchscript/` folder; inference needs nothing else |
+| 5. Register | `ponzi-models register-model` | a **model**: the artifact filed with one run config and a model card | `tide-weather--majortom-global-0.4.0` in `{home}/registry` |
+
+Only a model can be used: calibrations are made for it, and run configs and standards name it as `registry:<model id>@sha256:<digest>`. Two things follow from the steps:
+
+- **A model may have no artifact.** A rolling forecaster such as `rolling_ols` fits itself as it runs and has no trained weights, so steps 3 and 4 do not apply: its model is its run config and model card.
+- **One artifact can make two models.** The same weights registered with another run config give another model, of another run config hash, and its calibrations are its own: a calibration belongs to one run config.
 
 ## Calibration and panels
 
