@@ -16,6 +16,8 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/ponzi-core
           path: ponzi-core
+          # ponzi-core is private: a read-only deploy key of ponzi-core, its private half kept as this secret
+          ssh-key: ${{ secrets.PONZI_CORE_DEPLOY_KEY }}
           fetch-depth: 0   # ponzi-spec takes its version from its spec-v tags (CR-054)
       - uses: actions/setup-python@v5
         with:
