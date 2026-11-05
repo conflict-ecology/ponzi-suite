@@ -21,7 +21,7 @@ A word is letters and digits, and a name starts with a letter. The double hyphen
 
 - **Designs** (panels): `majortom`, cells of the Major TOM grid.
 - **Scopes** (panels): `global`.
-- **Families** (forecasters): `tide`.
+- **Families** (forecasters): `tide`, the default today; a new forecaster brings its own family word.
 - **Inputs** (forecasters): `weather`, the weather levels (soil moisture, snow depth, snow cover) and the compact set of their pair differences.
 - **Scorings** (run configs): `pyramid`, the 15-pair pyramid over baselines of 12 to 60 days and a horizon of 5. A run config's forecaster part is the forecaster it runs (`rolling-ols`, `tide-weather`); its name is a label and not part of its hash.
 - **Changes** (variants): `fill-<how>`, how a missing coherence is given to the model (`constant`, `median`, `previous`, `sentinel`, with `no-flags` when the obs flags are left out); `augmented`, the general training augmentation; `context-dropout`; `radar-moisture`, the Sentinel-1 moisture covariate; `finetune`.

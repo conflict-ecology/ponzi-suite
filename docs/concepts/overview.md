@@ -14,8 +14,8 @@ Sentinel-1 SLCs (ASF)
 
 Models and calibrations are made by `ponzi-models` from panels: sets of pixels of many bursts, run through the same chain.
 
-!!! note "TiDE is the current forecaster, not a fixed part"
-    The forecast step is replaceable. TiDE (Time-series Dense Encoder, [Das et al., 2023](../reference/references.md#forecasting)) is the forecaster of the current models: a neural network trained on panels and run as TorchScript. Forecasters are registered by name (`ponzi.core.forecast.registry`): today `tide`, the rolling fit `rolling_ols`, which needs no training, and `stored` and `external`, which read predictions made elsewhere. A new forecaster is one module and one `register` call; the run config, the scoring, the calibration and the detection do not change, and a standard names whichever model it runs ([A new model](../contributing/new-model.md)).
+!!! note "TiDE is the default forecaster, not a requirement"
+    The forecast step is replaceable. TiDE (Time-series Dense Encoder, [Das et al., 2023](../reference/references.md#forecasting)) is the default today: the draft standard `s1-general@1.0.0` runs a TiDE model, a neural network trained on panels and run as TorchScript. Nothing else in PONZI depends on it. Forecasters are registered by name (`ponzi.core.forecast.registry`): today `tide`, the rolling fit `rolling_ols`, which needs no training, and `stored` and `external`, which read predictions made elsewhere. A new forecaster is one module and one `register` call; the run config, the scoring, the calibration and the detection do not change, and a standard names whichever model it runs ([A new model](../contributing/new-model.md)).
 
 ## The components
 

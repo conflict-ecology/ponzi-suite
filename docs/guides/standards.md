@@ -6,7 +6,7 @@ A standard is a versioned bundle: a model, its run config hash, its calibrations
 
 ```
 cd ponzi-core
-pixi run -e ml ponzi-models rehearse --out /tmp/rehearsal               # a tiny TiDE fit, about 10 s
+pixi run -e ml ponzi-models rehearse --out /tmp/rehearsal               # a tiny fit of the default, TiDE, about 10 s
 pixi run ponzi-models rehearse --out /tmp/rehearsal-r --model rolling    # no torch
 ```
 
@@ -23,7 +23,7 @@ The rehearsal runs the functions of the real lifecycle on the synthetic world (`
 
 The checks of a standard (ponzi-core CR-055):
 
-- **The registry:** the model, its weights by reference, its run config, and the calibrations, each made for that run config on the standard's `panel`. The model was trained on that panel.
+- **The registry:** the model, its artifact by reference when it has one, its run config, and the calibrations, each made for that run config on the standard's `panel`. A trained model was trained on that panel.
 - **The panel:** with the built panel in the home, no training or validation cell of the model is a test cell of the panel, the calibrations' null.
 - **`requires`:** the installed distributions meet it. A worker also refuses a job of a standard whose `requires` its own versions do not meet.
 - **The version before it:** `check-standard` finds the previous version beside the file. Within a major, nothing that changes the runs may change (workflow, coherence and onboarding configs, panel, model, run config). Within a minor, only the description and `requires`.

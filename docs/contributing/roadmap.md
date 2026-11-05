@@ -121,7 +121,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [ ] **Weather in the onboarding.**
     - local: the code exists.
     - HPC: needs the network and CDS or EDH credentials.
-    - A TiDE standard needs the ERA5 series in its sidecars, so the standard's `onboarding` lists `weather` and `pairdiff`, not only `mask`.
+    - A TiDE standard (the default forecaster) needs the ERA5 series in its sidecars, so the standard's `onboarding` lists `weather` and `pairdiff`, not only `mask`.
     - Done when a TiDE standard runs through the worker on a real burst.
 - [ ] **Model stages as worker stages.** local.
     - `prepare`, `train`, `export`, `null-runs`, `null-rows` and `calibrate` run today as `ponzi-models` commands. Making them stages, with content ids, would put the lifecycle itself in the cache and its manifests.

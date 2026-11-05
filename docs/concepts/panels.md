@@ -6,7 +6,7 @@ A panel is the pinned, stratified, label-free set of pixels PONZI is trained and
 | --- | --- |
 | `train` | fitting the forecaster |
 | `val` | choosing the epoch, the breakdown tables |
-| `test` | the null of a calibration: the trained model is run on these cells and their scores become the calibration |
+| `test` | the null of a calibration: the model is run on these cells and their scores become the calibration |
 
 A calibration therefore comes from cells the model never saw. A calibration names the panel it was made on.
 

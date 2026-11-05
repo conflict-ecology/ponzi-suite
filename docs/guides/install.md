@@ -5,7 +5,7 @@ Every distribution installs with pip from its repository, under the GitHub organ
 | Distribution | Install | Notes |
 | --- | --- | --- |
 | `ponzi-spec` | `pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/spec"` | pydantic and PyYAML only |
-| `ponzi` | `pip install "ponzi @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/core"` | after `ponzi-spec`, which it depends on (it is not on PyPI); add `[tide]` for the TiDE forecaster, the current one (torch), `[grid]` for geometry |
+| `ponzi` | `pip install "ponzi @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/core"` | after `ponzi-spec`, which it depends on (it is not on PyPI); add `[tide]` for the TiDE forecaster, the default (torch; not needed for other forecasters), `[grid]` for geometry |
 | `ponzi-pipeline` | `pip install "ponzi-pipeline @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/pipeline"` | after `ponzi`; add `[asf]` for discovery and downloads, `[dem]` for DEMs; the coherence chain and the onboarding |
 | `ponzi-models` | `pip install "ponzi-models @ git+https://github.com/conflict-ecology/ponzi-core@<tag>#subdirectory=packages/models"` | after `ponzi-spec`, `ponzi[grid]` and `ponzi-pipeline`; add `[train]` for the trainer (torch, wandb). Gives the command `ponzi-models` |
 

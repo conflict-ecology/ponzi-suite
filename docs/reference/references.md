@@ -4,7 +4,7 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
 
 ## Forecasting
 
-- **TiDE**, the forecaster of the current models (`ponzi.core.forecast.tide`, trained by `ponzi-models train`). It is the current choice, not a fixed part: other forecasters register beside it ([System overview](../concepts/overview.md)).
+- **TiDE**, the default forecaster today (`ponzi.core.forecast.tide`, trained by `ponzi-models train`). It is a default, not a requirement: any forecaster registered beside it is used the same way ([System overview](../concepts/overview.md)).
   Das, A., Kong, W., Leach, A., Mathur, S., Sen, R., and Yu, R. (2023). Long-term Forecasting with TiDE: Time-series Dense Encoder. *Transactions on Machine Learning Research*. [arXiv:2304.08424](https://arxiv.org/abs/2304.08424)
 
 ## Satellite data
@@ -36,6 +36,6 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
 - **repeat_ccd**, by Corey Scher, from which the acquisition, orbit and ISCE3 coherence code of `ponzi-pipeline` was ported.
 - **STAC**, the SpatioTemporal Asset Catalog specification every output is recorded in ([STAC profile](../concepts/stac-profile.md)). [stacspec.org](https://stacspec.org)
 - **Zarr**, the format of the stores. [zarr.dev](https://zarr.dev)
-- **PyTorch**, the training of TiDE and its TorchScript artifacts. [pytorch.org](https://pytorch.org)
+- **PyTorch**, the training and the TorchScript artifacts of TiDE, the default forecaster; optional (`ponzi[tide]`). [pytorch.org](https://pytorch.org)
 
 A paper, dataset or tool the code relies on that is missing here is a gap in this page: add it with the change that brings it in.

@@ -64,8 +64,8 @@ The method, where it runs, how its registered pieces are made, and what a change
 <line class="pz-arrow" x1="306.0" y1="218" x2="88.0" y2="258"/>
 <rect class="pz-box" x="20" y="262" width="136" height="142" rx="6"/>
 <text class="pz-title" x="30" y="284">1 Forecast</text>
-<text class="pz-small" x="30" y="306">the forecaster (TiDE,</text>
-<text class="pz-small" x="30" y="323">or a rolling fit) gives</text>
+<text class="pz-small" x="30" y="306">the forecaster (default</text>
+<text class="pz-small" x="30" y="323">TiDE, or another) gives</text>
 <text class="pz-small" x="30" y="340">quantiles of the 25</text>
 <text class="pz-small" x="30" y="357">pairs from the context</text>
 <text class="pz-small" x="30" y="374">and the covariates</text>
@@ -168,9 +168,9 @@ The model, its calibrations and the standard are made with `ponzi-models`, from 
 flowchart LR
   def["panel definition<br/>panels/majortom-global<br/>(panel-check)"] --> build["panel-build<br/>stores and masks<br/>in home/panels"]
   build --> prep["prepare<br/>train and val windows,<br/>layer sample_train"]
-  spec["fit spec<br/>forecasters/tide/..."] --> prep
+  spec["fit spec<br/>forecasters/&lt;family&gt;/...<br/>(default: tide)"] --> prep
   prep --> train["train<br/>keeps the best<br/>val epoch"]
-  train --> export["export<br/>TorchScript +<br/>meta.json"]
+  train --> export["export<br/>the artifact<br/>(TiDE: TorchScript + meta.json)"]
   export --> reg["register-model<br/>model id + ONE run config:<br/>its hash fixed here"]
 ```
 

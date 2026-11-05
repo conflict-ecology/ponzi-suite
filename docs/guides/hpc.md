@@ -12,6 +12,34 @@ ponzi-worker run WORKFLOW.yaml --executor slurm ... --dry-run --print-scripts   
 ponzi-worker batch BATCH            # how far it got: job records in the cache, failures from sacct
 ```
 
+## Where the client loop runs
+
+`ponzi-client serve` is the only long-running process. It needs little: it polls the server, heartbeats, calls `ponzi-worker job` for a few seconds at a time, and delivers the outputs. It can run on the login node, or as a small SLURM job of its own.
+
+### As a SLURM job
+
+```
+#!/bin/bash
+#SBATCH --job-name=ponzi-client
+#SBATCH --partition=<partition> --account=<account>
+#SBATCH --cpus-per-task=1 --mem=2G
+#SBATCH --time=<the longest your partition allows>
+#SBATCH --output=%x_%j.out
+export PONZI_KEY_FILE=~/ponzi-worker.key          # a worker key (Authentication)
+ponzi-client serve --worker-id <name> -- --executor slurm --site <site>
+```
+
+Before relying on it, check on your cluster:
+
+- **The network:** a compute node must reach the server's URL. Many clusters allow outbound connections from the login node only. Try it from a short interactive job, for example `curl -sI <server url>/v1/standards`.
+- **Submitting from a job:** with `--executor slurm`, the loop's `ponzi-worker job` calls run `sbatch` and `sacct` from inside the loop's job. Try `sbatch --test-only <any script>` from an interactive job.
+- **The time limit:** the partition's `MaxTime` and your QOS's `MaxWall` (`scontrol show partition`, `sacctmgr show qos`) bound how long the job lives. A snapshot of the cluster records both (`partitions.txt`, `qos.psv`).
+- **The shared file system:** the worker's home (`roots.data` of the cluster's `ponzi.yaml`) must be on storage the compute nodes share, so the loop's job and the SLURM tasks see one cache.
+
+Restarting is safe. When the loop's job ends (its time limit, a node failure, maintenance), the job it held returns to the server's queue once its lease expires; a restarted loop claims it again, finds every finished output in the cache, and does not submit a batch twice. To restart it automatically, use `scrontab` where the cluster enables it, or a cron entry on the login node that submits the job again when `squeue` no longer shows it.
+
+One loop carries out one job at a time. More loops, each with its own `--worker-id`, carry out jobs side by side.
+
 ## How a batch is made
 
 - **Arrays.** Each step of the workflows becomes one array job, with one task per job that isn't cached. A job shared by several workflows, such as one calibration's ingest, is one task.
