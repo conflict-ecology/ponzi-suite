@@ -1,4 +1,4 @@
-# rolling-ols-pyramid: the reference run config. The rolling OLS forecaster, scored on the pyramid (baselines 12 to 60 days,
+# rolling-ols-pyramid: the reference scoring spec. The rolling OLS forecaster, scored on the pyramid (baselines 12 to 60 days,
 # horizon 5). Named by ponzi_spec.naming (CR-058); formerly exp_b5h5_base. The name is a label
 # and is not part of the config hash.
 schema_version: 1

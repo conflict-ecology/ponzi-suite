@@ -1,4 +1,4 @@
-# The fit spec of the registered model tide_c30_pdcompact_mt0.4 (run config mon_b5h5_d38pc04_mean): fitted from
+# The training spec of the registered model tide_c30_pdcompact_mt0.4 (scoring spec mon_b5h5_d38pc04_mean): fitted from
 # scratch on the Major-TOM package v0.4 (the same spec on v0.2 gave tide_c30_pdcompact_mt0.2, the base of the Gaza
 # fit). The keys below are the spec that fit was trained with, unchanged.
 # The weather levels (soil moisture, snow depth, snow cover) plus the COMPACT set of their sidecar pair
@@ -8,8 +8,8 @@
 # run scores, so a re-fit of this spec with the current code differs from the registered fit in that rule (in
 # Major-TOM v0.2: the last two anchors of one train burst of 188). The treatment of missing values is unchanged:
 # no key below declares one, which is 0.5 with the obs flags, the real future flags and a filled bperp.
-# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
-fit_id: tide-weather
+# Validated by training/training_spec.py (TrainingSpec); unknown keys are refused.
+training_id: tide-weather
 formerly: tide_c30_pdcompact
 model: tide
 context_length: 30

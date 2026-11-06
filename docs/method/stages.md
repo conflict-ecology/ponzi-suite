@@ -26,7 +26,7 @@ The stages ponzi-worker registers, each a thin adapter over the distribution nam
 | `assemble` | `ponzi-pairs`, `ponzi-coherence-pair` | `ponzi-coherence`, with the engine report | ponzi-pipeline |
 | `ingest-coherence` | a coherence store made elsewhere | `ponzi-coherence` | ponzi-worker |
 | `onboard` | `ponzi-coherence` | `ponzi-sidecar` | ponzi-pipeline |
-| `run` | `ponzi-coherence`, `ponzi-sidecar`; the model through the run config | `ponzi-run` | ponzi |
+| `run` | `ponzi-coherence`, `ponzi-sidecar`; the model through the scoring spec | `ponzi-run` | ponzi |
 | `ingest-calibration` | a calibration file | `ponzi-calibrations` | ponzi-worker |
 | `pvalues` | `ponzi-run`, `ponzi-calibrations` | `ponzi-pvalues` | ponzi |
 | `detect` | `ponzi-pvalues`, `ponzi-run` | `ponzi-events` | ponzi |

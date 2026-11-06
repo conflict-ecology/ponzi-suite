@@ -79,11 +79,11 @@ A file already in the folder is used as it is. A download writes a `.part` file 
 
 ### The DEM
 
-The Copernicus DEM GLO-30, stitched by `dem_stitcher` to ellipsoidal heights over the burst's fixed grid, widened by `margin_km` (5 km by default; the coherence config's `dem: {source: glo_30, margin_km: 5.0}`). The `dem` stage writes `dem_ellipsoidal_glo_30_<box>.tif` into `$PONZI_HOME/downloads/dem/`, with the tiles in `dem/tiles/`; a stitched DEM that already covers the box is reused. No login.
+The Copernicus DEM GLO-30, stitched by `dem_stitcher` to ellipsoidal heights over the burst's fixed grid, widened by `margin_km` (5 km by default; the coherence spec's `dem: {source: glo_30, margin_km: 5.0}`). The `dem` stage writes `dem_ellipsoidal_glo_30_<box>.tif` into `$PONZI_HOME/downloads/dem/`, with the tiles in `dem/tiles/`; a stitched DEM that already covers the box is reused. No login.
 
 ### ERA5-Land weather
 
-The weather series of the sidecar (`era5_*`; by default 2 m temperature, total precipitation, snow cover, snow depth, the 10 m wind components and the top layer's soil moisture), made by the `onboard` stage's `weather` step from ERA5-Land, by `weather_source` of the onboarding config (`ponzi_pipeline.onboard.weather`). Each source gives the same series with the same definitions:
+The weather series of the sidecar (`era5_*`; by default 2 m temperature, total precipitation, snow cover, snow depth, the 10 m wind components and the top layer's soil moisture), made by the `onboard` stage's `weather` step from ERA5-Land, by `weather_source` of the onboarding spec (`ponzi_pipeline.onboard.weather`). Each source gives the same series with the same definitions:
 
 | Source | From | Login |
 | --- | --- | --- |

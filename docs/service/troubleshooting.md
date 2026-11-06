@@ -52,11 +52,11 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 **Cause.** An area made without a standard takes the server's `default_standard`, else the one standard it holds (ponzi-core CR-068). With several and no `default_standard`, with none, or with a `default_standard` it does not hold, it cannot choose. ponzi-visual never sends a standard, so it always depends on this.
 
-**Fix.** Set `default_standard` in the server's settings (`server: {default_standard: s1-general@1.0.0}`) and restart it. Under `pixi run dev-up`, write that to a file and give it as `PONZI_SERVER_SETTINGS` ([Quickstart](../getting-started/quickstart.md#development-on-your-own-home)). With none held, copy a standard's file into the standards folder (`$PONZI_HOME/standards` by default) and restart ([Making a standard](../models/standards.md)). From the command line, `--standard` names one instead.
+**Fix.** Set `default_standard` in the server's settings (`server: {default_standard: s1-general@2.0.0}`) and restart it. Under `pixi run dev-up`, write that to a file and give it as `PONZI_SERVER_SETTINGS` ([Quickstart](../getting-started/quickstart.md#development-on-your-own-home)). With none held, copy a standard's file into the standards folder (`$PONZI_HOME/standards` by default) and restart ([Making a standard](../models/standards.md)). From the command line, `--standard` names one instead.
 
 ## A standard the server does not hold
 
-**You see.** `422 Unprocessable Content: no standard s1-general@1.0.0` when making or changing an area with that standard. For an area that already names it, the server logs a warning `area AREA_ID: no standard ...` each time the area is due, makes no jobs for it, and **Look now** (`area-discover`) answers 422 with the same text.
+**You see.** `422 Unprocessable Content: no standard s1-general@2.0.0` when making or changing an area with that standard. For an area that already names it, the server logs a warning `area AREA_ID: no standard ...` each time the area is due, makes no jobs for it, and **Look now** (`area-discover`) answers 422 with the same text.
 
 **Cause.** The server reads its standards once, from the standards folder, when it starts. A file added, renamed or removed afterwards is not seen; an area whose standard is no longer there is skipped.
 
@@ -80,7 +80,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 ## A worker refuses a standard's job
 
-**You see.** A job fails with `job ...: this worker cannot run s1-general@1.0.0: requires ponzi-models ..., installed is ...` (or `..., which is not installed`).
+**You see.** A job fails with `job ...: this worker cannot run s1-general@2.0.0: requires ponzi-models ..., installed is ...` (or `..., which is not installed`).
 
 **Cause.** A standard can name the distributions and versions a worker must have (`requires`, PEP 440 specifiers; ponzi-core CR-055). The worker checks them before it runs the job and refuses when its environment does not meet them. The failure is reported to the server, which queues the job again while attempts remain (`max_attempts`, default 3) and then marks it failed.
 

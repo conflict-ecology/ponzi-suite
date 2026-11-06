@@ -1,15 +1,23 @@
-# A panel definition (CR-046, CR-047; the rules: ponzi_spec.panel): the bursts and cells a model is trained,
-# validated and calibrated on. The folder is the panel's id; this file holds its version; git holds its history.
-# bursts.geojson and cells.geojson must match the sha256 below. Check it (from ponzi-core):
-#   pixi run ponzi-models panel-check ../ponzi-suite/panels/majortom-global
+# A panel spec (ponzi-core CR-046, CR-047, CR-070; the rules: ponzi_spec.panel, the build settings:
+# ponzi_models.panels.panel_spec): the bursts and cells a model is trained, validated and calibrated on, and how the
+# panel is built from them. The folder is the panel spec; its name is the panel's id. A panel spec has no version:
+# it is pinned by its hash (panel.yaml and the two geojson), and a changed panel is a new panel spec under a new
+# name. bursts.geojson and cells.geojson must match the sha256 below. Check it (from ponzi-core):
+#   pixi run ponzi-models panel-check majortom-global
+# Build it: pixi run ponzi-models panel-build --panel-spec majortom-global --bursts BURSTS.csv
 # Everything made from it (coherence stores, sidecars, masks, the built panel) goes into the PONZI home.
 id: majortom-global
-version: 0.4.0
 description: >-
   The Major TOM training panel: 239 cells of the 10 km Major TOM grid, stratified by climate and settlement, and the
   487 Sentinel-1 bursts that cover them, each cell observed over three years with no event. The train split trains
   a model, val checks it, and test is the calibration null (the independent locations whose scores give the
   p-values).
+coherence: isce3-gaussian      # the coherence spec its bursts are made with (coherence_specs/)
+draw:                          # the pixels of each cell (the defaults of D19)
+  per_stratum: 1000            # per cell and pixel stratum, shared over the cell's bursts by area
+  built_threshold: 0.3         # built: sidecar `built` >= this
+  land_threshold: 0.5          # land not built: sidecar `land` >= this and not built
+  seed: 1
 subpanels:
   majortom: {cells: {train: 120, val: 40, test: 40}, note: 8 test cells per climate, 5 climates}
   majortom-arid: {cells: {train: 23, val: 8, test: 8}, note: drylands only}

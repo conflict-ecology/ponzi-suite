@@ -14,7 +14,7 @@ What each part of PONZI needs to log in to, and where to put it. A secret is nev
 
 Needs no login: ASF's burst search (`discover`, and the server's [burst availability](../service/rest-api.md)), the Copernicus GLO-30 DEM, the GHSL built-up layers and the World Bank boundaries the server downloads.
 
-A machine needs only the credentials of what runs on it. The server needs none to reach out: it holds the hashes of the PONZI keys and calls nothing that needs a login. A machine that carries out jobs needs Earthdata and the weather source of its onboarding config for the worker, and a `worker` key for its client loop (the worker itself talks to no server).
+A machine needs only the credentials of what runs on it. The server needs none to reach out: it holds the hashes of the PONZI keys and calls nothing that needs a login. A machine that carries out jobs needs Earthdata and the weather source of its onboarding spec for the worker, and a `worker` key for its client loop (the worker itself talks to no server).
 
 ## The netrc file
 

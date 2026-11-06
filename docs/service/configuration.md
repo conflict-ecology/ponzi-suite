@@ -37,19 +37,22 @@ Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are 
 
 ## The PONZI home
 
-Everything an installation computes lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). These docs write it `$PONZI_HOME`, the variable that sets it. A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path; `roots.data` itself defaults to the PONZI home, so without a config a worker's home is `$PONZI_HOME` (`~/.ponzi`) too ([The worker](worker.md)). Its full structure and every environment variable are in [Paths and environment variables](../getting-started/paths.md). Its layout is fixed (`Layout`): `server/`, `keys/`, `standards/`, `outputs/`, `catalog/`, `cache/`, `registry/`, `panels/`, `downloads/` (`slc/`, `orbits/`, `dem/`), `cluster/` (the SLURM sites, the profiles a worker makes and their snapshots, CR-061; no cluster is shipped in the repositories, CR-065) and `logs/` (every log written to files: `slurm/<batch>/` the SLURM tasks', `client/` the client loop's when it runs as a SLURM job, CR-064). The server and the worker create it when they start. The repositories hold only code and the files PONZI runs from, so a home copied to another machine runs unchanged with the same repositories.
+Everything an installation computes lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). These docs write it `$PONZI_HOME`, the variable that sets it. A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path; `roots.data` itself defaults to the PONZI home, so without a config a worker's home is `$PONZI_HOME` (`~/.ponzi`) too ([The worker](worker.md)). Its full structure and every environment variable are in [Paths and environment variables](../getting-started/paths.md). Its layout is fixed (`Layout`): `server/`, `keys/`, `standards/`, `outputs/`, `catalog/`, `cache/`, `registry/`, `panels/`, the six spec folders (`training_specs/`, `scoring_specs/`, `panel_specs/`, `detection_specs/`, `coherence_specs/`, `onboarding_specs/`: working copies looked in before ponzi-suite's, CR-070), `downloads/` (`slc/`, `orbits/`, `dem/`), `cluster/` (the SLURM sites, the profiles a worker makes and their snapshots, CR-061; no cluster is shipped in the repositories, CR-065) and `logs/` (every log written to files: `slurm/<batch>/` the SLURM tasks', `client/` the client loop's when it runs as a SLURM job, CR-064). The server and the worker create it when they start. The repositories hold only code and the files PONZI runs from, so a home copied to another machine runs unchanged with the same repositories.
 
 ## Composition
 
-Run configs, fit specs, recipes, standards, panel specs, and coherence and onboarding configs compose (`ponzi_spec.compose`). `extends:` names a file, or a list of files merged in order, relative to the file that writes it, at the top of a document or opening any mapping inside one. Mappings merge key by key; lists, values and null replace what the base had; the file's own keys win. A config is validated and hashed as composed, so a composed file and its flat equal have the same hash.
+Every spec (training, scoring, panel, detection, coherence and onboarding) and every standard composes (`ponzi_spec.compose`). `extends:` names a file, or a list of files merged in order, relative to the file that writes it, at the top of a document or opening any mapping inside one. Mappings merge key by key; lists, values and null replace what the base had; the file's own keys win. A spec is validated and hashed as composed, so a composed file and its flat equal have the same hash.
 
-## Other configs
+## Specs and other configs
 
-| Config | Defines | Hashed |
+| File | Defines | Hashed |
 | --- | --- | --- |
-| run config | the forecast, scoring, aggregation and state machine of a run | yes (`config_hash`) |
-| coherence config | backend, looks, window, grid, DEM | yes |
-| onboarding config | the sidecar's steps and sources | recorded |
-| detection recipe | how codes become events | yes (`digest`) |
-| standard | the bundle a watched area runs: all of the above, the model and the calibrations | by version |
+| scoring spec | the forecast, scoring, aggregation and state machine of a run | yes (`spec_hash`) |
+| coherence spec | backend, looks, window, grid, DEM | yes (`spec_hash`) |
+| onboarding spec | the sidecar's steps and sources | yes (`spec_hash`) |
+| detection spec | how codes become events | yes (`spec_hash`) |
+| training spec, panel spec | how a model is trained, how a panel is built | yes (`spec_hash`) |
+| standard | the bundle a watched area runs: its panel, coherence, onboarding and detection specs by name, the model, its scoring spec by hash, and the calibrations | by version, held to its hash in the registry |
 | cluster profile | partitions, environments and resources of one SLURM cluster | by version |
+
+Where the specs live, how they are named and how their hashes are recorded: [Naming](../models/naming.md#spec-folders) and [Standard versions](../models/versions.md#specs-a-name-and-a-hash).

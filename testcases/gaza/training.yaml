@@ -1,6 +1,6 @@
 # (CR-043: moved from data/specs/tide_c30_gaza_f1p.yaml into the Gaza test case, composed on the base forecaster; CR-052:
-# named tide-weather-gaza-finetune, composed on forecasters/tide/weather.yaml.)
-# The fit spec of the registered model tide_c30_gaza_f1p_mt0.2 (run config mon_b5h5_d38f1p_mean), the model of
+# named tide-weather-gaza-finetune, composed on training_specs/tide/weather.yaml.)
+# The training spec of the registered model tide_c30_gaza_f1p_mt0.2 (scoring spec mon_b5h5_d38f1p_mean), the model of
 # the Gaza releases. The keys below are the spec that fit was trained with, unchanged (the artifact's meta.json says
 # package v0.2 and the model card names this init_from; the same fit on v0.4 is not registered).
 # F1p: a fine-tune of tide-weather fitted on package v0.2 (init_from), three epochs at
@@ -11,9 +11,9 @@
 # run scores, so a re-fit of this spec with the current code differs from the registered fit in that rule (in
 # Major-TOM v0.2: the last two anchors of one train burst of 188). The treatment of missing values is unchanged:
 # no key below declares one, which is 0.5 with the obs flags, the real future flags and a filled bperp.
-# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
-extends: ../../forecasters/tide/weather.yaml
-fit_id: tide-weather-gaza-finetune
+# Validated by training/training_spec.py (TrainingSpec); unknown keys are refused.
+extends: ../../training_specs/tide/weather.yaml
+training_id: tide-weather-gaza-finetune
 formerly: tide_c30_gaza_f1p
 lr: 0.0001
 epochs: 3

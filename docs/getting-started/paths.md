@@ -29,10 +29,18 @@ $PONZI_HOME/                            ~/.ponzi by default, or the worker's roo
     locks/<job id>.lock                 held while a job runs
     slurm/<batch>/                      rendered SLURM scripts and batch.json
   registry/                             models and their calibrations (roots.registry)
-    <model id>/                         the model card, the artifact, run_config.yaml
+    <model id>/                         the model card (model.json), the artifact, scoring_spec.yaml, training_spec.yaml
       calibrations/<calibration id>/    calibration.npz and its record
+    standards/<id>@<version>/           a registered standard: standard.yaml and record.json, written once
+    specs.json                          the hash each spec name was first used with
   panels/
-    <id>@<version>/                     a built panel: masks, draw, catalogue
+    <id>/                               a built panel: masks, draw, catalogue, panel.json
+  training_specs/                       working copies of the specs, looked in before ponzi-suite's (CR-070)
+  scoring_specs/
+  panel_specs/<id>/
+  detection_specs/
+  coherence_specs/
+  onboarding_specs/
   downloads/                            inputs shared by every run
     slc/                                Sentinel-1 SLCs (the parent SLC zip of each burst, `<granule>.zip`)
     orbits/                             orbit files
@@ -58,7 +66,7 @@ A home records its own files by paths relative to itself, so a home copied to an
 | `~/.netrc` | Earthdata and Earth Data Hub logins | `NETRC` |
 | `~/.cdsapirc` | the Copernicus CDS key | the CDS client's own |
 | a server settings file | the server's database, outputs, burst catalog and boundaries; every field has a default under `$PONZI_HOME` | `ponzi-server serve --settings FILE` |
-| ponzi-suite (beside the code repositories) | panels, forecasters, run configs, standards, test cases: the files PONZI runs from | where it is checked out |
+| ponzi-suite (beside the code repositories) | the specs (`training_specs/`, `scoring_specs/`, `panel_specs/`, `detection_specs/`, `coherence_specs/`, `onboarding_specs/`), standards and test cases: the files PONZI runs from | `PONZI_SUITE`, else the checkout beside ponzi-core |
 | `<repo>/.pixi/envs/<env>` | the pixi environments of a checkout (`default`, `ml`, `ml-gpu`, `isce3`) | `pixi install` |
 
 ## Environment variables
@@ -72,6 +80,7 @@ A home records its own files by paths relative to itself, so a home copied to an
 | `PONZI_ROOTS__DATA`, `PONZI_ROOTS__CACHE`, `PONZI_ROOTS__REGISTRY`, `PONZI_ROOTS__SCRATCH` | `roots.*` of the config | `$PONZI_HOME`, `{data}/cache`, `{data}/registry`, `{data}/tmp` |
 | `PONZI_SERVER__URL`, `PONZI_SERVER__KEY_ENV` | `server.*` of the config | |
 | `PONZI_CLUSTER_PROFILE` | `cluster_profile` of the config | |
+| `PONZI_SUITE` | the ponzi-suite checkout a spec name is looked up in, after the home's spec folders ([Naming](../models/naming.md#spec-folders)) | `ponzi-suite` beside the ponzi-core checkout |
 | `PONZI_DATA_ROOT`, `PONZI_MODEL_REGISTRY` | older names of `roots.data` and the registry, below the names above | |
 | `XDG_CONFIG_HOME` | where the config is looked up | `~/.config` |
 

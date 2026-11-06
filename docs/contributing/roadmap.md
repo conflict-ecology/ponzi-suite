@@ -78,8 +78,8 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - `pixi run -e ml ponzi-models rehearse --out DIR` fits a tiny TiDE model in about 10 s; `--model rolling` needs no torch.
 - [x] The coherence chain as worker stages: `discover`, `dem`, `coherence` (one job per pair) and `assemble`. The assembled store passes `ponzi validate-store` (`test_standard.py`).
 - [x] `ponzi-models standard-workflow`: a standard bundle as the server runs it. A rehearsed standard runs through the server and a worker (`test_standard.py`).
-- [x] Definitions in git, data in the PONZI home. Panels, forecasters, run configs and test cases are in ponzi-suite, and commands take their paths (CR-046 to CR-048). Panel definitions are checked by `ponzi-models panel-check`. The coherence stores, the registry, built panels, standards and the catalogs are in `$PONZI_HOME`, made at start by the server and the worker (CR-045, CR-047).
-- [x] Composable yaml: every config can build on another with `extends:`; presets are gone, and recipes are yaml files (CR-043). Forecasters, panels and models follow one [naming convention](../models/naming.md) (CR-052).
+- [x] Definitions in git, data in the PONZI home. The specs and test cases are in ponzi-suite, and commands take their paths (CR-046 to CR-048), or their names (CR-070). Panel specs are checked by `ponzi-models panel-check`. The coherence stores, the registry, built panels, standards and the catalogs are in `$PONZI_HOME`, made at start by the server and the worker (CR-045, CR-047).
+- [x] Composable yaml: every config can build on another with `extends:`; presets are gone, and the detection rules are yaml files (CR-043), now detection specs (CR-070). Specs, models and standards follow one [naming convention](../models/naming.md) (CR-052, CR-070).
 - [x] A staged (format 3) calibration from commands: `null-runs --staged`, then `calibrate-staged` (CR-051).
 - [ ] **Coherence stores for the panel's bursts.** HPC.
     - List the Major TOM bursts with `ponzi-models panel-cells --burst-map`. Make their stores with the worker's chain: `discover`, then `dem`, `coherence` and `assemble`, as SLURM batches.
@@ -87,7 +87,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - Done when each burst has a store in the cache that passes `ponzi validate-store`.
 - [ ] **Build the panel from those stores.** HPC.
     - Command: `ponzi-models panel-build`.
-    - The builder takes per-cell windows and builds from the ponzi-suite definition (`panel-build --definition DIR`, CR-056). Left: the builder spec of `majortom-global@0.4.0` (its draw and coherence settings).
+    - The builder takes per-cell windows and builds from the ponzi-suite panel spec (`panel-build --panel-spec majortom-global`, CR-056, CR-070); its `panel.yaml` holds the draw and the coherence spec.
     - Done when the `Panel` reader opens it and its split matches the spec.
 - [ ] **Train on the GPU.** HPC.
     - Steps: `ponzi-models prepare`, then `train`, on the cluster's GPU partition (the `gpu` role of the site file) in the `ml-gpu` environment, then `export` and `register-model`.
@@ -101,25 +101,26 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [ ] **Weather in the onboarding.**
     - local: the code exists.
     - HPC: needs the network and CDS or EDH credentials.
-    - A TiDE standard (the default forecaster) needs the ERA5 series in its sidecars: its onboarding runs `weather` and `pairdiff`, as the defaults do (the draft `s1-general@1.0.0` takes them).
+    - A TiDE standard (the default forecaster) needs the ERA5 series in its sidecars: its onboarding runs `weather` and `pairdiff`, as the defaults do (the draft `s1-general@2.0.0` takes them, through the onboarding spec `all-steps`).
     - Done when a TiDE standard runs through the worker on a real burst.
 - [ ] **Model stages as worker stages.** local.
     - `prepare`, `train`, `export`, `null-runs`, `null-rows` and `calibrate` run today as `ponzi-models` commands. Making them stages, with content ids, would put the lifecycle itself in the cache and its manifests.
     - Done when `ponzi-models rehearse` can be expressed as a worker workflow.
 - [ ] **Decide the default platforms.** Owner.
     - Either S1A only, which is a 12-day series, or S1A with S1C. Today it is S1A.
-    - Done when the decision is recorded in the plan and `CoherenceConfig`'s default follows it.
+    - Done when the decision is recorded in the plan and `CoherenceSpec`'s default follows it.
 - [ ] **Set the grid default (D9).** Owner.
     - The default is set with the first standard; 40 m, the posting in use today, is the starting point.
 - [ ] **The CDSE download route.** local, then HPC.
     - A CDSE fallback search and download when ASF misses a burst. Done when `discover` and `coherence` can take CDSE as the source.
-- [ ] **Publish `s1-general@1.0.0`.** Owner.
-    - Steps: `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`$PONZI_HOME/standards` by default).
-    - The draft is ponzi-suite `standards/s1-general-1.0.0.yaml` (CR-055); it waits for its model and calibrations.
+- [ ] **Publish `s1-general@2.0.0`.** Owner.
+    - Steps: fill the model and calibrations, set `status: published`, `ponzi-models register-standard`, then `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`$PONZI_HOME/standards` by default).
+    - The draft is ponzi-suite `standards/s1-general-2.0.0.yaml` (CR-055, CR-070); it waits for its model and calibrations.
 - [x] **Enforce a standard's `requires`.** `check-standard` and the worker check it (CR-055).
 - [x] **A standard names its panel.** The model and the calibrations must match it; no training cell may be a test cell (CR-055).
 - [x] **Versions are held against the one before.** Within a major the runs may not change, within a minor the outputs (CR-055).
 - [x] **Library versions in content ids.** The majors of the code that computes a stage (CR-054).
+- [x] **Specs, and only the standard versioned.** The files a person writes are training, scoring, panel, detection, coherence and onboarding specs, in folders of those names in ponzi-suite and the PONZI home, each known by its name and hash, frozen once used, and recorded in a `specs:` block with its suite commit. A standard is `<sensor>-<scope>`, names its specs, and is written and registered by `new-standard`, `bump-standard` and `register-standard`; every stage is at identity version `2`, so everything is made again (CR-070).
 
 ## Phase 9: watched areas
 

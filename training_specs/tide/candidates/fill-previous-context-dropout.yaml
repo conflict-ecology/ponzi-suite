@@ -1,11 +1,11 @@
 # A CANDIDATE, not a registered model: ONE C 30 model that also handles short histories, instead of separate C 10
-# and C 30 models. It is forecasters/tide/candidates/fill-previous.yaml (the spec of the registered model
+# and C 30 models. It is training_specs/tide/candidates/fill-previous.yaml (the spec of the registered model
 # tide_s1_mt04: the previous observed value with the obs flags, future obs as in a run, strict covariates,
 # support: gated) key for key, plus context dropout: in training, half of the windows (share 0.5) get their k OLDEST
 # context acquisitions blanked, k drawn uniformly from 0 to 29 (min_keep 1: at least one acquisition kept), set to
 # missing exactly as a real missing acquisition is (coherence of every baseline missing, so the previous fill and
 # obs indicators 0, and the |bperp| of the dropped pairs missing; the weather stays). Nothing changes at inference:
-# the same model runs at the start of a series and after long gaps, and the run config's context.min_support decides
+# the same model runs at the start of a series and after long gaps, and the scoring spec's context.min_support decides
 # when scores count. The val loss and the selection are on the real val windows; the model card's val_by_context
 # (the val loss and coverage with the context truncated to 1, 2, 3, 5, 8, 12, 16, 20, 25 and 30 acquisitions) is the
 # curve on which it is compared with tide_s1_mt04 (training/eval_context.py on the registered artifact, same
@@ -13,9 +13,9 @@
 # Fitted at seed 42 (`training/train.py --seed 42`: the fit is tide-weather-fill-previous-context-dropout-seed42), one GPU task,
 # hpc/train_one.sbatch. The prepared files are those of tide-weather (context dropout is applied when batches
 # are gathered, so the prepared folder and its tag are the same).
-# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
+# Validated by training/training_spec.py (TrainingSpec); unknown keys are refused.
 extends: ../weather.yaml
-fit_id: tide-weather-fill-previous-context-dropout
+training_id: tide-weather-fill-previous-context-dropout
 formerly: tide_c30_pdcompact_previous_cd
 missing:
   fill: previous

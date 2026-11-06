@@ -1,0 +1,37 @@
+# The general standard of Sentinel-1: what a watched area runs once its model is registered.
+# A DRAFT (status: draft, ponzi-core CR-055): the panel spec is written (panel_specs/majortom-global) but its
+# coherence stores are still to be made, so no model, scoring spec hash or calibration is registered yet. It names
+# its specs (CR-070): the coherence, onboarding and detection specs are files of coherence_specs/, onboarding_specs/
+# and detection_specs/, the panel the panel spec majortom-global. Version 2.0.0 (written by `ponzi-models
+# bump-standard --version 2.0.0`): every run is made again under new content ids, its calibrations are new, and its
+# specs are named files. Publishing it means filling `model.ref`, `scoring_spec_hash` and `calibrations` from the
+# registry, setting `status: published`, and `ponzi-models register-standard`.
+id: s1-general
+version: 2.0.0
+status: draft
+sensor: S1
+description: >-
+  Sentinel-1 surface disturbance monitoring: the TiDE forecaster with weather inputs and the previous observed value
+  for a missing coherence, trained and calibrated on the Major TOM panel, with the single-path detection.
+panel: majortom-global
+workflow:
+  - {name: discover, version: "2"}
+  - {name: dem, version: "2"}
+  - {name: coherence, version: "2"}
+  - {name: assemble, version: "2"}
+  - {name: onboard, version: "2"}
+  - {name: run, version: "2"}
+  - {name: pvalues, version: "2"}
+  - {name: detect, version: "2"}
+  - {name: tile, version: "2"}
+coherence: isce3-gaussian    # coherence_specs/isce3-gaussian.yaml: the code's defaults
+onboarding: all-steps        # onboarding_specs/all-steps.yaml: every step, the code's defaults
+model:
+  model_id: tide-weather-fill-previous--majortom-global
+scoring_spec_hash: ""
+calibrations: []
+detection: single-path       # detection_specs/single-path.yaml: code 50, Et dating, no gap bridged, no episodes
+requires:
+  ponzi: ">=0.1.0"
+  ponzi-pipeline: ">=0.1.0"
+  ponzi-models: ">=0.1.0"

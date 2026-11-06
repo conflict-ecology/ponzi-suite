@@ -42,7 +42,11 @@ The shared schemas. Generated from the docstrings of the installed package.
 
 ::: ponzi_spec.naming
 
-## Panel definitions
+## Specs
+
+::: ponzi_spec.specs
+
+## Panel specs
 
 ::: ponzi_spec.panel
 

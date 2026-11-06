@@ -8,7 +8,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | --- | --- | --- |
 | **stage** | a unit of a workflow the worker runs: `discover`, `dem`, `coherence`, `assemble`, `onboard`, `run`, `pvalues`, `detect`, `tile`, and the `ingest-coherence` and `ingest-calibration` stages ([Stages](../method/stages.md)) | in progressive scoring, how many of an anchor's future acquisitions are known: stage 1 to H - 1 is provisional, stage H is final (CR-021) |
 | **window** | the span of anchors a run scores (`t_lo` to `t_hi`) | the area of a mask layer a run reads; or the estimator's Gaussian window in coherence |
-| **run** | one forecast run of one burst under one run config (`ponzi run`, a `ponzi-run` Item) | loosely, any execution; this documentation uses *job* for that |
+| **run** | one forecast run of one burst under one scoring spec (`ponzi run`, a `ponzi-run` Item) | loosely, any execution; this documentation uses *job* for that |
 | **path** | one track seen in one direction, the bursts a detection combines (`detect-path`) | a file path |
 
 ## Where: places on the ground
@@ -62,7 +62,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **null** | the anomaly scores of the panel's test cells, where nothing happened | |
 | **p-value** | the share of the null at or above a score | |
 | **code** | `round(20 * -log10 p)` stored as one byte (C22); code 50 is p = 0.003 | a score |
-| **flag** | an anchor whose code is at or above the recipe's threshold | an event |
+| **flag** | an anchor whose code is at or above the detection spec's threshold | an event |
 | **provisional**, **withdrawn** | a flag at an early stage, and one the final stage does not confirm (CR-021) | |
 | **Et** | the break statistic that dates a run of flags (`summary.zarr`, C24) | E, the difference of means Et is made from |
 | **event** | a dated change of a pixel: a run of flags, dated by Et (C25) | a flag |
@@ -72,12 +72,12 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
 | **forecaster** | a kind of forecasting method, the code that predicts coherence (`tide`, `rolling_ols`, `stored`, `external`); TiDE is the default today; any registered forecaster works the same way | a model |
-| **fit spec** | a forecaster file: everything one training fixes (C, H, inputs, missing values, augmentation, seed) | a run config |
-| **candidate** | a fit spec being compared with the base (`candidates/`), not a registered model | |
-| **fit** | one training of a fit spec on a panel; `-seed43` for another seed | |
+| **training spec** | how a model is trained: everything one training fixes (C, H, inputs, missing values, augmentation, seed), `training_specs/` | a scoring spec; the forecaster (the code) |
+| **candidate** | a training spec being compared with the base (`candidates/`), not a registered model | |
+| **fit** | one training of a training spec on a panel; `-seed43` for another seed | |
 | **artifact** | the exported fit of a trained forecaster: for TiDE, the default, a TorchScript folder with its `meta.json` | a model (the artifact plus its registry entry) |
-| **model** | a registered artifact with its run config and model card, `tide-weather--majortom-global-0.4.0` | a forecaster |
-| **run config** | how a model is run: C, H, scoring, aggregation, state machine (C4); its hash is fixed when the model is registered | a run request (C4a: paths, dates and options of one run) |
+| **model** | a registered artifact with its scoring spec and model card, `<training spec>--<panel spec>` (`tide-weather--majortom-global`) | a forecaster |
+| **scoring spec** | how a model is applied to a burst: C, H, scoring, aggregation, state machine (C4), `scoring_specs/`; its hash is fixed when the model is registered | a run request (C4a: paths, dates and options of one run) |
 | **registry** | the folder of models and their calibrations, `$PONZI_HOME/registry` | the server's database |
 
 ### From forecaster to model, step by step
@@ -87,24 +87,24 @@ Each step makes the next thing from the one before, with one command. The exampl
 | Step | Command | Makes | Example |
 | --- | --- | --- | --- |
 | 1. Choose a forecaster | | the kind of method | `tide`, the TiDE neural network and today's default, or any other registered in `ponzi.core.forecast` (`rolling_ols`, ...) |
-| 2. Write a fit spec | | what one training fixes: context, horizon, inputs, missing values, augmentation, seed | `forecasters/tide/weather.yaml`, named `tide-weather` |
+| 2. Write a training spec | | what one training fixes: context, horizon, inputs, missing values, augmentation, seed | `training_specs/tide/weather.yaml`, named `tide-weather` |
 | 3. Train | `ponzi-models train` | a **fit**: the trained weights of the spec on a panel, as a checkpoint | `tide-weather`, or `tide-weather-seed43` at another seed |
 | 4. Export | `ponzi-models export` | an **artifact**: the fit in a self-contained form; for TiDE, TorchScript with its `meta.json` (window layout, channels, scalers, missing values) | a `torchscript/` folder; inference needs nothing else |
-| 5. Register | `ponzi-models register-model` | a **model**: the artifact filed with one run config and a model card | `tide-weather--majortom-global-0.4.0` in `$PONZI_HOME/registry` |
+| 5. Register | `ponzi-models register-model` | a **model**: the artifact filed with one scoring spec and a model card | `tide-weather--majortom-global` in `$PONZI_HOME/registry` |
 
-Only a model can be used: calibrations are made for it, and run configs and standards name it as `registry:<model id>@sha256:<digest>`. Two things follow from the steps:
+Only a model can be used: calibrations are made for it, and scoring specs and standards name it as `registry:<model id>@sha256:<digest>`. Two things follow from the steps:
 
-- **A model may have no artifact.** A rolling forecaster such as `rolling_ols` fits itself as it runs and has no trained weights, so steps 3 and 4 do not apply: its model is its run config and model card.
-- **One artifact can make two models.** The same weights registered with another run config give another model, of another run config hash, and its calibrations are its own: a calibration belongs to one run config.
+- **A model may have no artifact.** A rolling forecaster such as `rolling_ols` fits itself as it runs and has no trained weights, so steps 3 and 4 do not apply: its model is its scoring spec and model card.
+- **One artifact can make two models.** The same weights registered with another scoring spec give another model, of another scoring spec hash, and its calibrations are its own: a calibration belongs to one scoring spec.
 
 ## Calibration and panels
 
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
-| **panel** (definition) | the git-tracked set of cells and bursts in `panels/<id>/`, `majortom-global@0.4.0` | a built panel |
-| **built panel** | the panel's stores, masks and draw, made into `$PONZI_HOME/panels/<id>@<version>` | |
+| **panel spec** | the git-tracked folder of cells, bursts and build settings, `panel_specs/<id>/` (`majortom-global`); no version ([Panels](../method/panels.md)) | a built panel |
+| **built panel** | the panel's stores, masks and draw, made into `$PONZI_HOME/panels/<id>` | |
 | **split** | train, val or test; test is the calibration null | |
-| **calibration** | the mapping from scores to codes, filed under one model for one run config | a recipe |
+| **calibration** | the mapping from scores to codes, filed under one model for one scoring spec | a detection spec |
 | **plain**, **ceiling** calibration | against the whole null, or against the null of the pixel's ceiling class | the ceiling score (which the ceiling calibration uses) |
 | **format 2**, **format 3** | a calibration file of the final stage only, or with one mapping per stage (staged) | |
 
@@ -112,10 +112,12 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 
 | Term | What it fixes | Not to be confused with |
 | --- | --- | --- |
-| **recipe** | the detection rules: threshold code, dating, gaps, episodes | a calibration |
+| **spec** | a file a person writes, validated by PONZI, that says how something is made: a training, scoring, panel, detection, coherence or onboarding spec, known by its name and hash ([Naming](../models/naming.md#spec-folders)) | a standard; a config of the deployment |
+| **detection spec** | the detection rules: threshold code, dating, gaps, episodes, `detection_specs/` | a calibration |
+| **coherence spec**, **onboarding spec** | how a burst's coherence store is made (backend, looks, window, grid, DEM), and its sidecar and pixel sample, `coherence_specs/`, `onboarding_specs/` | |
 | **workflow** | the stages and their order for one burst, with variables | a job (one workflow for one burst and span) |
-| **standard** | everything an area runs, under one id and version (`s1-general@1.0.0`): the workflow, the coherence and onboarding configs, the model, its run config, its calibrations, the recipe ([Standards](../models/standards.md)) | a release of the library |
-| **test case** | a place used for testing, `testcases/<case>/`: its area, recipe and forecaster | a standard |
+| **standard** | everything an area runs, under one id `<sensor>-<scope>` and version (`s1-general@2.0.0`): the workflow, the panel, coherence, onboarding and detection specs by name, the model, its scoring spec hash, its calibrations ([Standards](../models/standards.md)) | a release of the library |
+| **test case** | a place used for testing, `testcases/<case>/`: its area, detection spec and training spec | a standard |
 
 ## The service
 
@@ -137,10 +139,9 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 | Term | What it identifies | Changes when |
 | --- | --- | --- |
 | **content id** | one output, from its stage, its stage version, its inputs' ids and its parameters ([Content ids](../using/content-ids.md)) | any of those change |
-| **stage version** | a stage's identity, `"1"` | raised by hand when its outputs may change |
-| **config hash** | a run config, composed | any key changes |
+| **stage version** | a stage's identity, `"2"` since CR-070 | raised by hand when its outputs may change |
+| **spec hash** | a spec, composed and with the code's defaults filled in (`spec_hash`) | any resolved setting changes |
 | **digest**, **sha256** | the bytes of a file or store | the bytes change |
-| **library version** | a release of `ponzi` (git tag, `0.2.4`); a calibration refuses another major | a release |
-| **panel version** | a panel definition, semver in `panel.yaml` | its files change |
-| **standard version** | a standard, semver | anything in it changes |
-| **name** | a readable label (`tide-weather`), never an identity on its own | |
+| **library version** | a release of `ponzi` (git tag, `0.1.0`); a calibration refuses another major | a release |
+| **standard version** | a standard, semver; the only version a person writes ([Standard versions](../models/versions.md)) | anything in it changes |
+| **name** | a readable label (`tide-weather`), never an identity on its own; a spec's name stands for one hash once used (`specs.json`) | |

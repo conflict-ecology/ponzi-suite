@@ -13,7 +13,7 @@ Checklists for agents that change PONZI's code. People follow the same rules in 
 
 - [ ] Imports follow the layering: `ponzi-spec` imports no ponzi distribution; `ponzi` does not import `ponzi_pipeline` or `ponzi_models`; the service and the front end import no computing distribution.
 - [ ] No hostnames, cluster paths or user names in code; paths through `pathlib` and `ponzi_spec.paths`.
-- [ ] No data in a code repository: the files PONZI runs from (panels, forecasters, run configs, test cases) go in ponzi-suite, and everything computed goes in the PONZI home (`~/.ponzi`, or `$PONZI_HOME`).
+- [ ] No data in a code repository: the files PONZI runs from (specs, standards, test cases) go in ponzi-suite, and everything computed goes in the PONZI home (`~/.ponzi`, or `$PONZI_HOME`).
 - [ ] Every new function has a concise docstring.
 - [ ] Identity params (hashed) and request params (not hashed) are kept apart.
 - [ ] Golden files are never regenerated to make a test pass.
@@ -29,7 +29,7 @@ See [A new stage](../new-stage.md) for the full steps.
 
 ## Adding a model
 
-- [ ] Fit spec, panel, prepare, train, export, register, null, calibrate, benchmark, standard, in that order.
+- [ ] Training spec, panel spec, prepare, train, export, register, null, calibrate, benchmark, standard, in that order.
 - [ ] The model is referenced by registry id and digest, never by path.
 
 See [A new model](../../models/new-model.md).

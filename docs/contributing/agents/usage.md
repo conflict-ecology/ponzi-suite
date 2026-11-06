@@ -25,7 +25,7 @@ Check first: `ponzi-client standards` answers in client mode; a connection error
 | Task | Client call (Python) | Command | Notes |
 | --- | --- | --- | --- |
 | Find bursts over an area | `c.bursts(bbox=...)` | `ponzi-client bursts --bbox ...` | burst ids look like `t028_058198_iw3` |
-| See what can be run | `c.standards()` | `ponzi-client standards` | a standard id has a version: `s1-general@1.0.0` |
+| See what can be run | `c.standards()` | `ponzi-client standards` | a standard id has a version: `s1-general@2.0.0` |
 | Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...])` | `ponzi-client area-create --cells C[,C] --tags T[,T]` | needs a `client:write` key; 1 to 64 tiles over land; the standard is optional (the server's); see [Watched areas](../../using/watched-areas.md) |
 | Pause or change a watched area | `c.update_area(area_id, active=False)` | `ponzi-client area-update ID --active false` | fields left out stay as they are |
 | Find the outputs of tagged areas | `c.search(tags=[...])` | `ponzi-client search --tags T[,T]` | analysis Items only ([Tags](../../using/watched-areas.md#tags)) |
@@ -47,13 +47,13 @@ With no server, PONZI runs on this machine from its own commands. Use a standard
 | Try it without computing | `ponzi-worker run WORKFLOW.yaml ... --dry-run` | the jobs and which are already cached |
 | Explain a result | `ponzi-worker manifest CONTENT_ID --json` | the provenance from the local cache |
 | One step of the data chain | `ponzi-pipeline discover`, `acquire`, `dem`, `coherence`, `assemble`, `onboard` | `ponzi-pipeline` with no argument lists them; `acquire` needs Earthdata ([Authentication](../../getting-started/authentication.md)) |
-| A forecast run on a store | `ponzi run ...` | needs a run config of a registered model; `ponzi --help` lists the commands |
+| A forecast run on a store | `ponzi run ...` | needs a scoring spec of a registered model (`--scoring-spec`); `ponzi --help` lists the commands |
 | Check or rehearse a standard | `ponzi-models check-standard FILE`, `ponzi-models rehearse --out DIR` | the rehearsal is synthetic and runs on the CPU in seconds |
 | Look up a burst or a boundary | the burst catalog `$PONZI_HOME/catalog/bursts.sqlite3`, the boundaries `$PONZI_HOME/catalog/boundaries.sqlite3` | read only |
 
 In local mode:
 
-- Work only in this machine's PONZI home and in a scratch folder; do not edit the files of ponzi-suite (panels, forecasters, run configs, standards) to make a run go.
+- Work only in this machine's PONZI home and in a scratch folder; do not edit the files of ponzi-suite (specs, standards) to make a run go.
 - Do not use `--executor slurm` or `sbatch` yourself: an agent submits cluster work only by asking for it through a server in client mode, or with the owner's approval.
 - Do not train, export or register models, or file calibrations, unless the owner asks: they change the registry every later run reads.
 - Downloads (`acquire`, the weather) are large and count against the owner's quotas: say how many acquisitions a run will fetch before starting it, and use `--dry-run` first.

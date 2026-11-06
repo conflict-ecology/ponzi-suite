@@ -1,5 +1,5 @@
 # A CANDIDATE, not a registered model: ONE C 30 model for every situation a run meets, trained with the general
-# augmentation of training/augment.py. It is forecasters/tide/candidates/fill-previous.yaml (the spec of the
+# augmentation of training/augment.py. It is training_specs/tide/candidates/fill-previous.yaml (the spec of the
 # registered model tide_s1_mt04: the previous observed value with the obs flags, future obs as in a run, strict
 # covariates, support: gated) key for key, plus `augment`, five kinds, each hitting a training window with its own
 # probability, independently (so about 35 % of the windows stay as they are: 0.71 * 0.76 * 0.8 * 0.9 * 0.9, the
@@ -22,9 +22,9 @@
 # Fitted at seed 42 (`training/train.py --seed 42`: the fit is tide-weather-fill-previous-augmented-seed42), one GPU task,
 # hpc/train_one.sbatch. The prepared files are those of tide-weather (augmentation is applied when batches
 # are gathered, so the prepared folder and its tag are the same).
-# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
+# Validated by training/training_spec.py (TrainingSpec); unknown keys are refused.
 extends: ../weather.yaml
-fit_id: tide-weather-fill-previous-augmented
+training_id: tide-weather-fill-previous-augmented
 formerly: tide_c30_pdcompact_previous_aug
 missing:
   fill: previous

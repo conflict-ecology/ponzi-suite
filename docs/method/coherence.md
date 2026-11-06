@@ -31,4 +31,4 @@ ponzi-pipeline coherence --burst ID --work DIR --burst-map FILE --index N     # 
 ponzi-pipeline assemble  --burst ID --work DIR --burst-map FILE --out DIR
 ```
 
-All take `--config FILE`, the coherence config (looks, window, grid, DEM, platforms, baselines), whose hash names the computation.
+All take `--coherence-spec NAME|FILE`, the coherence spec (looks, window, grid, DEM, platforms, baselines; `coherence_specs/`, [Naming](../models/naming.md#spec-folders)), whose hash names the computation; without it, the code's defaults.

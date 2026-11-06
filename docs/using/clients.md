@@ -10,10 +10,10 @@ c.standards(); c.bursts(bbox=(51.2, 35.5, 51.6, 35.8))
 unit = c.boundaries(level=1, bbox=(34.2, 31.2, 34.6, 31.6))[0]          # World Bank units, to draw: name, outline
 tiles = [x.cell_id for x in c.majortom_cells(bbox=(51.38, 35.68, 51.42, 35.72))]   # Major TOM tiles over land
 c.majortom_bursts(tiles); c.majortom_tracks(tiles)                       # what an area of them watches
-area = c.create_area(cells=tiles, tags=["Tehran"], start_date="2023-01-01", standard="s1-general@1.0.0")
+area = c.create_area(cells=tiles, tags=["Tehran"], start_date="2023-01-01", standard="s1-general@2.0.0")
 c.update_area(area.area_id, active=False); c.discover_area(area.area_id); c.jobs(area_id=area.area_id)
 tagged = c.search(tags=["Tehran"])                    # the analysis Items of the areas tagged so
-run = c.submit(burst_ids=["t028_058198_iw3"], standard="s1-general@1.0.0")
+run = c.submit(burst_ids=["t028_058198_iw3"], standard="s1-general@2.0.0")
 c.request(run.request_id).status                      # queued, running, done, failed
 items = c.search(collections=["ponzi-events-cell"], bbox=(51.2, 35.5, 51.6, 35.8))
 c.manifest(items[0].properties["ponzi:content_id"])

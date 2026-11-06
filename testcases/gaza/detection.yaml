@@ -1,7 +1,7 @@
-# The detection recipe of the Gaza damage release v4, for one path (CR-043: formerly the preset gaza_release_v4 in
+# The detection spec of the Gaza damage release v4, for one path (CR-043: formerly the preset gaza_release_v4 in
 # ponzi.products.recipe.PRESETS, the same fields). The release's settings: one-anchor gaps bridged, 60-day
 # episodes, overlapping dating windows, events from the first acquisition after 2023-10-07.
-# The release's cross-path confirmation (rule B) is not part of a recipe.
+# The release's cross-path confirmation (rule B) is not part of a detection spec.
 # Build on it with: extends: <path to this file>, then the fields to change.
 calibration_kind: ceiling
 code: 50

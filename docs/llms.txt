@@ -47,9 +47,9 @@ Agents use PONZI through ponzi-client when a server is running (client mode), el
 ## Models and standards
 
 - [Making a standard](models/standards/): the lifecycle on the CPU and at scale
-- [Standard versions and naming](models/versions/): how standards are named, versioned and tracked
-- [Naming](models/naming/): names of forecasters, panels and models
-- [A new model](models/new-model/): from a fit spec to a model in a standard
+- [Standard versions and naming](models/versions/): how standards are named, versioned and tracked; spec hashes and the specs block; new-standard, bump-standard, register-standard
+- [Naming](models/naming/): names of specs, models and standards; the six spec folders
+- [A new model](models/new-model/): from a training spec to a model in a standard
 
 ## Reference
 

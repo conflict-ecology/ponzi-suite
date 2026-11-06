@@ -1,4 +1,4 @@
-# A CANDIDATE, not a registered model: forecasters/tide/candidates/fill-previous-augmented.yaml (the spec of the
+# A CANDIDATE, not a registered model: training_specs/tide/candidates/fill-previous-augmented.yaml (the spec of the
 # registered augmented model tide_s1_mt04_aug) key for key, plus a Sentinel-1 moisture covariate
 # (owner 2026-10-16: the rain-onset false alarms of Tehran; the registered models have no precipitation input):
 #   s1_pd_vv_db_{12,24,36,48,60}d, the pair differences of the burst's non-built median VV backscatter (dB), one
@@ -8,9 +8,9 @@
 # EXTRA_DIR=$PONZI_DATA_ROOT/side/sar_sm/sidecars; a run with RunRequest.extra_sidecar). An AOI needs its own S1
 # sidecars (Tehran: not yet made). Fitted at seeds 42 and 43, compared with tide_s1_mt04_aug on the model card's
 # tables (same windows) and, after calibration, on the Tehran rain dates.
-# Validated by training/fit_spec.py (TideSpec); unknown keys are refused.
+# Validated by training/training_spec.py (TrainingSpec); unknown keys are refused.
 extends: ../weather.yaml
-fit_id: tide-weather-fill-previous-augmented-radar-moisture
+training_id: tide-weather-fill-previous-augmented-radar-moisture
 formerly: tide_c30_pdcompact_previous_aug_s1
 era5_vars:
 - era5_swvl1

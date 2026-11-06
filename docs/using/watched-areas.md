@@ -14,7 +14,7 @@ A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grid
 
 ```
 ponzi-client area-create --cells 393U_467R,393U_468R --tags "flood 2024,coast" --start 2024-01-01 --end 2024-12-31
-ponzi-client area-create --cells 393U_469R --standard s1-general@1.0.0 --cadence-hours 12   # a standard of its own
+ponzi-client area-create --cells 393U_469R --standard s1-general@2.0.0 --cadence-hours 12   # a standard of its own
 ponzi-client area-update AREA_ID --active false      # pause
 ponzi-client area-update AREA_ID --tags "flood 2024" # change its tags
 ponzi-client area-discover AREA_ID                   # look now, whatever the cadence
@@ -54,7 +54,7 @@ Content ids decide. The worker plans the standard's workflow and runs only what 
 - **Nothing new at ASF.** Discovery is named by what it found, not by the day it looked, so every job is cached and nothing runs.
 - **A new acquisition.**
     - A new pairs Item.
-    - Only the new pairs' coherence, at most one per baseline. A pair's id depends only on its two granules and the coherence config, never on the rest of the series.
+    - Only the new pairs' coherence, at most one per baseline. A pair's id depends only on its two granules and the coherence spec, never on the rest of the series.
     - A new store, and exactly one new staged run. A monitoring update is a new run; it is never appended to an old one.
     - New events, new p-values and new cells.
 

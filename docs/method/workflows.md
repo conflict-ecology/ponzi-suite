@@ -69,7 +69,7 @@ The method, where it runs, how its registered pieces are made, and what a change
 <text class="pz-small" x="30" y="340">quantiles of the 25</text>
 <text class="pz-small" x="30" y="357">pairs from the context</text>
 <text class="pz-small" x="30" y="374">and the covariates</text>
-<text class="pz-small" x="88.0" y="422" text-anchor="middle">uses: model + run config</text>
+<text class="pz-small" x="88.0" y="422" text-anchor="middle">uses: model + scoring spec</text>
 <rect class="pz-box" x="176" y="262" width="136" height="142" rx="6"/>
 <text class="pz-title" x="186" y="284">2 Score</text>
 <text class="pz-small" x="186" y="306">z: each observed pair</text>
@@ -95,20 +95,20 @@ The method, where it runs, how its registered pieces are made, and what a change
 <text class="pz-small" x="498" y="340">runs of flags per</text>
 <text class="pz-small" x="498" y="357">path, dated by Et:</text>
 <text class="pz-small" x="498" y="374">disturbance events</text>
-<text class="pz-small" x="556.0" y="422" text-anchor="middle">uses: recipe</text>
+<text class="pz-small" x="556.0" y="422" text-anchor="middle">uses: detection spec</text>
 <line class="pz-arrow" x1="470" y1="333.0" x2="485" y2="333.0"/>
 <text class="pz-small" x="20" y="452">In monitoring this repeats at every new acquisition; staged runs score an anchor before its block is complete</text>
 <text class="pz-small" x="20" y="466">(stages 1 to 4), and the final stage confirms or withdraws its flags.</text>
 </svg>
 </div>
 
-From the 30 acquisitions before an anchor `t` and the covariates (weather, built-up), the forecaster predicts the coherence of the 25 pairs ending on `t` to `t + 4` (baselines 12 to 60 days). Each observed pair is scored against its forecast (`z`). The 15 pairs that span the gap before `t`, the **pyramid**, are the ones a change at `t` lowers, and their mean `z` is the anomaly score of `t`. The score is turned into a p-value against the same score on the held-out test cells of the panel (the **null**), stored as a code. The detection recipe flags codes at or above its threshold, joins flags into runs along a path, and dates each change by the break statistic `Et`: the **surface disturbance events**. Labelled damage (BRIGHT, UNOSAT) is used only to evaluate.
+From the 30 acquisitions before an anchor `t` and the covariates (weather, built-up), the forecaster predicts the coherence of the 25 pairs ending on `t` to `t + 4` (baselines 12 to 60 days). Each observed pair is scored against its forecast (`z`). The 15 pairs that span the gap before `t`, the **pyramid**, are the ones a change at `t` lowers, and their mean `z` is the anomaly score of `t`. The score is turned into a p-value against the same score on the held-out test cells of the panel (the **null**), stored as a code. The detection spec flags codes at or above its threshold, joins flags into runs along a path, and dates each change by the break statistic `Et`: the **surface disturbance events**. Labelled damage (BRIGHT, UNOSAT) is used only to evaluate.
 
 ## Where it runs
 
 ```mermaid
 flowchart LR
-  suite["ponzi-suite<br/>panels, forecasters,<br/>run configs, test cases"]
+  suite["ponzi-suite<br/>specs, standards,<br/>test cases"]
   visual["ponzi-visual<br/>map: tiles, areas,<br/>outputs over time"]
   server[("ponzi-server<br/>areas, jobs, leases,<br/>final outputs")]
   client["ponzi-client serve<br/>the long-running loop"]
@@ -123,7 +123,7 @@ flowchart LR
   data --> worker
   worker --- home
   server --- home
-  suite -. "paths given to the commands" .-> worker
+  suite -. "specs by name or path" .-> worker
 ```
 
 The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([The service](../service/server.md), [The worker](../service/worker.md)).
@@ -144,13 +144,13 @@ flowchart TB
   subgraph score["scoring and detection"]
     direction LR
     onboard["onboard<br/>sidecar C2"] --> run["run<br/>scores C7, Et C24,<br/>staged C26"]
-    model[("registry<br/>model + run config")] --> run
+    model[("registry<br/>model + scoring spec")] --> run
     run --> pvalues["pvalues<br/>codes C22"]
     cal[("registry<br/>calibration")] -- "ingest-calibration" --> pvalues
     pvalues --> detect["detect<br/>events C25"]
     pvalues --> tile["tile<br/>events per<br/>Major TOM cell"]
-    recipe["standard's recipe"] --> detect
-    recipe --> tile
+    detection["standard's detection spec"] --> detect
+    detection --> tile
   end
   assemble --> onboard
   assemble --> run
@@ -166,12 +166,12 @@ The model, its calibrations and the standard are made with `ponzi-models`, from 
 
 ```mermaid
 flowchart LR
-  def["panel definition<br/>panels/majortom-global<br/>(panel-check)"] --> build["panel-build<br/>stores and masks<br/>in home/panels"]
+  def["panel spec<br/>panel_specs/majortom-global<br/>(panel-check)"] --> build["panel-build<br/>stores and masks<br/>in home/panels"]
   build --> prep["prepare<br/>train and val windows,<br/>layer sample_train"]
-  spec["fit spec<br/>forecasters/&lt;family&gt;/...<br/>(default: tide)"] --> prep
+  spec["training spec<br/>training_specs/&lt;family&gt;/...<br/>(default: tide)"] --> prep
   prep --> train["train<br/>keeps the best<br/>val epoch"]
   train --> export["export<br/>the artifact<br/>(TiDE: TorchScript + meta.json)"]
-  export --> reg["register-model<br/>model id + ONE run config:<br/>its hash fixed here"]
+  export --> reg["register-model<br/>model id + ONE scoring spec:<br/>its hash fixed here"]
 ```
 
 **Calibration**
@@ -181,7 +181,7 @@ flowchart LR
   reg[("registered model")] --> runs["null-runs<br/>production runs on the<br/>test split, layer sample_test"]
   runs --> rows["null-rows<br/>the runs' own anomaly<br/>scores where finite"]
   rows --> build["calibrate<br/>plain and ceiling"]
-  build --> regcal["register-calibration<br/>under the model; records the<br/>run config hash and library version"]
+  build --> regcal["register-calibration<br/>under the model; records the<br/>scoring spec hash and library version"]
   runs -. "--staged" .-> staged["calibrate-staged<br/>one mapping per stage<br/>(format 3)"]
   staged -.-> regcal
 ```
@@ -190,8 +190,10 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  std["standard yaml<br/>model, calibrations, recipe,<br/>coherence, onboarding"] --> check["check-standard<br/>against the registry"]
-  check --> wf["standard-workflow<br/>the server's standard file"]
+  newstd["new-standard<br/>or bump-standard"] --> std
+  std["standard yaml<br/>model, calibrations, and the<br/>detection, coherence, onboarding<br/>and panel specs by name"] --> check["check-standard<br/>against the registry"]
+  check --> regstd["register-standard<br/>registry standards/id@version"]
+  regstd --> wf["standard-workflow<br/>the server's standard file"]
   wf --> served[("home/standards<br/>read by the server")]
   bench["benchmark checks<br/>panel null, BRIGHT,<br/>Gaza with UNOSAT, Tehran"] -. "not yet a command" .-> std
 ```
@@ -209,13 +211,13 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | Piece | Fixed by | A change means |
 | --- | --- | --- |
 | Library (`ponzi`, `ponzi-pipeline`) | its version, `0.y` the major below 1.0 | a new major gives new content ids to the stages its code computes (CR-054), and a calibration refuses runs of another major (CR-020) |
-| Coherence config, onboarding config | the standard | new coherence stores and sidecars, and everything after |
-| Panel | `id@version` in `panel.yaml`, files by sha256 | a new model and calibration: the model id carries the panel version |
-| Fit spec | its file in `forecasters/` | a new fit, a new model |
-| Run config | its hash, fixed at `register-model` | new runs; a calibration is made for one hash and refuses others |
-| Calibration | its id under the model, the run config hash | new p-values and events; runs reused |
-| Recipe | its fields, inside the standard | new events and cells; runs and p-values reused |
-| Standard | `id@version`, immutable | any change is a new version; areas name the version they run |
+| Coherence spec, onboarding spec | its name and hash, named by the standard | new coherence stores and sidecars, and everything after |
+| Panel spec | its name and hash (`panel.yaml` and its files) | a new panel spec name, a new model and calibration: the model id carries the panel spec's name |
+| Training spec | its name and hash, in `training_specs/` | a new fit, a new model |
+| Scoring spec | its hash, fixed at `register-model` | new runs; a calibration is made for one hash and refuses others |
+| Calibration | its id under the model, the scoring spec hash | new p-values and events; runs reused |
+| Detection spec | its name and hash, named by the standard | new events and cells; runs and p-values reused |
+| Standard | `id@version`, immutable once registered | any change is a new version; areas name the version they run |
 | Area | its tiles (and so its bursts, of both passes) and its days | its jobs; no new standard |
 
 **The change matrix.** What each kind of work makes new, recomputes or reuses, as the worker behaves today.
@@ -225,10 +227,10 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | A. New area | the area | the stages of bursts not yet computed | the registry; any burst already computed | as intended |
 | B. Monitoring update | the pairs Item (identified by the acquisitions found) | the new pairs' coherence; then the store, sidecar, a new staged run over the window, p-values, events | the earlier pairs; a day with nothing new reuses everything | a monitoring update is a new run, never an appended one |
 | C. Fine-tune for an area | a child model (`init_from`), its calibration, a standard of its own | runs, p-values, events | coherence stores, sidecars | the two standards are not linked in the code |
-| D. New panel or fit spec | model, calibration, a new standard major | runs onward | coherence stores of bursts in both | as intended |
+| D. New panel spec or training spec | model, calibration, a new standard major | runs onward | coherence stores of bursts in both | as intended |
 | E. Better calibration | calibration, a new standard version | p-values, events | runs | nothing checks that its cells stayed out of training |
-| F. New recipe | a new standard version | events, cells | runs, p-values | as intended |
+| F. New detection spec | a new standard minor | events, cells | runs, p-values | as intended |
 | G. Library major change | the release, a rebuilt calibration | the stages whose `code` names the library: for `ponzi`, the store assembly, runs, p-values, events and cells; for `ponzi-pipeline`, coherence onward | the stages of other code | as intended (CR-054) |
-| H. Coherence engine change | new stores when the config changes, or with a new `ponzi-pipeline` major | stores onward | | **not automatic** for a minor or patch release of `ponzi-pipeline` or a new ISCE3 with the same config: stores are reused |
+| H. Coherence engine change | new stores when the coherence spec changes, or with a new `ponzi-pipeline` major | stores onward | | **not automatic** for a minor or patch release of `ponzi-pipeline` or a new ISCE3 with the same coherence spec: stores are reused |
 
-Standard versions: a minor version reuses the runs (a new calibration or recipe), a major one makes new runs (a new model or panel). `check-standard` refuses a version whose change needs a bigger bump, and a worker fails a job whose standard's `requires` its installed versions do not meet (CR-055; [Standard versions and naming](../models/versions.md)).
+Standard versions: a minor version reuses the runs (a new calibration or detection spec), a major one makes new runs (a new model or panel spec). `check-standard` refuses a version whose change needs a bigger bump, and a worker fails a job whose standard's `requires` its installed versions do not meet (CR-055; [Standard versions and naming](../models/versions.md)).
