@@ -32,6 +32,6 @@ scoring_spec_hash: ""
 calibrations: []
 detection: single-path       # detection_specs/single-path.yaml: code 50, Et dating, no gap bridged, no episodes
 requires:
-  ponzi: ">=0.1.0"
-  ponzi-pipeline: ">=0.1.0"
-  ponzi-models: ">=0.1.0"
+  ponzi: ">=0.0.1"
+  ponzi-pipeline: ">=0.0.1"
+  ponzi-models: ">=0.0.1"

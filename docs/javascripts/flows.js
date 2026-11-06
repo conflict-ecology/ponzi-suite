@@ -127,7 +127,7 @@
   const LEGEND = [["new", "new version made"], ["comp", "computed again"], ["reused", "reused as is"],
                   ["data", "data read"], ["gap", "should rerun, reused today"], ["todo", "not yet in the code"],
                   ["idle", "not involved"]];
-  const LIBRARY = "Library: ponzi 0.1.0, ponzi-pipeline 0.1.0, ponzi-models 0.1.0. Their majors are in the content ids (CR-054).";
+  const LIBRARY = "Library: ponzi 0.0.1, ponzi-pipeline 0.0.1, ponzi-models 0.0.1. Their majors are in the content ids (CR-054).";
 
   const NS = "http://www.w3.org/2000/svg";
   const NW = 172, NH = 48, COLX = [16, 236, 456, 676, 896], W = COLX[4] + NW + 90, H = 600;

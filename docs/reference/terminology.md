@@ -142,6 +142,6 @@ Only a model can be used: calibrations are made for it, and scoring specs and st
 | **stage version** | a stage's identity, `"2"` since CR-070 | raised by hand when its outputs may change |
 | **spec hash** | a spec, composed and with the code's defaults filled in (`spec_hash`) | any resolved setting changes |
 | **digest**, **sha256** | the bytes of a file or store | the bytes change |
-| **library version** | a release of `ponzi` (git tag, `0.1.0`); a calibration refuses another major | a release |
+| **library version** | a release of `ponzi` (git tag, `0.0.1`); a calibration refuses another major | a release |
 | **standard version** | a standard, semver; the only version a person writes ([Standard versions](../models/versions.md)) | anything in it changes |
 | **name** | a readable label (`tide-weather`), never an identity on its own; a spec's name stands for one hash once used (`specs.json`) | |
