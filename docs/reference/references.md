@@ -4,7 +4,7 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
 
 ## Forecasting
 
-- **TiDE**, the default forecaster today (`ponzi.core.forecast.tide`, trained by `ponzi-models train`). It is a default, not a requirement: any forecaster registered beside it is used the same way ([System overview](../concepts/overview.md)).
+- **TiDE**, the default forecaster today (`ponzi.core.forecast.tide`, trained by `ponzi-models train`). It is a default, not a requirement: any forecaster registered beside it is used the same way ([System overview](../getting-started/overview.md)).
   Das, A., Kong, W., Leach, A., Mathur, S., Sen, R., and Yu, R. (2023). Long-term Forecasting with TiDE: Time-series Dense Encoder. *Transactions on Machine Learning Research*. [arXiv:2304.08424](https://arxiv.org/abs/2304.08424)
 
 ## Satellite data
@@ -24,7 +24,7 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
 
 ## Grids
 
-- **Major TOM**, the 10 km grid of the panels' cells and the delivered outputs ([Grids](../concepts/grids.md)).
+- **Major TOM**, the 10 km grid of the panels' cells and the delivered outputs ([Grids](../method/grids.md)).
   Francis, A., and Czerkawski, M. (2024). Major TOM: Expandable Datasets for Earth Observation. *IGARSS 2024*. [arXiv:2402.12095](https://arxiv.org/abs/2402.12095)
 
 ## Software
@@ -33,7 +33,7 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
 - **s1-reader** and **COMPASS**, the OPERA readers and geocoding of Sentinel-1 bursts, beside ISCE3. [opera-adt/s1-reader](https://github.com/opera-adt/s1-reader), [opera-adt/COMPASS](https://github.com/opera-adt/COMPASS)
 - **asf_search**, the search and download client of ASF. [asfadmin/Discovery-asf_search](https://github.com/asfadmin/Discovery-asf_search)
 - **dem_stitcher**, the DEM tiles stitched over a burst. [ACCESS-Cloud-Based-InSAR/dem-stitcher](https://github.com/ACCESS-Cloud-Based-InSAR/dem-stitcher)
-- **STAC**, the SpatioTemporal Asset Catalog specification every output is recorded in ([STAC profile](../concepts/stac-profile.md)). [stacspec.org](https://stacspec.org)
+- **STAC**, the SpatioTemporal Asset Catalog specification every output is recorded in ([STAC profile](../using/stac-profile.md)). [stacspec.org](https://stacspec.org)
 - **Zarr**, the format of the stores. [zarr.dev](https://zarr.dev)
 - **PyTorch**, the training and the TorchScript artifacts of TiDE, the default forecaster; optional (`ponzi[tide]`). [pytorch.org](https://pytorch.org)
 

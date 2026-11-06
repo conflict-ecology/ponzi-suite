@@ -112,23 +112,22 @@
     { id: "lib", name: "Library major change", freq: "rarely", std: "should be major",
       example: "A results-changing fix, such as the Et early-anchor fix.",
       nodes: { lib: "new", cal: "new", std: "new", model: "reused", coh: "reused", onb: "reused", recipe: "reused",
-               runs: "gap", pv: "gap", ev: "gap", prod: "gap" },
+               runs: "comp", pv: "comp", ev: "comp", prod: "comp" },
       steps: ["Release the library with a new major (0.y while below 1.0).",
               "Rebuild the calibration under it: a calibration refuses runs of another major (CR-020).",
-              "Today: content ids do not include the library version, so the worker reuses its cached runs; pvalues then refuses them under the rebuilt calibration.",
-              "Needed: the library's major in the run stage's identity, so that the runs are made again."] },
+              "The major is part of the content id of every stage whose code it is (CR-054), so the runs and everything after them are made again."] },
     { id: "engine", name: "Coherence engine change", freq: "per engine release", std: "same, or major",
       example: "A new ISCE3 or ponzi-pipeline release, or a new coherence config.",
       nodes: { lib: "new", asf: "data", coh: "gap", onb: "gap", runs: "gap", pv: "gap", ev: "gap", prod: "gap",
                model: "reused", cal: "reused", recipe: "reused" },
       steps: ["With a new coherence config in the standard, the stores and everything after them get new content ids and are made again.",
-              "Today: when only the code changes (ponzi-pipeline, ISCE3) and the config does not, the stores keep their content ids and are reused.",
-              "Needed: the pipeline's major, or the stage version, in the coherence stage's identity."] },
+              "A new ponzi-pipeline major is part of the coherence stages' content ids (CR-054), so the stores are made again.",
+              "Today: a minor or patch release of ponzi-pipeline, or a new ISCE3, with the same config keeps the stores' content ids, and they are reused; a stage version raise makes them again."] },
   ];
   const LEGEND = [["new", "new version made"], ["comp", "computed again"], ["reused", "reused as is"],
                   ["data", "data read"], ["gap", "should rerun, reused today"], ["todo", "not yet in the code"],
                   ["idle", "not involved"]];
-  const LIBRARY = "Library: ponzi 0.2.4, ponzi-pipeline 0.2.0, ponzi-models 0.3.0. Content ids do not include them.";
+  const LIBRARY = "Library: ponzi 0.2.4, ponzi-pipeline 0.2.0, ponzi-models 0.3.0. Their majors are in the content ids (CR-054).";
 
   const NS = "http://www.w3.org/2000/svg";
   const NW = 172, NH = 48, COLX = [16, 236, 456, 676, 896], W = COLX[4] + NW + 90, H = 600;

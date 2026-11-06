@@ -1,6 +1,6 @@
 # Contributing (agents)
 
-Checklists for agents that change PONZI's code. People follow the same rules in [Contributing](../contributing/index.md).
+Checklists for agents that change PONZI's code. People follow the same rules in [Contributing](../index.md).
 
 ## Before any change
 
@@ -25,14 +25,14 @@ Checklists for agents that change PONZI's code. People follow the same rules in 
 - [ ] Synthetic tests: outputs validate against the PONZI extension schema; the content id is stable.
 - [ ] A docs page and a line in the stages table.
 
-See [A new stage](../contributing/new-stage.md) for the full steps.
+See [A new stage](../new-stage.md) for the full steps.
 
 ## Adding a model
 
 - [ ] Fit spec, panel, prepare, train, export, register, null, calibrate, benchmark, standard, in that order.
 - [ ] The model is referenced by registry id and digest, never by path.
 
-See [A new model](../contributing/new-model.md).
+See [A new model](../../models/new-model.md).
 
 ## Finishing
 

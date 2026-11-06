@@ -139,7 +139,7 @@ def visual_page(src: Path) -> str:
              "Generated from ponzi-visual's TypeScript source: each file's header comment and its exported functions, "
              "components and types with their doc comments. The API shapes (`Area`, `Boundary`, `Job` ...) are the "
              "server's, generated into `src/client/schema.d.ts` from its OpenAPI document "
-             "([REST API](../rest-api.md)).", ""]
+             "([REST API](../../service/rest-api.md)).", ""]
     for f in files:
         text = f.read_text(encoding="utf-8")
         rel = f.relative_to(src.parent).as_posix()

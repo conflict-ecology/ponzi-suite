@@ -66,33 +66,46 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Concepts:
-      - concepts/index.md
-      - System overview: concepts/overview.md
-      - Terminology: concepts/terminology.md
-      - How PONZI works: concepts/workflows.md
-      - STAC profile: concepts/stac-profile.md
-      - Content ids: concepts/content-ids.md
-      - Manifests: concepts/manifests.md
-      - Stages: concepts/stages.md
-      - Configuration: concepts/configuration.md
-      - Coherence: concepts/coherence.md
-      - Panels: concepts/panels.md
-      - Grids: concepts/grids.md
-      - The worker: concepts/worker.md
-      - The service: concepts/service.md
-  - Guides:
-      - guides/index.md
-      - Quickstart: guides/quickstart.md
-      - Install: guides/install.md
-      - Authentication: guides/authentication.md
-      - Making a standard: guides/standards.md
-      - Watched areas: guides/watched-areas.md
-      - Running on the cluster: guides/hpc.md
+  - Getting started:
+      - getting-started/index.md
+      - System overview: getting-started/overview.md
+      - Install: getting-started/install.md
+      - Quickstart: getting-started/quickstart.md
+      - Authentication: getting-started/authentication.md
+      - Paths and environment variables: getting-started/paths.md
+  - Using PONZI:
+      - using/index.md
+      - Watched areas: using/watched-areas.md
+      - The map: using/map.md
+      - The clients: using/clients.md
+      - "Outputs: the STAC profile": using/stac-profile.md
+      - Manifests: using/manifests.md
+      - Content ids: using/content-ids.md
+  - The service:
+      - service/index.md
+      - The server: service/server.md
+      - The worker: service/worker.md
+      - Running on the cluster: service/hpc.md
+      - Configuration: service/configuration.md
+      - REST API: service/rest-api.md
+      - Troubleshooting: service/troubleshooting.md
+  - The method:
+      - method/index.md
+      - How PONZI works: method/workflows.md
+      - Coherence: method/coherence.md
+      - Panels: method/panels.md
+      - Grids: method/grids.md
+      - Stages: method/stages.md
+      - Data sources and catalogs: method/data-sources.md
+  - Models and standards:
+      - models/index.md
+      - Making a standard: models/standards.md
+      - Standard versions and naming: models/versions.md
+      - Naming: models/naming.md
+      - A new model: models/new-model.md
   - Reference:
       - reference/index.md
       - ponzi-spec: reference/ponzi-spec.md
-      - REST API: reference/rest-api.md
       - API:
           - ponzi: reference/api/ponzi.md
           - ponzi-pipeline: reference/api/ponzi-pipeline.md
@@ -102,20 +115,17 @@ nav:
           - ponzi-client: reference/api/ponzi-client.md
           - ponzi-visual: reference/api/ponzi-visual.md
       - Store contracts: reference/contracts.md
-      - Naming: reference/naming.md
-      - The clients: reference/clients.md
-      - Paths and environment variables: reference/paths.md
+      - Terminology: reference/terminology.md
       - References: reference/references.md
   - Contributing:
       - contributing/index.md
       - Roadmap: contributing/roadmap.md
       - Change process: contributing/process.md
       - A new stage: contributing/new-stage.md
-      - A new model: contributing/new-model.md
-  - For agents:
-      - agents/index.md
-      - Using PONZI: agents/usage.md
-      - Contributing: agents/contributing.md
+      - For agents:
+          - contributing/agents/index.md
+          - Using PONZI: contributing/agents/usage.md
+          - Contributing: contributing/agents/contributing.md
   - History:
       - history/index.md
       - The overhaul plan: history/overhaul-plan.md

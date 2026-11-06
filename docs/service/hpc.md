@@ -14,7 +14,7 @@ ponzi-worker batch BATCH            # how far it got: job records in the cache, 
 
 ## Where the client loop runs
 
-`ponzi-client serve` is the only long-running process. It needs little: it polls the server, heartbeats, calls `ponzi-worker job` for a few seconds at a time, and delivers the outputs. It can run on the login node, or as a small SLURM job of its own.
+The loop needs little: it polls the server, heartbeats, calls `ponzi-worker job` for a few seconds at a time, and delivers the outputs. It can run on the login node, or as a small SLURM job of its own.
 
 ### As a SLURM job
 
@@ -95,7 +95,7 @@ It refuses a profile that cannot run:
 - a GPU request no node meets;
 - a stage that fits on no usable node.
 
-A root missing from the file systems, or a release not installed, becomes a warning in the file. The version is the snapshot's date.
+A root missing from the file systems, or a release not installed, becomes a warning in the file.
 
 The tests use a made-up cluster: `test_profile_create.py` makes profiles from a small synthetic snapshot and site file, and `test_slurm.py` renders and runs batches from a made-up profile with a fake `sbatch`. Nothing of a real cluster is in any repository.
 

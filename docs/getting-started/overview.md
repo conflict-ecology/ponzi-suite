@@ -15,7 +15,7 @@ Sentinel-1 SLCs (ASF)
 Models and calibrations are made by `ponzi-models` from panels: sets of pixels of many bursts, run through the same chain.
 
 !!! note "TiDE is the default forecaster, not a requirement"
-    The forecast step is replaceable. TiDE (Time-series Dense Encoder, [Das et al., 2023](../reference/references.md#forecasting)) is the default today: the draft standard `s1-general@1.0.0` runs a TiDE model, a neural network trained on panels and run as TorchScript. Nothing else in PONZI depends on it. Forecasters are registered by name (`ponzi.core.forecast.registry`): today `tide`, the rolling fit `rolling_ols`, which needs no training, and `stored` and `external`, which read predictions made elsewhere. A new forecaster is one module and one `register` call; the run config, the scoring, the calibration and the detection do not change, and a standard names whichever model it runs ([A new model](../contributing/new-model.md)).
+    The forecast step is replaceable. TiDE (Time-series Dense Encoder, [Das et al., 2023](../reference/references.md#forecasting)) is the default today: the draft standard `s1-general@1.0.0` runs a TiDE model, a neural network trained on panels and run as TorchScript. Nothing else in PONZI depends on it. Forecasters are registered by name (`ponzi.core.forecast.registry`): today `tide`, the rolling fit `rolling_ols`, which needs no training, and `stored` and `external`, which read predictions made elsewhere. A new forecaster is one module and one `register` call; the run config, the scoring, the calibration and the detection do not change, and a standard names whichever model it runs ([A new model](../models/new-model.md)).
 
 ## The components
 
@@ -32,7 +32,7 @@ Models and calibrations are made by `ponzi-models` from panels: sets of pixels o
 
 - **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It never imports the computing distributions.
 - **ponzi-client** (Python, and the `ponzi-client` command) is the only part that talks to a running server: submitting runs, watching areas, reading outputs, and, as `ponzi-client serve`, the one long-running loop that claims jobs, has the worker do them, delivers the final outputs (uploaded, or written into a folder the server also sees) and completes them (CR-063).
-- **ponzi-worker** never talks to the server and never stays running. `ponzi-worker job` is one short call on one job: it runs the job's workflow here, or submits and checks its SLURM jobs, and answers with what is done; the client calls it again until the job is finished. It keeps intermediate outputs in its own cache by content id, so each call goes on from where the last stopped. The front end has its own TypeScript client, generated from the server's committed OpenAPI document. Code can also use PONZI without a server: the ponzi-core libraries and their commands directly (`ponzi run`, `ponzi-pipeline`, `ponzi-models`), or a worker on its own (`ponzi-worker run` runs a workflow on this machine or through SLURM, with its cache, and no server).
+- **ponzi-worker** never talks to the server and never stays running. `ponzi-worker job` is one short call on one job: it runs the job's workflow here, or submits and checks its SLURM jobs, and answers with what is done; the client calls it again until the job is finished. It keeps intermediate outputs in its own cache by content id, so each call goes on from where the last stopped. Code can also use PONZI without a server: the ponzi-core libraries and their commands directly (`ponzi run`, `ponzi-pipeline`, `ponzi-models`), or a worker on its own (`ponzi-worker run` runs a workflow on this machine or through SLURM, with its cache, and no server).
 - **ponzi-visual** shows the watched areas and their outputs over time on a map, and makes new areas from Major TOM tiles (with their tags) over a span of days, and lists the areas monitored. The server chooses what runs them.
 
 ## Dependencies
@@ -107,11 +107,11 @@ Which distribution needs which: solid arrows are install dependencies (`pyprojec
 - `ponzi-spec` is the one distribution every other part depends on, and it holds no computing code, so the server and the clients install it without the scientific stack.
 - Only the worker installs the computing distributions; the server never imports `ponzi`, `ponzi-pipeline` or `ponzi-models`.
 - ponzi-visual installs nothing of PONZI: its client is generated from the server's committed OpenAPI document (`npm run gen`).
-- Optional parts: `ponzi[tide]` and `ponzi-models[train]` add torch (the `ml` environment on the CPU; `ml-gpu`, conda-forge torch in its CUDA 12.9 build); ISCE3 comes from conda-forge only, in the `isce3` environment, as version 0.25.22 in its CUDA 12.9 build ([Install](../guides/install.md)).
+- Optional parts: `ponzi[tide]` and `ponzi-models[train]` add torch (the `ml` environment on the CPU; `ml-gpu`, conda-forge torch in its CUDA 12.9 build); ISCE3 comes from conda-forge only, in the `isce3` environment, as version 0.25.22 in its CUDA 12.9 build ([Install](install.md)).
 
 ## What holds it together
 
-- Every artifact that crosses a component boundary is a STAC Item in a known Collection: the [STAC profile](stac-profile.md).
-- Every Item has a [content id](content-ids.md) computed before the work runs, so repeated requests reuse what exists.
-- Every final output has a [manifest](manifests.md) that traces it back to the satellite scenes.
-- Every unit of work is a [stage](stages.md) with declared inputs, params and outputs, so it can be replaced.
+- Every artifact that crosses a component boundary is a STAC Item in a known Collection: the [STAC profile](../using/stac-profile.md).
+- Every Item has a [content id](../using/content-ids.md) computed before the work runs, so repeated requests reuse what exists.
+- Every final output has a [manifest](../using/manifests.md) that traces it back to the satellite scenes.
+- Every unit of work is a [stage](../method/stages.md) with declared inputs, params and outputs, so it can be replaced.

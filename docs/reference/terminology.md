@@ -1,12 +1,12 @@
 # Terminology
 
-The words PONZI uses, grouped with the words they are easily confused with. Each group says how its terms differ. Names follow the [naming convention](../reference/naming.md); formats are in the [store contracts](../reference/contracts.md).
+The words PONZI uses, grouped with the words they are easily confused with. Each group says how its terms differ. Names follow the [naming convention](../models/naming.md); formats are in the [store contracts](contracts.md).
 
 ## Words with two meanings
 
 | Word | Meaning 1 | Meaning 2 |
 | --- | --- | --- |
-| **stage** | a unit of a workflow the worker runs: `discover`, `coherence`, `assemble`, `onboard`, `run`, `pvalues`, `detect`, `tile` ([Stages](stages.md)) | in progressive scoring, how many of an anchor's future acquisitions are known: stage 1 to H - 1 is provisional, stage H is final (CR-021) |
+| **stage** | a unit of a workflow the worker runs: `discover`, `dem`, `coherence`, `assemble`, `onboard`, `run`, `pvalues`, `detect`, `tile`, and the `ingest-coherence` and `ingest-calibration` stages ([Stages](../method/stages.md)) | in progressive scoring, how many of an anchor's future acquisitions are known: stage 1 to H - 1 is provisional, stage H is final (CR-021) |
 | **window** | the span of anchors a run scores (`t_lo` to `t_hi`) | the area of a mask layer a run reads; or the estimator's Gaussian window in coherence |
 | **run** | one forecast run of one burst under one run config (`ponzi run`, a `ponzi-run` Item) | loosely, any execution; this documentation uses *job* for that |
 | **path** | one track seen in one direction, the bursts a detection combines (`detect-path`) | a file path |
@@ -21,7 +21,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **track** (relative orbit) | the repeating ground path of the satellite, 1 to 175 | a path (a track *and* a direction) |
 | **orbit pass** | ascending or descending; one track crosses a place in one pass | |
 | **cell** | a square of the Major TOM grid (10 km), the unit of panels and of the delivered outputs | a burst; a pixel |
-| **grid**, **lattice** | the fixed raster a burst is processed on (UTM, 40 m), or the raster a path or cell is resampled to | ([Grids](grids.md)) |
+| **grid**, **lattice** | the fixed raster a burst is processed on (UTM, 40 m), or the raster a path or cell is resampled to | ([Grids](../method/grids.md)) |
 | **tile** | a cell of the Major TOM grid over land, as a watched area is made from it | |
 | **boundary** | an administrative unit of the World Bank Official Boundaries, level 0 (a country, or a disputed area of non-determined legal status), 1 or 2; drawn on the map and the land a tile must meet, never what an area is made from | an area |
 | **area** (watched area) | what the server keeps running: 1 to 64 tiles, every burst of both passes meeting them, a standard (the server's `default_standard` when none is given), a cadence, tags and optionally a first and last day | an AOI |
@@ -114,7 +114,7 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 | --- | --- | --- |
 | **recipe** | the detection rules: threshold code, dating, gaps, episodes | a calibration |
 | **workflow** | the stages and their order for one burst, with variables | a job (one workflow for one burst and span) |
-| **standard** | everything an area runs, under one id and version (`s1-general@1.0.0`): the workflow, the coherence and onboarding configs, the model, its run config, its calibrations, the recipe ([Standards](../guides/standards.md)) | a release of the library |
+| **standard** | everything an area runs, under one id and version (`s1-general@1.0.0`): the workflow, the coherence and onboarding configs, the model, its run config, its calibrations, the recipe ([Standards](../models/standards.md)) | a release of the library |
 | **test case** | a place used for testing, `testcases/<case>/`: its area, recipe and forecaster | a standard |
 
 ## The service
@@ -129,14 +129,14 @@ Only a model can be used: calibrations are made for it, and run configs and stan
 | **lease** | the client loop's hold on a job, renewed by heartbeats | |
 | **home** | the folder everything computed lives in, `~/.ponzi` or `$PONZI_HOME` | a repository |
 | **cache** | the worker's store of outputs by content id, `$PONZI_HOME/cache` | |
-| **Item**, **collection**, **asset** | a STAC record of one output, its kind (`ponzi-run`), and one of its files ([STAC profile](stac-profile.md)) | |
-| **manifest** | the readable provenance of an output: every step and input that made it ([Manifests](manifests.md)) | |
+| **Item**, **collection**, **asset** | a STAC record of one output, its kind (`ponzi-run`), and one of its files ([STAC profile](../using/stac-profile.md)) | |
+| **manifest** | the readable provenance of an output: every step and input that made it ([Manifests](../using/manifests.md)) | |
 
 ## Identity and versions
 
 | Term | What it identifies | Changes when |
 | --- | --- | --- |
-| **content id** | one output, from its stage, its stage version, its inputs' ids and its parameters ([Content ids](content-ids.md)) | any of those change |
+| **content id** | one output, from its stage, its stage version, its inputs' ids and its parameters ([Content ids](../using/content-ids.md)) | any of those change |
 | **stage version** | a stage's identity, `"1"` | raised by hand when its outputs may change |
 | **config hash** | a run config, composed | any key changes |
 | **digest**, **sha256** | the bytes of a file or store | the bytes change |

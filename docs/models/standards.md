@@ -1,6 +1,6 @@
 # Making a standard
 
-A standard is a versioned bundle: a model, its run config hash, its calibrations, a detection recipe, the onboarding and the coherence config. Watched areas and run requests name it as `<id>@<version>`.
+A standard is a versioned bundle: a model, its run config hash, its calibrations, a detection recipe, the onboarding and the coherence config. Watched areas and run requests name it as `<id>@<version>`. How versions are numbered, checked and tracked by the server is in [Standard versions and naming](versions.md).
 
 ## On the CPU, on local disk (the rehearsal)
 
@@ -34,7 +34,7 @@ Its registry (`<out>/registry`) and its standard (`<out>/standards/`) behave lik
 ## From bundle to server
 
 ```
-pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY --out s1-general.yaml \
+pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY --out s1-general-1.0.0.yaml \
     --source pipeline --set burst_map=... --set slc_dir=... --set orbit_dir=... --set dem_dir=... \
     --set start_date=2025-01-01
 ```

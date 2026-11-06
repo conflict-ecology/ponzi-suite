@@ -29,18 +29,19 @@ The commands are:
 - `standards`, `bursts`, `burst`, `burst-summary`;
 - `areas`, `area`, `area-create`, `area-update`, `area-delete`, `area-discover`;
 - `submit`, `request`, `requests`, `jobs`;
-- `search`, `item`, `manifest`, `download`.
+- `search`, `item`, `manifest`, `download`;
+- `serve`, the client loop (with a `worker` key).
 
-They print JSON. The server and key come from `--url` and `$PONZI_KEY` (or `--key-env`, or the file `$PONZI_KEY_FILE`), or else from the deployment config.
+The commands but `serve` print JSON. The server and key come from `--url` and `$PONZI_KEY` (or `--key-env`, or the file `$PONZI_KEY_FILE`), or else from the deployment config.
 
-- `area-create --cells C[,C] [--standard S] [--tags T[,T]] [--name N] [--start D] [--end D]` makes an area of 1 to 64 Major TOM tiles; it watches every burst of both passes meeting them. There is no `--bursts`: an area is its tiles. Without `--standard` the server chooses it (its `default_standard`, else the one it holds).
+- `area-create --cells C[,C] [--standard S] [--tags T[,T]] [--name N] [--start D] [--end D]` makes an area of 1 to 64 Major TOM tiles; it watches every burst of both passes meeting them. There is no `--bursts`: an area is its tiles. Without `--standard` the server chooses it: its `default_standard`, else the one standard it holds, else a 422 (CR-068).
 - `submit --bursts B[,B]` runs given bursts once; a run is not an area.
 - `search --tags T[,T]` finds the analysis Items of the areas with those tags.
 - The boundaries and the tile listings are reached from Python and ponzi-visual only.
 
 ## TypeScript (in ponzi-visual)
 
-ponzi-visual carries its own client, `src/client`. It is not a separate package. The app uses it to make areas of tiles over a span of days and to list and manage them; it sends no standard and no cadence, and makes no run requests (the client still has `submit`, which its end-to-end test uses).
+ponzi-visual carries its own client, `src/client`. It is not a separate package. The app uses it to make areas of tiles, with tags, over a span of days and to list and manage them; it sends no standard and no cadence, and makes no run requests (the client still has `submit`, which its end-to-end test uses).
 
 ```ts
 import { createPonziClient, contentId } from "./client";

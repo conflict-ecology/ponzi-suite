@@ -15,7 +15,7 @@ A stage is replaced or added without touching the worker or the server. Example:
         window: str = "17x3"
         polarisation: str = "VV"
 
-    SPEC = StageSpec(name="coherence-snap", version="1",
+    SPEC = StageSpec(name="coherence-snap", version="1", code=("ponzi-pipeline",),
                      inputs={"scenes": "s1-slc", "orbits": "s1-orbit", "dem": "ponzi-dem", "pairs": "ponzi-pairs"},
                      outputs={"coherence": "ponzi-coherence-pair"},
                      identity_params=SnapCoherenceParams,
@@ -23,15 +23,17 @@ A stage is replaced or added without touching the worker or the server. Example:
                      fan_out="per_pair")
     ```
 
+    `code` names the distributions whose code computes the outputs; their majors are part of the content id (CR-054).
+
 4. **Implement `run`.** Read the input Items' assets, write the outputs under `workdir`, return the output Items, built with `make_item` and `PonziFields(content_id=SPEC.content_id(...), stage=SPEC.ref(), ...)`.
-5. **Register the entry point** in the distribution's `pyproject.toml`:
+5. **Register the entry point** in the `pyproject.toml` of the distribution that holds the stage (today every stage is a thin adapter in ponzi-worker, `ponzi_worker.stages`):
 
     ```toml
     [project.entry-points."ponzi.stages"]
-    coherence-snap = "ponzi_pipeline.coherence.snap:STAGE"
+    coherence-snap = "ponzi_worker.stages.snap:SNAP_STAGE"
     ```
 
 6. **Test.** Synthetic fixtures, no network. The outputs validate against the PONZI extension schema; the content id is stable; a second run with the same inputs and params gives the same content id.
-7. **Backend-specific checks.** A coherence backend states its agreement with the primary backend on a reference burst (equal, or within a documented tolerance), and its assembled store passes `validate-store`.
-8. **Document it** on this site (a page under the stage's area and a line in the [stages table](../concepts/stages.md)) and in the agent checklist if it changes how agents work.
+7. **Backend-specific checks.** A coherence backend states its agreement with the primary backend on a reference burst (equal, or within a documented tolerance), and its assembled store passes `ponzi validate-store`.
+8. **Document it** on this site (a page under the stage's area and a line in the [stages table](../method/stages.md)) and in the agent checklist if it changes how agents work.
 9. **Use it.** A standard names the stage in its workflow; a new standard version makes it the default for watched areas.

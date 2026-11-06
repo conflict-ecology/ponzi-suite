@@ -5,7 +5,7 @@ hide:
 
 # How PONZI works
 
-The method, where it runs, how its registered pieces are made, and what a change to one of them makes new. Every diagram follows the code as it stands; the [terminology](terminology.md) defines the words.
+The method, where it runs, how its registered pieces are made, and what a change to one of them makes new. Every diagram follows the code as it stands; the [terminology](../reference/terminology.md) defines the words.
 
 ## The method
 
@@ -113,7 +113,7 @@ flowchart LR
   server[("ponzi-server<br/>areas, jobs, leases,<br/>final outputs")]
   client["ponzi-client serve<br/>the long-running loop"]
   worker["ponzi-worker job<br/>short calls: runs the stages,<br/>caches by content id"]
-  home[("PONZI home<br/>~/.ponzi")]
+  home[("PONZI home<br/>$PONZI_HOME")]
   data[("ASF, Copernicus DEM,<br/>weather, GHSL")]
   visual -- "areas: tiles, tags, days" --> server
   server -- "outputs, boundaries" --> visual
@@ -126,11 +126,11 @@ flowchart LR
   suite -. "paths given to the commands" .-> worker
 ```
 
-The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([The service](service.md), [The worker](worker.md)).
+The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([The service](../service/server.md), [The worker](../service/worker.md)).
 
 ## One burst under a standard
 
-What a job runs: the workflow of the area's [standard](../guides/standards.md), for one burst and the area's days.
+What a job runs: the workflow of the area's [standard](../models/standards.md), for one burst and the area's days.
 
 ```mermaid
 flowchart TB
@@ -204,11 +204,11 @@ Each piece is fixed at a known point, and a change to it gives new content ids t
 
 <div class="pz-flows" markdown="0"><p>Pick a kind of work to see its path through the system. (The map needs JavaScript; the matrix below says the same.)</p></div>
 
-Pick a kind of work to see where its data comes in, which registered pieces it makes new, which it computes again and which it reuses. Red dashed pieces should be computed again but are reused as the code stands (the library and engine changes); dotted ones are not yet in the code.
+Pick a kind of work to see where its data comes in, which registered pieces it makes new, which it computes again and which it reuses. Red dashed pieces should be computed again but are reused as the code stands (an engine change below a major); dotted ones are not yet in the code.
 
 | Piece | Fixed by | A change means |
 | --- | --- | --- |
-| Library (`ponzi`) | its git tag, `0.y` the major below 1.0 | a calibration refuses runs of another major (CR-020); content ids do not change |
+| Library (`ponzi`, `ponzi-pipeline`) | its version, `0.y` the major below 1.0 | a new major gives new content ids to the stages its code computes (CR-054), and a calibration refuses runs of another major (CR-020) |
 | Coherence config, onboarding config | the standard | new coherence stores and sidecars, and everything after |
 | Panel | `id@version` in `panel.yaml`, files by sha256 | a new model and calibration: the model id carries the panel version |
 | Fit spec | its file in `forecasters/` | a new fit, a new model |
@@ -216,7 +216,7 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | Calibration | its id under the model, the run config hash | new p-values and events; runs reused |
 | Recipe | its fields, inside the standard | new events and cells; runs and p-values reused |
 | Standard | `id@version`, immutable | any change is a new version; areas name the version they run |
-| Area | its bursts, orbit pass and days | its jobs; no new standard |
+| Area | its tiles (and so its bursts, of both passes) and its days | its jobs; no new standard |
 
 **The change matrix.** What each kind of work makes new, recomputes or reuses, as the worker behaves today.
 
@@ -228,7 +228,7 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | D. New panel or fit spec | model, calibration, a new standard major | runs onward | coherence stores of bursts in both | as intended |
 | E. Better calibration | calibration, a new standard version | p-values, events | runs | nothing checks that its cells stayed out of training |
 | F. New recipe | a new standard version | events, cells | runs, p-values | as intended |
-| G. Library major change | the release | should be: runs onward | | **not automatic**: cached runs are reused; `pvalues` refuses them only when the calibration was rebuilt under the new release |
-| H. Coherence engine change | new stores when the config changes | stores onward | | **not automatic** when the code changes but the config does not: stores are reused |
+| G. Library major change | the release, a rebuilt calibration | the stages whose `code` names the library: for `ponzi`, the store assembly, runs, p-values, events and cells; for `ponzi-pipeline`, coherence onward | the stages of other code | as intended (CR-054) |
+| H. Coherence engine change | new stores when the config changes, or with a new `ponzi-pipeline` major | stores onward | | **not automatic** for a minor or patch release of `ponzi-pipeline` or a new ISCE3 with the same config: stores are reused |
 
-Standard versions: a minor version is meant to reuse the runs (a new calibration or recipe), a major one to make new runs (a new model or panel). The code records the version but does not check which kind a change is, and a standard's `requires` (the library versions it expects) is recorded but not enforced.
+Standard versions: a minor version reuses the runs (a new calibration or recipe), a major one makes new runs (a new model or panel). `check-standard` refuses a version whose change needs a bigger bump, and a worker fails a job whose standard's `requires` its installed versions do not meet (CR-055; [Standard versions and naming](../models/versions.md)).

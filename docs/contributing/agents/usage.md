@@ -8,13 +8,13 @@ Which one applies depends on whether a PONZI server is running for you:
 | --- | --- | --- |
 | **When** | a server is running and you have its URL and a key | no server: PONZI is installed on this machine (a checkout of ponzi-core, and of ponzi-service for the worker) |
 | **Through** | `ponzi-client`, the Python package or its command line | the commands of ponzi-core (`ponzi`, `ponzi-pipeline`, `ponzi-models`) and `ponzi-worker run` |
-| **Results land** | on the server, found by search | in this machine's PONZI home (`$PONZI_HOME/cache`, [Paths](../reference/paths.md)) |
+| **Results land** | on the server, found by search | in this machine's PONZI home (`$PONZI_HOME/cache`, [Paths](../../getting-started/paths.md)) |
 
 Check first: `ponzi-client standards` answers in client mode; a connection error or no `server.url` means there is no server. When a server is running, use client mode, even on the server's own machine.
 
 ## Client mode
 
-`ponzi-client` is a REST client, so it needs a running server: `--url` or `server.url` of `ponzi.yaml`, and a key in `PONZI_KEY` or the file `$PONZI_KEY_FILE` ([Authentication](../guides/authentication.md)). In this mode:
+`ponzi-client` is a REST client, so it needs a running server: `--url` or `server.url` of `ponzi.yaml`, and a key in `PONZI_KEY` or the file `$PONZI_KEY_FILE` ([Authentication](../../getting-started/authentication.md)). In this mode:
 
 - Do not import `ponzi`, `ponzi_pipeline` or `ponzi_models`; the server's workers compute.
 - Do not read or write the server's storage or a worker's cache directly (both are in a PONZI home).
@@ -26,14 +26,14 @@ Check first: `ponzi-client standards` answers in client mode; a connection error
 | --- | --- | --- | --- |
 | Find bursts over an area | `c.bursts(bbox=...)` | `ponzi-client bursts --bbox ...` | burst ids look like `t028_058198_iw3` |
 | See what can be run | `c.standards()` | `ponzi-client standards` | a standard id has a version: `s1-general@1.0.0` |
-| Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...], standard=...)` | `ponzi-client area-create --cells C[,C] --tags T[,T] --standard S` | needs a `client:write` key; 1 to 64 tiles over land; every burst of both passes meeting them is watched, and its jobs are made at once |
+| Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...])` | `ponzi-client area-create --cells C[,C] --tags T[,T]` | needs a `client:write` key; 1 to 64 tiles over land; the standard is optional (the server's); see [Watched areas](../../using/watched-areas.md) |
 | Pause or change a watched area | `c.update_area(area_id, active=False)` | `ponzi-client area-update ID --active false` | fields left out stay as they are |
-| Find the outputs of tagged areas | `c.search(tags=[...])` | `ponzi-client search --tags T[,T]` | analysis Items only; tags are added by the server, never part of a content id |
+| Find the outputs of tagged areas | `c.search(tags=[...])` | `ponzi-client search --tags T[,T]` | analysis Items only ([Tags](../../using/watched-areas.md#tags)) |
 | Look at an area now | `c.discover_area(area_id)` | `ponzi-client area-discover ID` | whatever its cadence |
 | Run once | `c.submit(burst_ids=[...], standard=...)` | `ponzi-client submit ...` | returns existing results when they exist (`reused: true`) |
 | Follow a run | `c.request(request_id)`, `c.jobs(request_id=...)` | `ponzi-client request ID` | a done job lists the Items it made (`items`) |
-| Find results | `c.search(collections=["ponzi-events-cell"], bbox=..., datetime=...)` | `ponzi-client search ...` | Items of the [STAC profile](../concepts/stac-profile.md) |
-| Explain a result | `c.manifest(content_id)` | `ponzi-client manifest CID --yaml` | the provenance, see [Manifests](../concepts/manifests.md) |
+| Find results | `c.search(collections=["ponzi-events-cell"], bbox=..., datetime=...)` | `ponzi-client search ...` | Items of the [STAC profile](../../using/stac-profile.md) |
+| Explain a result | `c.manifest(content_id)` | `ponzi-client manifest CID --yaml` | the provenance, see [Manifests](../../using/manifests.md) |
 | Fetch a result's file | `c.download(item, "events", "out/")` | `ponzi-client download COLLECTION ID events out/` | a zipped store comes back unpacked |
 
 ## Local mode
@@ -46,10 +46,10 @@ With no server, PONZI runs on this machine from its own commands. Use a standard
 | Run a workflow on bursts | `ponzi-worker run WORKFLOW.yaml --each burst=t028_058198_iw3,... --set start_date=... --set end_date=...` | locally by default; a standard's workflow comes from `ponzi-models standard-workflow`; outputs are cached by content id, so a second run reuses them |
 | Try it without computing | `ponzi-worker run WORKFLOW.yaml ... --dry-run` | the jobs and which are already cached |
 | Explain a result | `ponzi-worker manifest CONTENT_ID --json` | the provenance from the local cache |
-| One step of the data chain | `ponzi-pipeline discover`, `acquire`, `dem`, `coherence`, `assemble`, `onboard` | `ponzi-pipeline` with no argument lists them; `acquire` needs Earthdata ([Authentication](../guides/authentication.md)) |
+| One step of the data chain | `ponzi-pipeline discover`, `acquire`, `dem`, `coherence`, `assemble`, `onboard` | `ponzi-pipeline` with no argument lists them; `acquire` needs Earthdata ([Authentication](../../getting-started/authentication.md)) |
 | A forecast run on a store | `ponzi run ...` | needs a run config of a registered model; `ponzi --help` lists the commands |
 | Check or rehearse a standard | `ponzi-models check-standard FILE`, `ponzi-models rehearse --out DIR` | the rehearsal is synthetic and runs on the CPU in seconds |
-| Look up a burst or a boundary | the burst catalog in `$PONZI_HOME/catalog/bursts.sqlite3` | read only |
+| Look up a burst or a boundary | the burst catalog `$PONZI_HOME/catalog/bursts.sqlite3`, the boundaries `$PONZI_HOME/catalog/boundaries.sqlite3` | read only |
 
 In local mode:
 

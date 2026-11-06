@@ -9,12 +9,12 @@ What each part of PONZI needs to log in to, and where to put it. A secret is nev
 | **Earthdata Login** (NASA) | the worker, `ponzi-pipeline acquire` | downloading the SLCs and orbit files from ASF | `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else the netrc file |
 | **Earth Data Hub** token (DestinE) | the worker, onboarding with weather source `edh` or `edh_cdsgrid` | ERA5-Land weather for the sidecar | the netrc file |
 | **Copernicus CDS** key | the worker, onboarding with weather source `cdsgrid` or `edh_cdsgrid` | ERA5-Land weather newer than the Earth Data Hub store | `~/.cdsapirc` |
-| **PONZI server key** | the worker, `ponzi-client`, ponzi-visual | every call to a running server | `PONZI_KEY` (or the variable `server.key_env` names), else the file `$PONZI_KEY_FILE` |
-| **wandb** key | `ponzi-models train` with tracking `online` | logging training runs | wandb's own: `WANDB_API_KEY` or `wandb login` |
+| **PONZI server key** | `ponzi-client` (and its loop, `ponzi-client serve`), ponzi-visual | every call to a running server | `PONZI_KEY` (or the variable `server.key_env` names), else the file `$PONZI_KEY_FILE` |
+| **wandb** key | `ponzi-models train` with `--wandb online` (its default) | logging training runs | wandb's own: `WANDB_API_KEY` or `wandb login` |
 
-Needs no login: ASF's burst search (`discover`, and the server's [burst availability](../reference/rest-api.md)), the Copernicus GLO-30 DEM, the GHSL built-up layers and the World Bank boundaries the server downloads.
+Needs no login: ASF's burst search (`discover`, and the server's [burst availability](../service/rest-api.md)), the Copernicus GLO-30 DEM, the GHSL built-up layers and the World Bank boundaries the server downloads.
 
-A machine needs only the credentials of what runs on it. The server needs none to reach out: it holds the hashes of the PONZI keys and calls nothing that needs a login. A worker that runs whole workflows needs Earthdata, the weather source of its onboarding config, and a `worker` key.
+A machine needs only the credentials of what runs on it. The server needs none to reach out: it holds the hashes of the PONZI keys and calls nothing that needs a login. A machine that carries out jobs needs Earthdata and the weather source of its onboarding config for the worker, and a `worker` key for its client loop (the worker itself talks to no server).
 
 ## The netrc file
 
@@ -64,7 +64,7 @@ ponzi-server keys revoke hpc-worker
 | `worker` | claim jobs, heartbeat and deliver outputs: the key of `ponzi-client serve` |
 | `admin` | everything |
 
-A key is shown once, when it is made: `--out` writes it to a new file only its owner can read. Move that file to the machine that uses it, then point the client or the worker at it:
+A key is shown once, when it is made: `--out` writes it to a new file only its owner can read. Move that file to the machine that uses it, then point the client at it:
 
 ```
 export PONZI_KEY_FILE=~/hpc-worker.key      # a file keeps the key out of the environment of a shared node

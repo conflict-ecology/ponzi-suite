@@ -8,7 +8,7 @@ One Item of each Collection is:
 
 <!-- ponzi:collections -->
 
-Every burst-level Item carries the ESA Sentinel-1 burst id and footprint. Watched areas and requests are lists of burst ids.
+Every burst-level Item carries the ESA Sentinel-1 burst id and footprint. A request is a list of burst ids; a watched area is made from Major TOM tiles and holds the ids of the bursts meeting them.
 
 ## Extensions
 
@@ -39,7 +39,7 @@ Schema: <a href="../../schemas/ponzi/v0.1.0/schema.json"><code>schemas/ponzi/v0.
 | `ponzi:config_hash` | no | the hash of the stage's identity config (run config, coherence config, ...) |
 | `ponzi:request` | no | the request fields that do not change the result, for the record |
 | `ponzi:standard` | no | the standard it was made under |
-| `ponzi:tags` | no | assigned by the server as it serves an analysis Item (runs, p-values, events, events of a cell): the tags of the watched areas of its burst or tile ([Watched areas](../guides/watched-areas.md#tags)). Never set by a stage, never stored in the Item and never part of its content id |
+| `ponzi:tags` | no | assigned by the server as it serves an analysis Item (runs, p-values, events, events of a cell): the tags of the watched areas of its burst or tile ([Watched areas](watched-areas.md#tags)). Never set by a stage, never stored in the Item and never part of its content id |
 
 Unknown `ponzi:` fields are refused.
 

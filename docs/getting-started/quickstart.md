@@ -21,7 +21,7 @@ cd ponzi-visual && pixi run dev      # http://localhost:5173
 
 Connect with the key the server printed; every scope's key is in `ponzi-visual/.e2e/demo/keys.json`.
 
-The map holds the demo's five bursts. To select from every Sentinel-1 burst, build the full catalog with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or set `bursts:` in `.e2e/demo/server.yaml` to `.e2e/bursts.sqlite3`. The demo's server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, set `boundaries:` in `server.yaml` to a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`. A `client:write` key can create areas in the app, and submit runs from Python or the command line.
+The demo's five bursts are synthetic and on no land, so the map has no tiles to choose at first. The demo's server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, set `boundaries:` in `.e2e/demo/server.yaml` to a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`. For the bursts of the tiles chosen, build every Sentinel-1 burst with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or set `bursts:` in `server.yaml` to `.e2e/bursts.sqlite3`. A `client:write` key can create areas in the app, and submit runs from Python or the command line.
 
 From ponzi-service, in Python or a shell:
 
@@ -32,15 +32,15 @@ pixi run ponzi-client --url http://127.0.0.1:8799 search --collections ponzi-eve
 
 ## What the demo did
 
-1. **The rehearsal** (`ponzi-models rehearse`). It built synthetic bursts and a panel, fitted a model (the rolling fit; a tiny TiDE with `--model tide` in the `ml` environment), registered it, ran the null on the panel's test bursts, calibrated, and wrote the standard bundle, checked against the registry. See [Making a standard](standards.md).
+1. **The rehearsal** (`ponzi-models rehearse`, with the rolling fit: `ponzi-worker demo --model tide` fits a tiny TiDE instead, in the `ml` environment). It made a model, its calibrations and the standard bundle on synthetic bursts, on the CPU. See [Making a standard](../models/standards.md).
 2. **The server standard** (`ponzi-models standard-workflow --source stores`). The bundle became the workflow the server hands to workers.
-3. **A watched area over two of the bursts, looked at once, and one run request over all five.** The worker ran their jobs, one per burst, through the server in the same process. Each ingested a store, onboarded it, ran the model, coded the p-values, detected events, tiled them onto Major TOM cells, and uploaded the final Items.
+3. **A watched area over two of the bursts, looked at once, and one run request over all five.** The area is written as an area of bursts, as areas were made before CR-067, since its bursts are on no land. The worker ran their jobs, one per burst, through the server in the same process. Each ingested a store, onboarded it, ran the model, coded the p-values, detected events, tiled them onto Major TOM cells, and uploaded the final Items.
 
 To start over, remove `ponzi-visual/.e2e/demo`; the next `pixi run server` makes it again. The cache in `.e2e/demo/cache` can be removed at any time: content ids make every entry reproducible.
 
 ## Development on your own home
 
-For developing and testing on Linux (x86-64; the command stops on any other system), not for deploying, one command from ponzi-suite starts the server, the client loop and the front end together, on the PONZI home instead of the demo. Install them first with `pixi run dev-install` ([Install](install.md#for-development)).
+For developing and testing on Linux ([Install](install.md)), not for deploying, one command from ponzi-suite starts the server, the client loop and the front end together, on the PONZI home instead of the demo. Install them first with `pixi run dev-install` ([Install](install.md#for-development)).
 
 ```
 cd ponzi-suite
@@ -69,4 +69,4 @@ printf 'server:\n  fetch_boundaries: false\n  fetch_catalog: false\n' > /tmp/dev
 PONZI_HOME=/tmp/ponzi-dev PONZI_SERVER_SETTINGS=/tmp/dev-server.yaml pixi run dev-up
 ```
 
-A new home has no standard, and a watched area needs one: copy one into `$PONZI_HOME/standards` and start again ([Making a standard](standards.md)). With exactly one there, the areas the app makes take it. With several, name the one areas take in a settings file (`server: {default_standard: s1-general@1.0.0}`) given as `PONZI_SERVER_SETTINGS`; without it the server refuses the app's areas and says so. Run requests from Python or the command line always name their standard.
+A new home has no standard, and a watched area needs one: copy one into `$PONZI_HOME/standards` and start again ([Making a standard](../models/standards.md)). With several there, name the one the app's areas take in a settings file (`server: {default_standard: s1-general@1.0.0}`) given as `PONZI_SERVER_SETTINGS`; how the server chooses is in [Watched areas](../using/watched-areas.md).

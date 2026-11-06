@@ -22,8 +22,6 @@ workspace/
 
 Then set up the logins the work needs: [Authentication](authentication.md).
 
-To set up a development workstation in one command instead, see [For development](#for-development).
-
 ## The client
 
 One pip command, in any Python 3.11 or later. `ponzi-spec` is named in the same command because it is not on PyPI:
@@ -33,7 +31,7 @@ pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@mai
             "ponzi-client @ git+https://github.com/conflict-ecology/ponzi-service@main#subdirectory=packages/client"
 ```
 
-It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [The clients](../reference/clients.md).
+It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [The clients](../using/clients.md).
 
 ## ponzi-core
 
@@ -49,7 +47,7 @@ The other environments are installed only when asked for (`pixi install -e NAME`
 | Environment | Adds | For |
 | --- | --- | --- |
 | `default` | the geospatial stack; never torch | everything that needs no GPU and no ISCE3 |
-| `ml` | torch on the CPU | the TiDE forecaster (the default) on the CPU, the rehearsal's tiny fit |
+| `ml` | torch on the CPU | the TiDE forecaster (the current default) on the CPU, the rehearsal's tiny fit |
 | `ml-gpu` | torch 2.14.1 from conda-forge, CUDA 12.9 build; wandb | training on a GPU |
 | `isce3` | ISCE3 0.25.22, CUDA 12.9 build, with s1reader, COMPASS, dem_stitcher, GDAL, asf_search | the coherence chain from SLCs |
 
@@ -61,7 +59,7 @@ pixi install                 # ponzi-server, ponzi-client, ponzi-worker, with po
 pixi run test                # optional
 ```
 
-It has the same four environments as ponzi-core; the worker's stages run in the one a stage declares, and a cluster's release installs all four. How the pieces run together: [Quickstart](quickstart.md) on one machine, [Running on the cluster](hpc.md).
+It has the same four environments as ponzi-core; the worker's stages run in the one a stage declares, and a cluster's release installs all four. How the pieces run together: [Quickstart](quickstart.md) on one machine, [Running on the cluster](../service/hpc.md).
 
 ## ponzi-visual
 
@@ -92,7 +90,7 @@ PONZI_ENVS="ml isce3" pixi run dev-install
 pixi run dev-install ml      # the same, as arguments
 ```
 
-Both commands run on Linux (x86-64) only, and stop at once on any other system. `ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9; set `CONDA_OVERRIDE_CUDA=12.9` to install them anyway ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-on-your-own-home)).
+`ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9 ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-on-your-own-home)).
 
 ## GPUs and CUDA
 
@@ -100,8 +98,8 @@ The two environments are tied to a platform of their own, `linux-64-cuda`: Linux
 
 `ml-gpu` and `isce3` use CUDA 12.9 and need an NVIDIA driver for it (575 or later); pixi refuses to install them on a machine without one. On such a machine (a CI runner, a laptop), `CONDA_OVERRIDE_CUDA=12.9` installs them anyway.
 
-- **Why 12.9.** CUDA 13 dropped GPUs below compute capability 7.5, so the cluster's GTX 1080 Ti (6.1) and V100 (7.0) nodes would be lost.
-- **Why conda-forge torch.** PyTorch's own CUDA 12.8 and 12.9 wheels dropped Pascal; conda-forge's CUDA 12.9 build has kernels from SM 5.0 up, so it runs on every GPU of the cluster.
+- **Why 12.9.** CUDA 13 dropped GPUs below compute capability 7.5, so GPUs such as the GTX 1080 Ti (6.1) and V100 (7.0) would be lost.
+- **Why conda-forge torch.** PyTorch's own CUDA 12.8 and 12.9 wheels dropped Pascal; conda-forge's CUDA 12.9 build has kernels from SM 5.0 up, so it runs on those GPUs too.
 - **Why pixi for ISCE3.** ISCE3 and its companions are published on conda-forge only. Its version and build are pinned (`isce3 ==0.25.22`, build `py312cuda129*_cuda`), and the lock files of ponzi-core and ponzi-service hold the same exact build.
 
 To check that the GPU is seen:

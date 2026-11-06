@@ -1,6 +1,6 @@
 # Watched areas
 
-A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grids](../concepts/grids.md)) that keep being run under one standard. The outputs are made on the same grid, so the tiles of an area are the tiles of its outputs.
+A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grids](../method/grids.md)) that keep being run under one standard. The outputs are made on the same grid, so the tiles of an area are the tiles of its outputs.
 
 - **Tiles only.** An area is 1 to 64 tiles. A tile must meet land, a level 0 outline of the administrative boundaries: a country or territory, or one of the disputed areas below. The server lists no tile over open sea and refuses one in an area.
 - **Every burst.** The server watches every burst, of both passes, whose footprint meets the union of the tiles. There is no burst, pass or track to choose.
@@ -37,17 +37,11 @@ An area made before areas were made from tiles (from a list of bursts, or from a
 
 ## On the map
 
-ponzi-visual makes areas the same way, and makes nothing else: it submits tiles with a span of days, and the server chooses what runs them.
-
-- **Tiles.** Zoom in to ×32 to see the tiles (the note at the top of the map says so). Drag a box with the left mouse button to add every tile it meets; each box adds more. Hold Shift while dragging to remove the tiles the box meets. A click on a tile adds it, or removes it when selected. **Clear**, in the panel, removes them all. The map stops at 64 tiles and says so.
-- **Panning.** Drag with the right mouse button, anywhere; below ×32 a left drag pans too, and the middle button always does. The wheel and the + and - buttons zoom.
-- **Looking.** The land is always drawn under everything, filled gray: the level 0 boundaries, so it matches the country outlines exactly. The administrative boundaries are three overlays toggled on the map (Admin 0 countries, on at first; Admin 1 from ×6; Admin 2 from ×16), outlines with their names; a disputed area is outlined dashed. The footprints of the bursts meeting the selected tiles are drawn for one pass at a time (Ascending, Descending or Both), or hidden (Off). Neither can be clicked, and neither decides what the area watches.
-- **Watch.** Add tags and set the **First day** and **Last day** in the panel beside the map (both empty at first), then **Watch**. They are sent as `start_date` and `end_date`; an empty first day leaves the start to the server (the standard's). What was acquired in the span so far is processed at once, and each new acquisition as it arrives, to the last day; a span that has ended is processed whole at once. Leave the last day empty to keep watching until the area is paused. No standard and no cadence are sent.
-- **Monitored.** The **Monitored** page (`#/monitored`, from the drawer at the left of every page) lists the areas watched now: their tiles, tags, span, whether active or paused, their jobs queued, running, done and failed, and when each was last looked at. Pause, resume, look now or delete an area there, or open its outputs. Areas made before tiles are listed too, labelled as made from bursts or from a boundary.
+ponzi-visual makes areas the same way, and makes nothing else: it submits tiles, tags and a span of days (`start_date` and `end_date`, both may be empty), and no standard and no cadence, so the server chooses what runs them. Its **Monitored** page lists the areas, made from tiles or before, and pauses, resumes, looks now or deletes them. How to choose tiles, what the overlays and the burst footprints show, and the pages of the front end are in [The map](map.md).
 
 ## Tags
 
-Outputs are content-addressed and shared between areas: one store may serve several areas. A tag is therefore never part of an Item, its content id or a worker's cache. The server adds it as it serves an Item (`GET /v1/stac/collections/{c}/items/{id}` and `GET /v1/stac/search`), as the property `ponzi:tags` ([STAC profile](../concepts/stac-profile.md)).
+Outputs are content-addressed and shared between areas: one store may serve several areas. A tag is therefore never part of an Item, its content id or a worker's cache. The server adds it as it serves an Item (`GET /v1/stac/collections/{c}/items/{id}` and `GET /v1/stac/search`), as the property `ponzi:tags` ([STAC profile](stac-profile.md)).
 
 - **Which Items.** Only the analysis outputs: runs, p-values, events and the events of a Major TOM cell. Never the downloads and inputs (scenes, orbits, DEMs, pairs, coherence, sidecars, masks, samples), nor models, calibrations and the registry.
 - **Which tags.** The tags, once each, of every area whose bursts hold the Item's burst, or, for an Item of a cell, whose tiles hold that cell. Two areas sharing a tile both tag its outputs, and a change of an area's tags shows at once.

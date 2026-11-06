@@ -1,13 +1,13 @@
 # Paths and environment variables
 
-Where PONZI keeps things on a machine, and the variables that move them. Secrets are in [Authentication](../guides/authentication.md); the deployment config is in [Configuration](../concepts/configuration.md).
+Where PONZI keeps things on a machine, and the variables that move them. Secrets are in [Authentication](authentication.md); the deployment config is in [Configuration](../service/configuration.md).
 
 ## The PONZI home
 
-`$PONZI_HOME` in these docs is the PONZI home: the variable when it is set, else `~/.ponzi` (`ponzi_spec.home`). A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path, and `roots.data` defaults to the PONZI home, so without a config it is `~/.ponzi` for every part; where a worker's `roots.data` is set, read `$PONZI_HOME` in a worker's paths as that folder. The server and the worker make the folders when they start; nothing needs setting up by hand.
+`$PONZI_HOME` in these docs is the PONZI home: the variable when it is set, else `~/.ponzi` (`ponzi_spec.home`). A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path, and `roots.data` defaults to the PONZI home, so without a config it is `~/.ponzi` for every part; where a worker's `roots.data` is set, read `$PONZI_HOME` in a worker's paths as that folder. The server makes the folders when it starts and the worker each time it is called; nothing needs setting up by hand.
 
 ```
-~/.ponzi/                               $PONZI_HOME, or the worker's roots.data
+$PONZI_HOME/                            ~/.ponzi by default, or the worker's roots.data
   server/
     server.db                           the server's database: areas, requests, jobs, key hashes
   keys/                                 key files, readable by the owner only (mode 700)
@@ -20,6 +20,7 @@ Where PONZI keeps things on a machine, and the variables that move them. Secrets
     burst-id-geometries-simple-*.geojson.zip   the OPERA burst footprints, as downloaded
     bursts.sqlite3                      the burst catalog the server builds from them
     boundaries.sqlite3                  the World Bank boundaries, admin 0 to 2 and the disputed areas (CR-053, CR-069)
+    boundaries/                         the World Bank GeoParquet files it is built from, as downloaded
     availability/<burst>.json           ASF acquisitions the server has looked up (CR-060)
   cache/                                the worker's content-addressed cache (roots.cache)
     <collection>/<content id>/          one output: item.json and its files, never changed
@@ -33,11 +34,12 @@ Where PONZI keeps things on a machine, and the variables that move them. Secrets
   panels/
     <id>@<version>/                     a built panel: masks, draw, catalogue
   downloads/                            inputs shared by every run
-    slc/                                Sentinel-1 SLC bursts
+    slc/                                Sentinel-1 SLCs (the parent SLC zip of each burst, `<granule>.zip`)
     orbits/                             orbit files
     dem/                                stitched DEMs, tiles/ the GLO-30 tiles
-  cluster/                              SLURM profiles a worker makes of its cluster (CR-061)
-    profiles/<site>.yaml                the current profile
+  cluster/                              the site file and SLURM profiles of a worker's cluster; none is shipped (CR-061, CR-065)
+    sites/<site>.yaml                   the site file, written once for the cluster
+    profiles/<site>.yaml                the current profile, made from the site file and a snapshot
     profiles/<site>-<version>.yaml      every version made
     snapshots/<site>/<YYYY-MM-DDTHHMMSS>/   the last 10 snapshots
   logs/                                 every log PONZI writes to files (CR-064)
@@ -94,5 +96,5 @@ Config variables nest with a double underscore and rank below command-line flags
 | `PONZI_TIDE_WORKERS` | the TiDE forecaster | its data loader workers (default min(4, torch threads / 2)) |
 | `CONDA_OVERRIDE_CUDA` | pixi | install the `isce3` environment where no NVIDIA driver is found (`12.9`) |
 | `PONZI_URL` | ponzi-visual's dev server | the server it forwards to (default `http://127.0.0.1:8799`, the demo) |
-| `PONZI_ENVS`, `PONZI_REF` | ponzi-suite's `pixi run dev-install` | the extra environments to install, the branch or tag to clone ([For development](../guides/install.md#for-development)) |
-| `PONZI_SERVER_PORT`, `PONZI_VISUAL_PORT`, `PONZI_SERVER_HOST`, `PONZI_SERVER_SETTINGS`, `PONZI_WORKER_ID` | ponzi-suite's `pixi run dev-up` | its ports, the server's address and settings, the client loop's name ([Quickstart](../guides/quickstart.md#development-on-your-own-home)) |
+| `PONZI_ENVS`, `PONZI_REF` | ponzi-suite's `pixi run dev-install` | the extra environments to install, the branch or tag to clone ([For development](install.md#for-development)) |
+| `PONZI_SERVER_PORT`, `PONZI_VISUAL_PORT`, `PONZI_SERVER_HOST`, `PONZI_SERVER_SETTINGS`, `PONZI_WORKER_ID` | ponzi-suite's `pixi run dev-up` | its ports, the server's address and settings, the client loop's name ([Quickstart](quickstart.md#development-on-your-own-home)) |

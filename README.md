@@ -13,7 +13,7 @@ Pages are under `docs/`. Content that comes from code is generated at build time
 
 Linux on x86-64 only, for now: both commands check the machine first and stop on any other system.
 
-For developing and testing PONZI on one machine, not for deploying it, two pixi tasks of this repository set up and start the whole system ([Install](docs/guides/install.md#for-development), [Quickstart](docs/guides/quickstart.md#development-on-your-own-home)):
+For developing and testing PONZI on one machine, not for deploying it, two pixi tasks of this repository set up and start the whole system ([Install](docs/getting-started/install.md#for-development), [Quickstart](docs/getting-started/quickstart.md#development-on-your-own-home)):
 
 ```
 pixi run dev-install         # clone the missing ponzi-core, ponzi-service, ponzi-visual beside the suite, install them
@@ -38,6 +38,6 @@ The suite also holds the files PONZI runs from, versioned here because ponzi-cor
 | `testcases/<case>/` | test locations: an area, a recipe, its forecaster. The first is `gaza`. | `ponzi detect ... --recipe ../ponzi-suite/testcases/gaza/recipe.yaml` |
 | `standards/` | standard versions, `<id>-<version>.yaml`. The first is the draft `s1-general-1.0.0.yaml`. | `ponzi-models check-standard ../ponzi-suite/standards/s1-general-1.0.0.yaml` |
 
-Forecasters, panels and models are named by one convention, [docs/reference/naming.md](docs/reference/naming.md) (`ponzi_spec.naming`). ponzi-core's tests check these files (`test_panels.py`, `test_testcases.py`, `test_training_missing.py`, `test_suite_names.py`). They find the suite as `$PONZI_SUITE`, else `ponzi-suite/` beside ponzi-core.
+Forecasters, panels and models are named by one convention, [docs/models/naming.md](docs/models/naming.md) (`ponzi_spec.naming`). ponzi-core's tests check these files (`test_panels.py`, `test_testcases.py`, `test_training_missing.py`, `test_suite_names.py`). They find the suite as `$PONZI_SUITE`, else `ponzi-suite/` beside ponzi-core.
 
 The instructions AI coding agents follow in every PONZI repository are in `agents/` (see `agents/README.md`); each repository's `CLAUDE.md` imports its file from there.

@@ -20,7 +20,7 @@ A panel is defined by a folder kept in git in ponzi-suite, `panels/<id>/` (`pane
 | `bursts.geojson` | one feature per burst: its footprint, track, subswath, orbit pass, split, cells and window |
 | `cells.geojson` | one feature per cell: its outline, split, sub-panel, stratum, window and bursts |
 
-A panel is cited as `<id>@<version>` (`majortom-global@0.4.0`, [Naming](../reference/naming.md)). `ponzi-models panel-check DIR` holds a folder to the rules: named by its id, the three files matching their sha256, the cells and bursts naming each other, the split counts those of the files. The definition holds no computed data: what is built from it goes into the PONZI home.
+A panel is cited as `<id>@<version>` (`majortom-global@0.4.0`, [Naming](../models/naming.md)). `ponzi-models panel-check DIR` holds a folder to the rules: named by its id, the three files matching their sha256, the cells and bursts naming each other, the split counts those of the files. The definition holds no computed data: what is built from it goes into the PONZI home.
 
 ## How a panel is built
 

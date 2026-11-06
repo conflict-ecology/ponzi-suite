@@ -1,6 +1,6 @@
 # Agent instructions
 
-The instructions AI coding agents follow in every PONZI repository live here, so the rules are written once and every repository loads the same version. The pages under `docs/agents/` are different: they are published on the site and tell agents how to use and change PONZI. These files configure the agents themselves.
+The instructions AI coding agents follow in every PONZI repository live here, so the rules are written once and every repository loads the same version. The pages under `docs/contributing/agents/` are different: they are published on the site and tell agents how to use and change PONZI. These files configure the agents themselves.
 
 | File | Loaded by |
 | --- | --- |
