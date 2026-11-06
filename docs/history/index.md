@@ -23,10 +23,10 @@ Why coherence is estimated in radar geometry, and how the backends repeat_ccd ex
 
 ## Decision log
 
-The library's earlier decisions are in the monorepo's `docs/decisions.md` and in ponzi-core's change requests (`docs/requests/CR-000` onward); they move here as the overhaul proceeds.
+The library's earlier decisions are in the monorepo's `docs/decisions.md` and in the change requests below (CR-000 onward).
 
 ## Change requests
 
-Nothing in ponzi-core changes without a written request the owner signs off. The requests are kept in ponzi-core (`docs/requests/`) and rendered here at build time. Several also change ponzi-service, ponzi-visual or this suite.
+Nothing in ponzi-core changes without a written request the owner signs off. The requests are kept here (`docs/history/requests/`, since CR-071; the form is [TEMPLATE.md](requests/TEMPLATE.md)). Several also change ponzi-service, ponzi-visual or this suite.
 
 <!-- ponzi:requests -->

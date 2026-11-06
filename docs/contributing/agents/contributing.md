@@ -4,7 +4,7 @@ Checklists for agents that change PONZI's code. People follow the same rules in 
 
 ## Before any change
 
-- [ ] A change request exists in `ponzi-core/docs/requests/` and the owner has signed it off.
+- [ ] A change request exists in ponzi-suite `docs/history/requests/` and the owner has signed it off.
 - [ ] You know whether the change alters results for an existing config. If it does, it is RESULTS-CHANGING.
 - [ ] You do not commit, tag or push unless the owner asks; leave changes in the working tree for review.
 - [ ] You do not access a cluster, submit a job or move data without the owner's approval for that action.

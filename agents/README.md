@@ -30,4 +30,4 @@ Skills are packaged as the `ponzi-dev` plugin in `plugins/ponzi-dev/`, published
 
 ## Changing these files
 
-A change to a repository's file changes that repository's rules, so it goes through that repository's change process (for ponzi-core, a signed request in `docs/requests/`).
+A change to a repository's file changes that repository's rules, so it goes through that repository's change process (for ponzi-core, a signed request in ponzi-suite `docs/history/requests/`).

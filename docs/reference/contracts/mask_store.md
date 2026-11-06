@@ -1,0 +1,14 @@
+# C23: mask store
+
+**Purpose.** Named pixel selections on the grid of ONE coherence store (CR-014): a run restricted by a layer (`RunRequest.mask_store`, `RunRequest.mask`; `ponzi run --mask-store PATH --mask LAYER`, both or neither) processes its usual process mask AND the layer, and reads and writes only the bounding window of what remains. **Producer:** whoever defines the selection, through `ponzi.contracts.masks.write_mask_store`; for a panel, `ponzi_models.panels.draw.draw_panel` (`ponzi-models panel-build`), with the layers `cell_<split>` (the processed pixels of the split's cells) and `sample_<split>` (the drawn pixels) and the attrs `panel` (the panel spec's id), `panel_spec_hash` (its `spec_hash`; `panel_spec_digest` before CR-070), `draw_seed`. **Consumers:** `ponzi.core.runner.open_input` (`WindowedInput`), and through it `ponzi run`, the panel null runs (`ponzi_models.calibration.null_runs`, `ponzi-models null-runs`) and the masked input of a panel burst (`ponzi_models.panels.masked_input`: training data, `ponzi-models export-pixels`). **Location:** never inside the sidecar, which stays byte-identical; a panel's are in the panel folder, `<panel>/<burst>/<burst>_masks.zarr` (default panel folder `{PONZI home}/panels/<id>`), recorded relative to it in the panel record (`Panel.masks_path`).
+
+| Array | Dims | Stored | Content |
+| --- | --- | --- | --- |
+| `y`, `x` | y; x | float64, one chunk | the coherence store's coordinates, value for value |
+| `<layer>` | y, x | bool, one chunk, fill false | one named selection; any number of layers; attr `n_pixels` (its true pixels) |
+
+Group attrs: `source_store` (path of the coherence store the masks are for), `source_digest` (its `store_digest`, empty where the writer could not know it), `layers` (sorted names), `producer` (`ponzi.contracts.masks`), `contract_version` (1), plus the writer's own.
+
+Invariants: at least one layer; every layer is bool of shape `(len(y), len(x))`; a layer is not named `y` or `x`; the store is zarr v3 with consolidated metadata; an existing store is replaced only with `overwrite`. The reader takes every bool 2-d array other than `y` and `x` as a layer (other arrays are a warning) and fails without `source_store`. A mask store is used only with a coherence store of the same grid (`MaskDataset.check_grid`, an error otherwise), never with a pixel sample (refused); another `source_digest` than the store's is a warning; a layer that leaves no pixel of the process mask is refused. A layer is a selection of the input and no part of `scoring_spec_hash`; `run_meta.mask` records the store, its digest, the layer, the window and the pixel counts.
+
+Functions: `write_mask_store`, `open_mask_store` (`MaskDataset`: `layers`, `layer(name)`, `check_grid(y, x)`, `meta`), `validate_mask_store`.

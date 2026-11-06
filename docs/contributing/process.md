@@ -2,7 +2,11 @@
 
 ## Change requests
 
-Every change to ponzi-core starts as a written request in `docs/requests/` (the template is there): why, what changes, whether results change, the tests, the version. The owner signs it off before it is implemented. A change ends with its tests green and a `CHANGELOG.md` entry.
+Every change to ponzi-core starts as a written request in this suite's `docs/history/requests/` (the template is there, [TEMPLATE.md](../history/requests/TEMPLATE.md)): why, what changes, whether results change, the tests, the version. The owner signs it off before it is implemented. A change ends with its tests green and a `CHANGELOG.md` entry.
+
+## Tests
+
+The `test` tasks of ponzi-core and ponzi-service run light (CR-072): at low priority (`nice -n 10`) and with the thread pools at 4 (`OMP_NUM_THREADS` and the BLAS settings, which `ponzi.core.parallel`, torch and the BLAS libraries read; unset, they take every core). The cap changes only the speed, never a result. During a change, run the test files it touches; run the whole suites before a commit, one at a time. On a shared machine, also bound a run from outside: `systemd-run --user --scope -p CPUQuota=400% -p MemoryMax=24G pixi run test`.
 
 ## Versions
 
