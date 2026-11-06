@@ -154,7 +154,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - areas chosen from administrative boundaries, with the days and the orbit (CR-053);
     - areas chosen from Major TOM cells, drawn from the map's ×64 (CR-066);
     - areas made from tiles only, clicked or painted on the map, with tags; the boundaries as view-only overlays with their names; the burst footprints of the selected tiles by pass; the skin on a settings page (CR-067).
-    - tile submission only: the selected tiles, their tags and a monitoring year, the standard and cadence left to the server; the Runs tab removed; a Monitored page of the areas watched now with their job counts; a collapsible navigation drawer (CR-068).
+    - tile submission only: the selected tiles, their tags and a first and last day, the standard and cadence left to the server; the Runs tab removed; a Monitored page of the areas watched now with their job counts; a collapsible navigation drawer (CR-068).
 - [x] Tests:
     - unit tests on the server's own answers (fixtures from `ponzi-worker demo --fixtures`);
     - an end-to-end run against a real server (`pixi run e2e`).

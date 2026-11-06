@@ -40,7 +40,7 @@ They print JSON. The server and key come from `--url` and `$PONZI_KEY` (or `--ke
 
 ## TypeScript (in ponzi-visual)
 
-ponzi-visual carries its own client, `src/client`. It is not a separate package. The app uses it to make areas of tiles over a monitoring year and to list and manage them; it sends no standard and no cadence, and makes no run requests (the client still has `submit`, which its end-to-end test uses).
+ponzi-visual carries its own client, `src/client`. It is not a separate package. The app uses it to make areas of tiles over a span of days and to list and manage them; it sends no standard and no cadence, and makes no run requests (the client still has `submit`, which its end-to-end test uses).
 
 ```ts
 import { createPonziClient, contentId } from "./client";

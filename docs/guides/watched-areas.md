@@ -34,13 +34,13 @@ An area made before areas were made from tiles (from a list of bursts, or from a
 
 ## On the map
 
-ponzi-visual makes areas the same way, and makes nothing else: it submits tiles with a monitoring year, and the server chooses what runs them.
+ponzi-visual makes areas the same way, and makes nothing else: it submits tiles with a span of days, and the server chooses what runs them.
 
 - **Tiles.** Zoom in to ×64 to see the tiles. A click on a tile adds it, or removes it when selected. Pressing on a tile and dragging paints: from an unselected tile the drag adds every tile it passes over, from a selected one it removes them. The map stops at 64 tiles and says so.
 - **Panning.** Drag with the right mouse button, anywhere; a left drag where there is no tile (or anywhere below ×64) and the middle button pan too. The wheel and the + and - buttons zoom.
 - **Looking.** The administrative boundaries are three overlays toggled on the map (Admin 0 countries, on at first; Admin 1 from ×6; Admin 2 from ×16), outlines with their names. The footprints of the bursts meeting the selected tiles are drawn for one pass at a time (Ascending, Descending or Both), or hidden (Off). Neither can be clicked, and neither decides what the area watches.
-- **Watch.** Add tags and choose the **Monitoring year** (this year at first) in the panel beside the map, then **Watch**. The year is sent as `start_date` 1 January and `end_date` 31 December of it. For this year, what was acquired since 1 January is processed at once and each new acquisition as it arrives, to the end of the year; a past year is processed over that whole span. No standard and no cadence are sent.
-- **Monitored.** The **Monitored** page (`#/monitored`, from the drawer at the left of every page) lists the areas watched now: their tiles, tags, year or span, whether active or paused, their jobs queued, running, done and failed, and when each was last looked at. Pause, resume, look now or delete an area there, or open its outputs. Areas made before tiles are listed too, labelled as made from bursts or from a boundary.
+- **Watch.** Add tags and set the **First day** and **Last day** in the panel beside the map (this year, 1 January to 31 December, at first), then **Watch**. They are sent as `start_date` and `end_date`. What was acquired in the span so far is processed at once, and each new acquisition as it arrives, to the last day; a span that has ended is processed whole at once. Leave the last day empty to keep watching until the area is paused. No standard and no cadence are sent.
+- **Monitored.** The **Monitored** page (`#/monitored`, from the drawer at the left of every page) lists the areas watched now: their tiles, tags, span, whether active or paused, their jobs queued, running, done and failed, and when each was last looked at. Pause, resume, look now or delete an area there, or open its outputs. Areas made before tiles are listed too, labelled as made from bursts or from a boundary.
 
 ## Tags
 
