@@ -65,9 +65,9 @@ A box adds only the tiles the map has loaded for the view, so wait for the note 
 
 The map draws the footprints of the bursts that meet the selected tiles (`GET /v1/majortom/bursts`), for the pass chosen under **Bursts**:
 
-- **Ascending** (at first): blue, with long dashes.
+- **Ascending**: blue, with long dashes.
 - **Descending**: magenta, dotted.
-- **Both**: the two together, kept apart by their lines.
+- **Both** (at first): the two together, kept apart by their lines.
 - **Off**: none.
 
 Each chip shows its line. This is a view only: an area always watches every burst of both passes, whatever is shown, and the footprints let the pointer through to the tiles. The note counts the bursts of each pass.

@@ -1,14 +1,10 @@
 # C20: Row set
 
-Status: implemented 2026-09-16, `ponzi.contracts.row_set` and `ponzi.evaluation.rows` (package `packages/core`).
-
-## Purpose
-
-The rows of ONE finished run for the evaluation primitive: `signal` rows and `null` rows read out of the run's stores at labelled pixels, with the pixel id, the step, the label code and the provenance of every row. Every metric of `ponzi.evaluation.metrics` runs on a row set; `ponzi.evaluation.events` concatenates row sets across bursts and pools events; the caller names the runs, the nulls and the classes. Nothing is recomputed from coherence: whatever a run's state machine or context rule did to its pixels is what the metrics see.
+`ponzi.contracts.row_set` and `ponzi.evaluation.rows` (package `packages/core`). The rows of ONE finished run for the evaluation primitive: `signal` rows and `null` rows read out of the run's stores at labelled pixels, with the pixel id, the step, the label code and the provenance of every row. Every metric of `ponzi.evaluation.metrics` runs on a row set; `ponzi.evaluation.events` concatenates row sets across bursts and pools events; the caller names the runs, the nulls and the classes. Nothing is recomputed from coherence: whatever a run's state machine or context rule did to its pixels is what the metrics see.
 
 ## Producer and consumers
 
-Producers: `ponzi.evaluation.rows.score_rows` (C7, optionally C8's as-run flag), `channel_rows` (C6), `bag_rows` (C7 over C11's `bag` layer), `quiet_rows` (C7 or C6, LABEL FREE: the whole process mask at every scored step on the null side and an empty signal side). Consumers: `ponzi.evaluation.metrics`, `ponzi.evaluation.events` (burst to event, `concat_rows`, `pool_rows`); ponzi-models `calibration.null_rows` (`ponzi-models null-rows`: `quiet_rows` per burst of a panel, `concat_rows(offset_pixels=True)`, written with `RowSet.save` as `panel_{config}_{setting}.npz`) and `calibration.build` (`ponzi-models calibrate`: `RowSet.load` of that file).
+Producers: `ponzi.evaluation.rows.score_rows` (C7, optionally C8's as-run flag), `channel_rows` (C6), `bag_rows` (C7 over C11's `bag` layer), `quiet_rows` (C7 or C6, LABEL FREE: the whole process mask at every scored step on the null side and an empty signal side). Consumers: `ponzi.evaluation.metrics`, `ponzi.evaluation.events` (burst to event, `concat_rows`, `pool_rows`); `ponzi-models null-rows` (`calibration.null_rows`: `quiet_rows` per burst of a panel, `concat_rows(offset_pixels=True)`, written with `RowSet.save` as `panel_{scoring_spec_name}_{setting}.npz`) and `ponzi-models calibrate` (`calibration.build`: `RowSet.load` of that file).
 
 ## Arrays
 
@@ -19,7 +15,7 @@ Arrays of one side share their first dimension `n`; `signal` and `null` are `(n,
 | `level` | `scores` or `channels` | one value per row, or one per channel |
 | `null_kind` | `temporal`, `spatial`, `spatiotemporal`, `bags`, `external`, `quiet` | how the null rows were selected; `quiet` is signal free by construction (`SIGNAL_FREE_KINDS`) |
 | `signal`, `null` | `(n,)` or `(n, B * H)`, f32 as read, f64 once aggregated | the rows; NaN only at channel level (an invalid channel) |
-| `signal_pixel`, `null_pixel` | `(n,)` int64 | the pixel id: the flat index `y * X + x` on the run's grid (`pixel_id_kind = flat`); the ground cell id after the pipeline's dedup (`ground_cell`); a flat id shifted by a per member offset after `concat_rows(offset_pixels=True)` (`offset`) |
+| `signal_pixel`, `null_pixel` | `(n,)` int64 | the pixel id: the flat index `y * X + x` on the run's grid (`pixel_id_kind = flat`); the ground cell id after the ground dedup (`dedup_ground_cells`) (`ground_cell`); a flat id shifted by a per member offset after `concat_rows(offset_pixels=True)` (`offset`) |
 | `signal_step`, `null_step` | `(n,)` int32 | the anchor index of the row (a bag's first acquisition) |
 | `signal_label`, `null_label` | `(n,)` int16 | the label code of the row's pixel (its class); the class SET names are in the provenance |
 | `signal_weight`, `null_weight` | `(n,)` f32 or absent | optional row weights |
@@ -31,7 +27,7 @@ Arrays of one side share their first dimension `n`; `signal` and `null` are `(n,
 
 ## Provenance
 
-`RowProvenance` (pydantic, `extra="forbid"`): `contract_version` (1), `run_dir`, `scoring_spec_name`, `scoring_spec_hash` (named `config_name` and `config_hash` before CR-070), `forecaster`, `run_mode`, `run_window {mode, t_lo, t_hi, date_lo, date_hi}` (the stamp), `input_store`, `input_digest` (C9's), `sidecar_digest`, `mask_digest` (BLAKE2b over the score store's `process_pixels` shape and bytes, so a subset run without a sidecar has one), `extent {T, Y, X}`, `context_window`, `horizon_length`, `min_channels`, `baseline_days`, `revisit_days`, `label_store`, `label_digest`, `class_sets` (name to codes, as passed), `null_spec` (the `NullSpec` dump), `signal_steps`, `null_steps` (sorted unique), `pixel_set_digest` (BLAKE2b over the sorted unique pixel ids of both sides), `pixel_id_kind` (`flat`; `ground_cell` after the pipeline's dedup; `pooled` for a pool; `offset` for a concatenation of different runs whose flat ids were shifted apart), `aggregated_cols` (set by `aggregate`), `dropped {signal, null}` with `outside_process`, `unscored`, `below_finite_rule`, `label_zero`, `external_null` (the external null's own provenance), and for an event set or a pool `members` (one record per burst or event, in order, the fields above then holding the shared values and the joined digests) and `dedup` (the ground dedup or pooling record). `check_comparable` compares two event sets member by member.
+`RowProvenance` (pydantic, `extra="forbid"`): `contract_version` (1), `run_dir`, `scoring_spec_name`, `scoring_spec_hash`, `forecaster`, `run_mode`, `run_window {mode, t_lo, t_hi, date_lo, date_hi}` (the stamp), `input_store`, `input_digest` (C9's `input.digest`), `sidecar_digest`, `mask_digest` (BLAKE2b over the score store's `process_pixels` shape and bytes, so a subset run without a sidecar has one), `extent {T, Y, X}`, `context_window`, `horizon_length`, `min_channels`, `baseline_days`, `revisit_days`, `label_store`, `label_digest`, `class_sets` (name to codes, as passed), `null_spec` (the `NullSpec` dump), `signal_steps`, `null_steps` (sorted unique), `pixel_set_digest` (BLAKE2b over the sorted unique pixel ids of both sides), `pixel_id_kind` (`flat`; `ground_cell` after the ground dedup (`dedup_ground_cells`); `pooled` for a pool; `offset` for a concatenation of different runs whose flat ids were shifted apart), `aggregated_cols` (set by `aggregate`), `dropped {signal, null}` with `outside_process`, `unscored`, `below_finite_rule`, `label_zero`, `external_null` (the external null's own provenance), and for an event set or a pool `members` (one record per burst or event, in order, the fields above then holding the shared values and the joined digests) and `dedup` (the ground dedup or pooling record). `check_comparable` compares two event sets member by member.
 
 ## Null specifications
 
@@ -39,13 +35,13 @@ Arrays of one side share their first dimension `n`; `signal` and `null` are `(n,
 
 ## Invariants
 
-- Rows come from finished runs only: `run_meta.json` and `score.zarr` exist, the store stamp equals the record (config hash, window).
+- Rows come from finished runs only: `run_meta.json` and `score.zarr` exist, the store stamp equals the record (`scoring_spec.hash`, window; `open_run`).
 - A step of the signal or of a temporal, spatial or spatiotemporal null was scored by the run (`run_meta.anchors`); otherwise the builder refuses and names the missing steps with their dates. A detection run serves the spatial null only.
 - A row with a NaN score at a scored step is not in the set and is counted in `dropped.unscored` (at channel level: a row with every channel NaN). A bag none of whose acquisitions was scored is dropped the same way; a partially scored bag is kept with `n_scored`.
 - Labelled pixels outside the run's process mask are counted in `dropped.outside_process`.
 - The label grid is the run grid; at least one code of the class sets (and of a null class) must occur in the label store, a class an event lacks simply yields no rows.
 - `aggregate(cols)` turns channel rows into score rows by the unweighted NaN aware mean with the 60 percent finite rule (`aggregate_rows`), dropping and counting the rows below it.
-- Pairing (`pair`, `check_comparable`) intersects each side on the pixel id and REFUSES when the input digest, the mask digest, the extent, the pixel id kind, the signal steps or the null steps differ; a different stamped run window, level, null kind or label digest is reported as a warning (owner, 2026-09-16: the compared rows must agree, not the range a run happened to score).
+- Pairing (`pair`, `check_comparable`) intersects each side on the pixel id and REFUSES when the input digest, the mask digest, the extent, the pixel id kind, the signal steps or the null steps differ; a different stamped run window, level, null kind or label digest is reported as a warning (the compared rows must agree, not the range a run happened to score).
 - `select(codes, null_codes=None)` keeps the signal rows of the codes; the null side follows the same codes only when it is the pixels' own rows (temporal), else it is kept whole unless `null_codes` is given.
 
 ### Quiet rows

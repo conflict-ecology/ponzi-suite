@@ -1,32 +1,28 @@
 # C11: Label store
 
-Status: implemented 2026-09-07, `ponzi.evaluation.labels` (packages/core); the `bag` layer added 2026-09-16. STAC collection `ponzi-labels` (asset `labels`).
-
-## Purpose
-
-The only label input evaluation reads. Which codes are positive and which are the null is never stored here: class sets are arguments to every metric.
+`ponzi.evaluation.labels` (package `packages/core`). The only label input evaluation reads. Which codes are positive and which are the null is never stored here: class sets are arguments to every metric.
 
 ## Producer and consumers
 
-Producers: whoever calls `write_labels`; no command or ponzi-worker stage writes one (there is no BRIGHT, UNOSAT or crater producer here), so today the tests only. Consumers: `ponzi.evaluation` (`open_labels`, read by `ponzi.evaluation.events.event_rows` and by `score_rows`, `channel_rows` and `bag_rows` of `ponzi.evaluation.rows`); no command or stage reads one.
+Producer: whoever calls `write_labels`; no command or worker stage writes one. Consumers: `ponzi.evaluation` (`open_labels`, used by `ponzi.evaluation.events.event_rows`; the `LabelSet` is read by `score_rows`, `channel_rows` and `bag_rows` of `ponzi.evaluation.rows`, C20); no command or stage reads one.
 
 ## Arrays
 
 | Name | Dims | dtype | Fill | Meaning |
 |---|---|---|---|---|
 | `label` | `(y, x)` or `(time, y, x)` | int16 | 0 | 0 = excluded; `k > 0` caller-defined class. The 3-d form gives the class per acquisition; the bag class is the highest nonzero code over the evaluated anchors |
-| `bag` | `(time, y, x)` | int32 | 0 | Optional. `k > 0` = the id of the bag the acquisition belongs to; 0 = in no bag. An id is unique in the store, belongs to one pixel, and `label` is constant inside it. Replaces the former `window` layer: `LabelSet.window` is the derived `bag > 0`, and a legacy store with `window` only is converted on read, one id per contiguous run of a pixel |
+| `bag` | `(time, y, x)` | int32 | 0 | Optional. `k > 0` = the id of the bag the acquisition belongs to; 0 = in no bag. An id is unique in the store, belongs to one pixel, and `label` is constant inside it. `LabelSet.window` is the derived `bag > 0`. A store with a `window` array and no `bag` is converted on read, one id per contiguous run of a pixel |
 | `onset` | `(y, x)` | int32 | -1 | Optional. Index of the first acquisition after the true change |
 | `weight` | `(y, x)` | float32 | NaN | Optional |
 | `stratum` | `(y, x)` | int16 | 0 | Optional reporting dimension |
 
-Further arrays a producer adds (`write_labels(..., extra=)`, on the label grid, with or without a leading `time`) are ignored by the evaluation. Chunks: one per acquisition, the whole grid each; the store is zarr v3 with dimension names and consolidated metadata. Attrs: `label_schema` (1), `label_names {code: name}`, `stratum_names`, free producer attrs; `open_labels` adds `bag_from_legacy_window` to the attrs it returns for a converted legacy store. The label grid equals the run grid (`expect_shape`; or the `px` pixel order for a sampled run, dims `(px,)`).
+Further arrays a producer adds (`write_labels(..., extra=)`, on the label grid, with or without a leading `time`) are ignored by the evaluation. Chunks: one per acquisition, the whole grid each. Attrs: `label_schema` (1), `label_names {code: name}`, `stratum_names`, free producer attrs; `open_labels` adds `bag_from_legacy_window` to the attrs it returns for a converted `window` store. The label grid equals the run grid (`expect_shape`), or for a sampled run the pixel order, dims `(px,)`.
 
 ## Bags
 
-The producer decides every bag when it writes the store, and the evaluation only ever reduces a score over a bag id (`ponzi.evaluation.rows.bag_rows`: the window maximum of `anomaly_score` over the bag's marked acquisitions). Three kinds of bag live side by side, told apart by their label and their dates: damage bags (one per assessment interval with new damage), negative assessment bags (a pixel assessed and found undamaged over an interval, a null bag with a real meaning), and pre-event quiet bags (disjoint blocks of the pre-event acquisitions, the quiet null of the monitoring use case; the block rule is in the attrs). Which label codes form the signal and which the null is, as always, the caller's class sets.
+The producer decides every bag when it writes the store, and the evaluation only ever reduces a score over a bag id (`ponzi.evaluation.rows.bag_rows`: the window maximum of `anomaly_score` over the bag's marked acquisitions). Three kinds of bag live side by side, told apart by their label and their dates: damage bags (one per assessment interval with new damage), negative assessment bags (a pixel assessed and found undamaged over an interval, a null bag with a real meaning), and pre-event quiet bags (disjoint blocks of the pre-event acquisitions, the quiet null of the monitoring use case; the block rule is in the attrs). Which label codes form the signal and which the null is the caller's class sets.
 
-A worked pixel of the Gaza interval store (UNOSAT codes 1 intact, 2 damaged; conflict start 2023-10-07; assessments A1 2023-11-07 intact, A2 2024-01-06 moderate, A3 2024-03-02 moderate, A4 2024-05-03 destroyed; 12 day cadence):
+A worked pixel of the Gaza interval store (UNOSAT codes 1 intact, 2 damaged; conflict start 2023-10-07; assessments A1 2023-11-07 intact, A2 2024-01-06 moderate, A3 2024-03-02 moderate, A4 2024-05-03 destroyed; 12-day cadence):
 
 | t | date | label | bag | why |
 |---|---|---|---|---|
@@ -43,8 +39,4 @@ Bags 5 and 6 are adjacent with different labels, which is why the id and not a r
 
 ## Functions
 
-`open_labels(path, *, expect_shape=None, T=None) -> LabelSet` (v2 legacy stores such as the BRIGHT labels open unchanged; `LabelSet.bags()` tabulates the bags), `write_labels(path, label, *, bag, onset, weight, stratum, names, stratum_names, attrs, extra)` (zarr v3; refuses a bag layer that breaks the id invariants), `bag_table(bag, label_t) -> BagTable`, `bags_from_window(window)` (the legacy conversion), `validate_class_sets(labels, positive_sets, negative_sets)`.
-
-## Formats
-
-The `bag` id layer replaced the `window` flag on 2026-09-16; the writer emits zarr v3 and the reader accepts both formats and the legacy flag.
+`open_labels(path, *, expect_shape=None, T=None) -> LabelSet` (`LabelSet.bags()` tabulates the bags), `write_labels(path, label, *, bag, onset, weight, stratum, names, stratum_names, attrs, extra)` (refuses a bag layer that breaks the id invariants), `bag_table(bag, label_t) -> BagTable`, `bags_from_window(window)` (the `window` conversion), `validate_class_sets(labels, positive_sets, negative_sets)`.
