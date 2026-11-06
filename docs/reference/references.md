@@ -20,7 +20,7 @@ The papers, data and software PONZI is built on. Each entry says where PONZI use
   Muñoz-Sabater, J., et al. (2021). ERA5-Land: a state-of-the-art global reanalysis dataset for land applications. *Earth System Science Data*, 13, 4349-4383. [doi:10.5194/essd-13-4349-2021](https://doi.org/10.5194/essd-13-4349-2021)
 - **GHSL**, the Global Human Settlement Layer of the European Commission's Joint Research Centre: the built-up surface `GHS_BUILT_S` (R2023A, epoch 2020) and the land fraction `GHS_LAND` (R2022A), the `built` and `land` layers of the sidecar. [human-settlement.emergency.copernicus.eu](https://human-settlement.emergency.copernicus.eu)
 - **Copernicus DEM GLO-30**, the 30 m elevation model of the coherence chain, stitched to ellipsoidal heights by dem_stitcher. [Copernicus DEM](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM)
-- **World Bank Official Boundaries**, the administrative units of levels 0 to 2 that areas are chosen from (CR-053). [World Bank Data Catalog](https://datacatalog.worldbank.org)
+- **World Bank Official Boundaries**, the administrative units of levels 0 to 2 drawn on the map, and with the areas of non-determined legal status (NDLSA, CR-069) the land a tile must meet (CR-053, CR-067). Dataset 0038272 version 3, CC BY 4.0. [World Bank Data Catalog](https://datacatalog.worldbank.org)
 
 ## Grids
 

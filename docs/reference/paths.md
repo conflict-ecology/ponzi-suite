@@ -19,7 +19,7 @@ Where PONZI keeps things on a machine, and the variables that move them. Secrets
     opera-burst-bbox-only.sqlite3       the OPERA burst map the worker reads (pinned, sha256 checked)
     burst-id-geometries-simple-*.geojson.zip   the OPERA burst footprints, as downloaded
     bursts.sqlite3                      the burst catalog the server builds from them
-    boundaries.sqlite3                  the World Bank boundaries, admin 0 to 2 (CR-053)
+    boundaries.sqlite3                  the World Bank boundaries, admin 0 to 2 and the disputed areas (CR-053, CR-069)
     availability/<burst>.json           ASF acquisitions the server has looked up (CR-060)
   cache/                                the worker's content-addressed cache (roots.cache)
     <collection>/<content id>/          one output: item.json and its files, never changed

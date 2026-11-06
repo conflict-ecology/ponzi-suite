@@ -130,6 +130,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] Areas from Major TOM cells (10 km): the server picks the bursts of an orbit pass meeting a cell, from a grid it computes (CR-066).
 - [x] Areas from Major TOM tiles only: 1 to 64 tiles over land, every burst of both passes meeting them, its jobs made at once, and tags the server adds to the analysis outputs of its tiles (CR-067). Areas made before from bursts or a boundary keep running.
 - [x] The server chooses an area's standard when none is given: `default_standard`, else the one standard it holds, else a 422 saying to set it (CR-068).
+- [x] The World Bank's disputed areas (NDLSA) are level 0 boundaries and land, so their tiles can be watched; the map draws the land from the level 0 boundaries (CR-069).
 - [x] A job lists the Items it made (`Job.items`), so an area's outputs are its done jobs' Items (CR-042).
 - [x] Outputs reach the server by upload or by a shared path, as the server's `outputs` setting says (CR-041).
 - [ ] **Run the scheduler in a deployment.** Owner.
@@ -155,11 +156,12 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - areas chosen from Major TOM cells, drawn from the map's ×64 (CR-066);
     - areas made from tiles only, clicked or painted on the map, with tags; the boundaries as view-only overlays with their names; the burst footprints of the selected tiles by pass; the skin on a settings page (CR-067).
     - tile submission only: the selected tiles, their tags and a first and last day, the standard and cadence left to the server; the Runs tab removed; a Monitored page of the areas watched now with their job counts; a collapsible navigation drawer (CR-068).
+    - a box tool for the tiles from ×32: each box adds the tiles it meets, Shift removes them, Clear empties the selection.
 - [x] Tests:
     - unit tests on the server's own answers (fixtures from `ponzi-worker demo --fixtures`);
     - an end-to-end run against a real server (`pixi run e2e`).
 - [ ] **Browser end-to-end tests.** local.
-    - Playwright on the built app against the demo server: paint tiles, create an area, open a manifest.
+    - Playwright on the built app against the demo server: box tiles, create an area, open a manifest.
     - Done when it runs in CI.
 - [ ] **Publish ponzi-visual's client to npm.** Needs the package name, the npm organisation and a publishing token.
 - [ ] **Raster display (D12).** local.
