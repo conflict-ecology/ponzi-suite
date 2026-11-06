@@ -33,7 +33,7 @@ Models and calibrations are made by `ponzi-models` from panels: sets of pixels o
 - **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It never imports the computing distributions.
 - **ponzi-client** (Python, and the `ponzi-client` command) is the only part that talks to a running server: submitting runs, watching areas, reading outputs, and, as `ponzi-client serve`, the one long-running loop that claims jobs, has the worker do them, delivers the final outputs (uploaded, or written into a folder the server also sees) and completes them (CR-063).
 - **ponzi-worker** never talks to the server and never stays running. `ponzi-worker job` is one short call on one job: it runs the job's workflow here, or submits and checks its SLURM jobs, and answers with what is done; the client calls it again until the job is finished. It keeps intermediate outputs in its own cache by content id, so each call goes on from where the last stopped. The front end has its own TypeScript client, generated from the server's committed OpenAPI document. Code can also use PONZI without a server: the ponzi-core libraries and their commands directly (`ponzi run`, `ponzi-pipeline`, `ponzi-models`), or a worker on its own (`ponzi-worker run` runs a workflow on this machine or through SLURM, with its cache, and no server).
-- **ponzi-visual** shows the watched areas and their outputs over time on a map, and makes new areas from Major TOM tiles (with their tags) and a span.
+- **ponzi-visual** shows the watched areas and their outputs over time on a map, and makes new areas from Major TOM tiles (with their tags) and a monitoring year, and lists the areas monitored. The server chooses what runs them.
 
 ## Dependencies
 

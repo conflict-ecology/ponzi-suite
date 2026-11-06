@@ -21,7 +21,7 @@ cd ponzi-visual && pixi run dev      # http://localhost:5173
 
 Connect with the key the server printed; every scope's key is in `ponzi-visual/.e2e/demo/keys.json`.
 
-The map holds the demo's five bursts. To select from every Sentinel-1 burst, build the full catalog with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or set `bursts:` in `.e2e/demo/server.yaml` to `.e2e/bursts.sqlite3`. The demo's server downloads no administrative boundaries (`fetch_boundaries: false`); to choose areas from boundaries, set `boundaries:` in `server.yaml` to a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`. A `client:write` key can create areas and submit runs.
+The map holds the demo's five bursts. To select from every Sentinel-1 burst, build the full catalog with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or set `bursts:` in `.e2e/demo/server.yaml` to `.e2e/bursts.sqlite3`. The demo's server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, set `boundaries:` in `server.yaml` to a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`. A `client:write` key can create areas in the app, and submit runs from Python or the command line.
 
 From ponzi-service, in Python or a shell:
 
@@ -69,4 +69,4 @@ printf 'server:\n  fetch_boundaries: false\n  fetch_catalog: false\n' > /tmp/dev
 PONZI_HOME=/tmp/ponzi-dev PONZI_SERVER_SETTINGS=/tmp/dev-server.yaml pixi run dev-up
 ```
 
-Runs and watched areas name a standard, and a new home has none: copy one into `$PONZI_HOME/standards` and start again ([Making a standard](standards.md)).
+A new home has no standard, and a watched area needs one: copy one into `$PONZI_HOME/standards` and start again ([Making a standard](standards.md)). With exactly one there, the areas the app makes take it. With several, name the one areas take in a settings file (`server: {default_standard: s1-general@1.0.0}`) given as `PONZI_SERVER_SETTINGS`; without it the server refuses the app's areas and says so. Run requests from Python or the command line always name their standard.

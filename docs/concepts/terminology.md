@@ -24,7 +24,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **grid**, **lattice** | the fixed raster a burst is processed on (UTM, 40 m), or the raster a path or cell is resampled to | ([Grids](grids.md)) |
 | **tile** | a cell of the Major TOM grid over land, as a watched area is made from it | |
 | **boundary** | an administrative unit of the World Bank Official Boundaries, level 0 (country), 1 or 2; drawn on the map and the land a tile must meet, never what an area is made from | an area |
-| **area** (watched area) | what the server keeps running: 1 to 64 tiles, every burst of both passes meeting them, a standard, a cadence, tags and optionally a first and last day | an AOI |
+| **area** (watched area) | what the server keeps running: 1 to 64 tiles, every burst of both passes meeting them, a standard (the server's `default_standard` when none is given), a cadence, tags and optionally a first and last day | an AOI |
 | **tag** | free text of an area, added by the server to the analysis outputs of its tiles as it serves them; never part of a content id | a name; a label (C11) |
 | **AOI** | area of interest: a place studied (Gaza, Tehran), as a test case or an area | |
 
