@@ -9,7 +9,6 @@ strict: true
 theme:
   name: material
   features:
-    - navigation.sections
     - navigation.indexes
     - content.code.copy
   palette:
@@ -66,6 +65,14 @@ extra_javascript:
 
 nav:
   - Home: index.md
+  - The method:
+      - method/index.md
+      - How PONZI works: method/workflows.md
+      - Coherence: method/coherence.md
+      - Panels: method/panels.md
+      - Grids: method/grids.md
+      - Stages: method/stages.md
+      - Data sources and catalogs: method/data-sources.md
   - Getting started:
       - getting-started/index.md
       - System overview: getting-started/overview.md
@@ -73,7 +80,7 @@ nav:
       - Quickstart: getting-started/quickstart.md
       - Authentication: getting-started/authentication.md
       - Paths and environment variables: getting-started/paths.md
-  - Using PONZI:
+  - Interacting with PONZI:
       - using/index.md
       - Watched areas: using/watched-areas.md
       - The map: using/map.md
@@ -89,14 +96,6 @@ nav:
       - Configuration: service/configuration.md
       - REST API: service/rest-api.md
       - Troubleshooting: service/troubleshooting.md
-  - The method:
-      - method/index.md
-      - How PONZI works: method/workflows.md
-      - Coherence: method/coherence.md
-      - Panels: method/panels.md
-      - Grids: method/grids.md
-      - Stages: method/stages.md
-      - Data sources and catalogs: method/data-sources.md
   - Models and standards:
       - models/index.md
       - Making a standard: models/standards.md

@@ -20,14 +20,17 @@ Models and calibrations are made by `ponzi-models` from panels: sets of pixels o
 ## The components
 
 ```
-                ponzi-server  ◄──── REST ────  ponzi-client  ◄── ponzi-visual, agents
-                                                   │   serve: the only long-running process; it always asks,
-                                                   │   the server never calls out
-                                                   ▼
-                                    ponzi-worker job  (one short call per step of a job)
-                                                   │
-                                                   └── runs ponzi, ponzi-pipeline, ponzi-models,
-                                                       here or as SLURM jobs
+ponzi-visual, agents
+        │
+        ▼
+ponzi-client  ──── REST ────►  ponzi-server
+   │    serve: the only long-running process;
+   │    it always asks, the server never calls out
+   ▼
+ponzi-worker job   (one short call per step of a job)
+   │
+   └── runs ponzi, ponzi-pipeline, ponzi-models,
+       here or as SLURM jobs
 ```
 
 - **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It never imports the computing distributions.

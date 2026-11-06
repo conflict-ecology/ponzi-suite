@@ -20,10 +20,10 @@ Start with [how PONZI works](method/workflows.md) and the [system overview](gett
 
 | Section | For |
 | --- | --- |
-| [Getting started](getting-started/index.md) | what PONZI is made of, installing it, a first run on one machine, logins, paths |
-| [Using PONZI](using/index.md) | watching areas, the map, the clients, and reading the outputs |
-| [The service](service/index.md) | the server, the worker, running on a cluster, configuration, the REST API, troubleshooting |
 | [The method](method/index.md) | how the detection works: coherence, panels, grids, stages, and the data it is built from |
+| [Getting started](getting-started/index.md) | what PONZI is made of, installing it, a first run on one machine, logins, paths |
+| [Interacting with PONZI](using/index.md) | working with PONZI through the libraries around ponzi-core: watching areas, the map, the clients, and reading the outputs |
+| [The service](service/index.md) | the server, the worker, running on a cluster, configuration, the REST API, troubleshooting |
 | [Models and standards](models/index.md) | making, versioning and naming standards and models |
 | [Reference](reference/index.md) | the schemas and APIs generated from the code, the store contracts, terminology, citations |
 | [Contributing](contributing/index.md) | the roadmap, the change process, new stages, and the rules for agents |

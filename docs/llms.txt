@@ -17,7 +17,7 @@ Agents use PONZI through ponzi-client when a server is running (client mode), el
 - [Authentication](getting-started/authentication/): the logins each part needs
 - [Paths and environment variables](getting-started/paths/): the PONZI home and every variable
 
-## Using PONZI
+## Interacting with PONZI
 
 - [Watched areas](using/watched-areas/): areas of Major TOM tiles and what a daily look computes
 - [The map](using/map/): ponzi-visual, choosing tiles, the Monitored page

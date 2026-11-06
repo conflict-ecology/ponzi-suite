@@ -1,5 +1,8 @@
 # Watched areas
 
+!!! warning "Under construction"
+    Watched areas are still being built; this page and how areas are run will change.
+
 A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grids](../method/grids.md)) that keep being run under one standard. The outputs are made on the same grid, so the tiles of an area are the tiles of its outputs.
 
 - **Tiles only.** An area is 1 to 64 tiles. A tile must meet land, a level 0 outline of the administrative boundaries: a country or territory, or one of the disputed areas below. The server lists no tile over open sea and refuses one in an area.

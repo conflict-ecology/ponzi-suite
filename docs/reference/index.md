@@ -6,4 +6,4 @@
 - [Terminology](terminology.md): the words PONZI uses, beside the words they are confused with.
 - [References](references.md): the papers, data and software PONZI is built on.
 
-Elsewhere: the [REST API](../service/rest-api.md) is under The service, [Naming](../models/naming.md) under Models and standards, [the clients](../using/clients.md) under Using PONZI, and [paths and environment variables](../getting-started/paths.md) under Getting started.
+Elsewhere: the [REST API](../service/rest-api.md) is under The service, [Naming](../models/naming.md) under Models and standards, [the clients](../using/clients.md) under Interacting with PONZI, and [paths and environment variables](../getting-started/paths.md) under Getting started.

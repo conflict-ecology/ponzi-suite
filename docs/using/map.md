@@ -1,5 +1,8 @@
 # The map
 
+!!! warning "Under construction"
+    ponzi-visual is still being built; this page and the map itself will change.
+
 ponzi-visual is PONZI's web front end. It shows the administrative boundaries the server serves, lets you choose Major TOM tiles and watch them over a span of days, and lists the areas watched now with their outputs. It makes areas of tiles and nothing else: the server chooses the standard that runs them and how often it looks (ponzi-core CR-068). What an area is and how the server runs it is in [Watched areas](watched-areas.md).
 
 Every call goes through the server's API with your key. To run the front end, see [Install](../getting-started/install.md#ponzi-visual) and, for the whole system on one machine, [Quickstart](../getting-started/quickstart.md#development-on-your-own-home).
