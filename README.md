@@ -11,6 +11,8 @@ Pages are under `docs/`. Content that comes from code is generated at build time
 
 ## A development workstation
 
+Linux on x86-64 only, for now: both commands check the machine first and stop on any other system.
+
 For developing and testing PONZI on one machine, not for deploying it, two pixi tasks of this repository set up and start the whole system ([Install](docs/guides/install.md#for-development), [Quickstart](docs/guides/quickstart.md#development-on-your-own-home)):
 
 ```

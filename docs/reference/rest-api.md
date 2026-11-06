@@ -10,5 +10,5 @@ Rules:
 - Keys are scoped (`worker`, `client:read`, `client:write`, `admin`) and sent as bearer tokens. `admin` holds every scope, and `client:write` holds `client:read`.
 - A lease expires unless heartbeated; an expired lease returns the job to the queue, and completing a job that is already done does nothing.
 - Every lease carries the server's `Outputs` (`mode`: `upload` or `path`, and the `root` in `path` mode), which says how the client loop delivers the final assets.
-- The burst and boundary routes answer 503 with `Retry-After` while the server is still building their catalogs.
+- The burst and boundary routes answer 503 with `Retry-After` while the server is still building their catalogs, and so do the Major TOM tile routes (`/v1/majortom/...`) and making an area, which need the land (the countries).
 - Errors are `Problem` bodies (RFC 9457).

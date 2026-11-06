@@ -52,11 +52,11 @@
   // again, reused today), todo (not yet in the code); a piece not named is not involved
   const FLOWS = [
     { id: "area", name: "New area", freq: "most common", std: "same standard",
-      example: "Gaza: the Admin 1 boundary PSE001, descending pass, 7 Oct 2023 to 31 Jan 2024.",
+      example: "Gaza: 40 Major TOM tiles over the Strip, tagged gaza-2023, 7 Oct 2023 to 31 Jan 2024.",
       nodes: { asf: "data", wx: "data", coh: "comp", onb: "comp", runs: "comp", pv: "comp", ev: "comp", prod: "new",
                model: "reused", cal: "reused", recipe: "reused", std: "reused" },
-      steps: ["In ponzi-visual, choose an admin boundary (level 0 to 2) or bursts, an orbit pass and the days. The server watches the bursts of that pass that meet the boundary.",
-              "At the area's cadence the server makes one job per burst: the standard's workflow with the area's days.",
+      steps: ["In ponzi-visual, click or paint Major TOM tiles (up to 64), add tags and the days. The server watches every burst of both passes that meets the tiles.",
+              "On creation, then at the area's cadence, the server makes one job per burst: the standard's workflow with the area's days.",
               "A worker finds the acquisitions (ASF), downloads the scenes and makes the burst's coherence store with ISCE3.",
               "Onboard the store: weather and built-up covariates into its sidecar.",
               "Run the standard's model (staged, with Et), code p-values with its calibration, detect with its recipe, and tile into Major TOM cells.",

@@ -12,6 +12,8 @@
 # loop) and dev-browser.key (client:write, printed for the app). The logs are appended to $PONZI_HOME/logs/server/,
 # logs/client/ and logs/visual/.
 set -euo pipefail
+# shellcheck source=scripts/linux-only.sh
+. "$(dirname "$0")/linux-only.sh"
 suite="$(cd "$(dirname "$0")/.." && pwd)"
 parent="$(dirname "$suite")"
 service="$parent/ponzi-service/pixi.toml"

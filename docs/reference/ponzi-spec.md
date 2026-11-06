@@ -50,6 +50,10 @@ The shared schemas. Generated from the docstrings of the installed package.
 
 ::: ponzi_spec.catalog
 
+## The Major TOM grid
+
+::: ponzi_spec.majortom
+
 ## Cluster profiles
 
 ::: ponzi_spec.cluster

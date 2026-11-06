@@ -9,6 +9,8 @@
 # lock file (pixi install --locked), so they change nothing in it. ml-gpu and isce3 need an NVIDIA driver for CUDA
 # 12.9; CONDA_OVERRIDE_CUDA=12.9 installs them anyway (pixi reads it from the environment).
 set -euo pipefail
+# shellcheck source=scripts/linux-only.sh
+. "$(dirname "$0")/linux-only.sh"
 suite="$(cd "$(dirname "$0")/.." && pwd)"
 parent="$(dirname "$suite")"
 org="https://github.com/conflict-ecology"

@@ -26,9 +26,9 @@ Check first: `ponzi-client standards` answers in client mode; a connection error
 | --- | --- | --- | --- |
 | Find bursts over an area | `c.bursts(bbox=...)` | `ponzi-client bursts --bbox ...` | burst ids look like `t028_058198_iw3` |
 | See what can be run | `c.standards()` | `ponzi-client standards` | a standard id has a version: `s1-general@1.0.0` |
-| Watch an area | `c.create_area(name=..., burst_ids=[...], standard=...)` | `ponzi-client area-create ...` | needs a `client:write` key |
-| Watch an administrative unit | `c.boundaries(level=1, bbox=...)`, then `c.create_area(name=..., boundary={"level": 1, "code": ...}, orbit_pass="ASCENDING", standard=...)` | none: Python only | the server picks the bursts of that pass; `start_date` and `end_date` bound the span |
+| Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...], standard=...)` | `ponzi-client area-create --cells C[,C] --tags T[,T] --standard S` | needs a `client:write` key; 1 to 64 tiles over land; every burst of both passes meeting them is watched, and its jobs are made at once |
 | Pause or change a watched area | `c.update_area(area_id, active=False)` | `ponzi-client area-update ID --active false` | fields left out stay as they are |
+| Find the outputs of tagged areas | `c.search(tags=[...])` | `ponzi-client search --tags T[,T]` | analysis Items only; tags are added by the server, never part of a content id |
 | Look at an area now | `c.discover_area(area_id)` | `ponzi-client area-discover ID` | whatever its cadence |
 | Run once | `c.submit(burst_ids=[...], standard=...)` | `ponzi-client submit ...` | returns existing results when they exist (`reused: true`) |
 | Follow a run | `c.request(request_id)`, `c.jobs(request_id=...)` | `ponzi-client request ID` | a done job lists the Items it made (`items`) |

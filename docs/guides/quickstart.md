@@ -40,7 +40,7 @@ To start over, remove `ponzi-visual/.e2e/demo`; the next `pixi run server` makes
 
 ## Development on your own home
 
-For developing and testing, not for deploying, one command from ponzi-suite starts the server, the client loop and the front end together, on the PONZI home instead of the demo. Install them first with `pixi run dev-install` ([Install](install.md#for-development)).
+For developing and testing on Linux (x86-64; the command stops on any other system), not for deploying, one command from ponzi-suite starts the server, the client loop and the front end together, on the PONZI home instead of the demo. Install them first with `pixi run dev-install` ([Install](install.md#for-development)).
 
 ```
 cd ponzi-suite

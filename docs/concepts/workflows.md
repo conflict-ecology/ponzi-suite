@@ -109,13 +109,13 @@ From the 30 acquisitions before an anchor `t` and the covariates (weather, built
 ```mermaid
 flowchart LR
   suite["ponzi-suite<br/>panels, forecasters,<br/>run configs, test cases"]
-  visual["ponzi-visual<br/>map: boundaries, areas,<br/>outputs over time"]
+  visual["ponzi-visual<br/>map: tiles, areas,<br/>outputs over time"]
   server[("ponzi-server<br/>areas, jobs, leases,<br/>final outputs")]
   client["ponzi-client serve<br/>the long-running loop"]
   worker["ponzi-worker job<br/>short calls: runs the stages,<br/>caches by content id"]
   home[("PONZI home<br/>~/.ponzi")]
   data[("ASF, Copernicus DEM,<br/>weather, GHSL")]
-  visual -- "areas: boundary, orbit, days" --> server
+  visual -- "areas: tiles, tags, days" --> server
   server -- "outputs, boundaries" --> visual
   server -- "jobs (lease)" --> client
   client -- "one call per step" --> worker

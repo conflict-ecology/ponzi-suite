@@ -1,5 +1,8 @@
 # Install
 
+!!! note "Linux only, for now"
+    PONZI runs on Linux on x86-64. Its pixi workspaces are solved for `linux-64` alone, and the development commands (`dev-install`, `dev-up`) check the machine when they start and stop on any other system. macOS and Windows are not supported yet; on Windows, WSL 2 with a Linux distribution is the closest.
+
 Pick the line that matches what you want to do; each needs only what it says.
 
 | You want to | Install | You get |
@@ -8,6 +11,7 @@ Pick the line that matches what you want to do; each needs only what it says.
 | run PONZI on this machine, without a server | [ponzi-core](#ponzi-core) (pixi) | `ponzi`, `ponzi-pipeline`, `ponzi-models` |
 | run the service: a server, the client loop, the worker | [ponzi-service](#ponzi-service) (pixi) | `ponzi-server`, `ponzi-client`, `ponzi-worker`, and ponzi-core's commands |
 | see it in the browser | [ponzi-visual](#ponzi-visual) (pixi) | the map front end, against a server |
+| develop and test the whole system on one machine | [For development](#for-development): `pixi run dev-install` in ponzi-suite | all of the above, then `pixi run dev-up` starts the server, the client loop and the front end |
 
 The repositories are under the GitHub organisation `conflict-ecology`. The pixi installs expect them checked out side by side, as ponzi-service and ponzi-visual use the code of the checkouts beside them:
 
@@ -88,9 +92,11 @@ PONZI_ENVS="ml isce3" pixi run dev-install
 pixi run dev-install ml      # the same, as arguments
 ```
 
-`ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9; set `CONDA_OVERRIDE_CUDA=12.9` to install them anyway ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-on-your-own-home)).
+Both commands run on Linux (x86-64) only, and stop at once on any other system. `ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9; set `CONDA_OVERRIDE_CUDA=12.9` to install them anyway ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-on-your-own-home)).
 
 ## GPUs and CUDA
+
+The two environments are tied to a platform of their own, `linux-64-cuda`: Linux on x86-64 with a CUDA 12.9 driver (pixi's virtual package `__cuda`). The others are on plain `linux-64`, so each environment is solved once.
 
 `ml-gpu` and `isce3` use CUDA 12.9 and need an NVIDIA driver for it (575 or later); pixi refuses to install them on a machine without one. On such a machine (a CI runner, a laptop), `CONDA_OVERRIDE_CUDA=12.9` installs them anyway.
 
