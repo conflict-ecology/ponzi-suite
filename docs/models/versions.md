@@ -1,6 +1,6 @@
 # Standard versions and naming
 
-A standard is cited by its id and its version, and a registered version never changes: a change is a new version. The standard is the one thing in PONZI with a version: a spec has none, and is known by its name and its content hash. This page says how the two are written, how specs are pinned, which number a change raises, the commands that write and register a version, how a version reaches the server and how the server holds it. How a standard is made and checked against the registry is in [Making a standard](standards.md); the names of specs, models and standards and the spec folders are in [Naming](naming.md).
+A standard is cited by its id and its version, and a registered version never changes: a change is a new version. Of the things a person writes, the standard is the one with a version number: a spec has none, and is known by its name and its content hash. Every version in PONZI is laid out in [Versions](../reference/versions.md). This page says how the two are written, how specs are pinned, which number a change raises, the commands that write and register a version, how a version reaches the server and how the server holds it. How a standard is made and checked against the registry is in [Making a standard](standards.md); the names of specs, models and standards and the spec folders are in [Naming](naming.md).
 
 The rules are code: `ponzi_models.standards.Standard`, `check_versions` and `ponzi_models.standards.versions` in ponzi-core, and `ponzi_server.catalog.Standard` in ponzi-service (ponzi-core CR-055, CR-070).
 
@@ -33,11 +33,13 @@ A draft is written before its model and calibrations are registered. ponzi-suite
 
 ## Specs: a name and a hash
 
-Every spec ([Naming](naming.md#spec-folders)) is known by its name and its content hash, `spec_hash`, and has no version. The hash is `ponzi_spec.identity.spec_hash`: BLAKE2b with a 16-byte digest of the canonical JSON of the spec as its class reads it, every setting the file leaves out filled with the code's default, without its `name`. A changed code default is then a changed hash; key order, comments and a default written out are not. A panel spec's hash also covers its geojson files, by name and bytes. A scoring spec's hash is the value its run config's `config_hash` was before CR-070.
+Every spec ([Naming](naming.md#spec-folders)) is known by its name, and its version is its content hash, `spec_hash` (ponzi-core CR-083): it has no version field, and is cited `name@<hash8>`. The hash is `ponzi_spec.identity.spec_hash`: BLAKE2b with a 16-byte digest of the canonical JSON of the keys the spec's class declares and their values, every setting the file leaves out filled with the code's default, without its name. Comments, `description`, a panel spec's `notes`, key order and a default written out do not change it; a changed code default does. A panel spec's hash also covers its geojson files, by name and bytes, and the hash of the coherence spec it names.
 
 - **Where a spec is used, it is recorded** as a `specs:` block of `{name, hash, suite_commit}` per kind (`ponzi_spec.specs.spec_record`): on a model card (its training, scoring and panel specs), on a built panel's `panel.json` (its panel spec), on a calibration (its scoring and panel specs), on a standard's registry record and in the server's file `standard-workflow` writes (every spec it names, and the bundle). `suite_commit` is the ponzi-suite commit the file was read from, or null when the file is not tracked, has an uncommitted change, or is not in ponzi-suite (a working copy in the home).
-- **A spec is frozen once used.** The registry's `specs.json` keeps, per kind, the hash each name was first used with. Registering a model, building a panel or registering a standard with a known name and another hash is refused: give the changed spec a new name.
-- **The stored fields name the spec.** A run's stamp and a model card hold `scoring_spec_name` and `scoring_spec_hash`, a run's `run_meta.json` a `scoring_spec` record, a calibration `scoring_spec_hash`; an events store holds `detection_spec` and `detection_spec_hash`; a coherence store `coherence_spec` and `coherence_spec_hash`; an Item `ponzi:spec_hash` ([STAC profile](../using/stac-profile.md)). The names before CR-070 (`run_config_*`, `config_hash`, `recipe`, `recipe_digest`) are not read: a registry entry, calibration or standard with them is refused, saying what to run.
+- **A spec may be edited in place.** An edit is a new version under the same name: anything made from it records the new hash, and model ids and built panels carry it (`tide-weather@59bfd3dc--majortom-global@77941f85`, `$PONZI_HOME/panels/majortom-global@77941f85/`).
+- **A reference is a name or a version.** A spec that names another (a panel spec's `coherence`, a standard's specs) writes `name` (the file of that name now) or `name@<hash>` (that version); the named spec's hash enters the dependent's hash, so editing a coherence spec changes every panel spec that names it.
+- **The registry keeps every version used.** Building a panel, registering a model and registering a standard archive each spec they use, resolved, under the registry's `specs/<kind>_specs/<name>/<hash>/`, its references pinned. `name@<hash>` is found there once the file has moved on (`ponzi_spec.specs.find_spec`).
+- **The stored fields name the spec.** A run's stamp and a model card hold `scoring_spec_name` and `scoring_spec_hash`, a run's `run_meta.json` a `scoring_spec` record, a calibration `scoring_spec_hash`; an events store holds `detection_spec` and `detection_spec_hash`; a coherence store `coherence_spec` and `coherence_spec_hash`; an Item `ponzi:spec_hash` ([STAC profile](../using/stac-profile.md)).
 
 ## When to raise which number
 
@@ -45,7 +47,7 @@ Every spec ([Naming](naming.md#spec-folders)) is known by its name and its conte
 
 | Raise | When | Fields |
 | --- | --- | --- |
-| major | anything that changes the runs (`RUN_IDENTITY`) | `sensor`, `workflow`, `coherence`, `onboarding`, `panel`, `model`, `scoring_spec_hash` |
+| major | anything that changes the runs (`RUN_IDENTITY`) | `sensor`, `coherence`, `onboarding`, `panel`, `model`, `scoring_spec_hash` |
 | minor | the same runs, other outputs (`MINOR_FIELDS`): new p-values and events | `calibrations`, `detection` |
 | patch | the same outputs | `description`, `requires`, `status` |
 
@@ -55,13 +57,13 @@ A major may change anything. A minor may change its own fields and a patch's, ne
 
 ## Writing and registering a version
 
-Three commands write a standard's versions, so no version number or hash is copied by hand. Each takes `--registry DIR` and `--home DIR` (the home whose spec folders are looked in first).
+Three commands write a standard's versions, so no version number or hash is copied by hand. Each takes `--registry DIR`; the spec folders looked in first are the PONZI home's (`$PONZI_HOME`; CR-088).
 
 | Command | Use it | What it does |
 | --- | --- | --- |
 | `ponzi-models new-standard --model MODEL_ID --detection-spec NAME --coherence-spec NAME --onboarding-spec NAME [--scope general] [--calibrations ID,...] [--description TEXT] [--out FILE]` | for the first version of a new id | from the registry: the model's reference, its scoring spec's hash, its panel spec and its calibrations (all, or those named); the id `<sensor>-<scope>` from the model card's sensor, refused when that id is registered; each named spec resolved and hashed; `requires` from the installed versions as lower bounds; `status: draft`, version `1.0.0`, written to `$PONZI_HOME/standards/<id>-1.0.0.yaml` (or `--out`), then checked as `check-standard` does |
 | `ponzi-models bump-standard FILE [--version X.Y.Z]` | after editing a bundle | compares it with the latest registered version (else the highest file beside it), prints each changed field and the bump it implies, and writes `<id>-<version>.yaml` beside it. `--version` asks for a larger bump, never a smaller one. Nothing changed: nothing is written |
-| `ponzi-models register-standard FILE [--allow-uncommitted]` | to make a version citable | files the bundle and its record (its hash and `specs:` block) in the registry as `standards/<id>@<version>/`, once, and freezes the specs it names. With no `version` in the file it assigns the next one and writes it into the file; with one it checks it is later than the latest registered by at least the bump the change needs. The same `id@version` with another hash is refused ("raise the version"); the same hash again does nothing. A `published` standard whose bundle or specs are not in a ponzi-suite commit is refused unless `--allow-uncommitted`, which the record says |
+| `ponzi-models register-standard FILE [--allow-uncommitted]` | to make a version citable | files the bundle and its record (its hash and `specs:` block) in the registry as `standards/<id>@<version>/`, once, and archives the specs it names (CR-083). With no `version` in the file it assigns the next one and writes it into the file; with one it checks it is later than the latest registered by at least the bump the change needs. The same `id@version` with another hash is refused ("raise the version"); the same hash again does nothing. A `published` standard whose bundle or specs are not in a ponzi-suite commit is refused unless `--allow-uncommitted`, which the record says |
 
 ## Two files for one version
 
@@ -70,15 +72,15 @@ Three commands write a standard's versions, so no version number or hash is copi
 | Model | `ponzi_models.standards.Standard` | `ponzi_server.catalog.Standard` |
 | Written by | a person, kept in git (ponzi-suite `standards/`) | `ponzi-models standard-workflow`, from a published bundle and the registry |
 | Says | what runs: model, scoring spec hash, calibrations, and the panel, detection, onboarding and coherence specs by name, `requires` | how it runs: the steps of `ponzi-worker`, each spec's resolved fields given to the steps that use it |
-| Fields | `id`, `version`, `status`, `sensor`, `description`, `panel`, `workflow` (stage names and versions), `coherence`, `onboarding`, `model`, `scoring_spec_hash`, `calibrations`, `detection`, `requires` | `standard` (the key), `description`, `final` (`[events, cells]`), `requires`, `variables` (`registry` and those given with `--set`), `workflow` (`{workflow: <id>, version: <version>, steps: [...]}`), `specs` (the `specs:` block of every spec named and of the bundle) |
+| Fields | `id`, `version`, `status`, `sensor`, `description`, `panel`, `coherence`, `onboarding`, `model`, `scoring_spec_hash`, `calibrations`, `detection`, `requires` | `standard` (the key), `description`, `final` (`[events, cells]`), `requires`, `variables` (`registry` and those given with `--set`), `workflow` (`{workflow: <id>, version: <version>, steps: [...]}`), `specs` (the `specs:` block of every spec named and of the bundle) |
 | Read by | `check-standard`, `bump-standard`, `register-standard`, `standard-workflow` | the server, and through each job's payload the worker |
 
 The steps of the server's file, and the `--source pipeline|stores` choice, are in [Making a standard](standards.md#from-bundle-to-server).
 
 **How the server's file reaches the server:**
 
-1. Write it with `standard-workflow ... --out FILE`. Naming it `<id>-<version>.yaml` too keeps two versions apart in one folder; the server goes by the `standard` field inside, not the file name.
-2. Copy it into the server's standards folder: the setting `standards`, by default `$PONZI_HOME/standards/`.
+1. Write it with `standard-workflow`: by default it lands in `$PONZI_HOME/standards/<id>-<version>.yaml` (CR-080), else where `--out FILE` says. The `<id>-<version>.yaml` name keeps two versions apart in one folder; the server goes by the `standard` field inside, not the file name.
+2. Unless it was written there, copy it into the server's standards folder: the setting `standards`, by default `$PONZI_HOME/standards/`.
 3. Restart the server. It reads every `*.yaml` of the folder once, when it starts (`Catalog`), and never looks again while it runs. A file that does not parse, or two files with the same key, stop it from starting.
 4. `GET /v1/standards` (`ponzi-client standards`) lists what it holds: each key, its workflow as `<id>@<version>`, its final steps, its stages, its description, and the bundle's `hash` and `suite_commit` from the file's `specs:` block.
 

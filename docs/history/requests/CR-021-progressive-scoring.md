@@ -3,6 +3,7 @@
 - **Requested by / date:** owner, 2026-10-15
 - **Owner decisions 2026-10-15:** D1 the same model serves every stage: train it with the future covariate rows randomly blanked (as the context), the fill of unknown rows is only a stopgap until that model exists. D2 the proportional minimum. D3 one run config, one calibration file with a mapping per stage. D4 provisional flags at every stage. D5 the full set per stage (anomaly and ceiling scores, n_channels, difference, sensitivity, predicted median). D6 start with A (each update a small dated run folder), but B is the target: one growing store per burst, appended per update, where a superseded value is marked as such (which stage it came from, when it was replaced) instead of silently overwritten, plus a write-all-stages mode for analysis that keeps every stage; B gets its own change request. D7 run the effective-context test first on the full-pyramid calibration of tide_s1_mt04, then on the augmented candidate, bins 12 to 15, 16 to 20, 21 to 25, 26 to 30, rule: a bin's 1 in 1,000 rate outside 0.67 to 1.5 times nominal with its interval excluding nominal adds context classes.
 - **Status:** signed off and merged into main 2026-10-21 (owner), released in v0.2.3.
+- **Superseded in part:** `provisional` is a detection spec field (CR-070), and calibration formats 2 and 3 are one hashed format (CR-086).
 
 ## Why
 

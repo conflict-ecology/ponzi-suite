@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("remove it if that is okay").
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** the refusal of a `credentials` section was removed (CR-082).
 
 ## Why
 

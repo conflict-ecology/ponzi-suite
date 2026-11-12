@@ -22,14 +22,6 @@ The shared schemas. Generated from the docstrings of the installed package.
 
 ::: ponzi_spec.stages
 
-## Deployment config
-
-::: ponzi_spec.config
-
-## Paths
-
-::: ponzi_spec.paths
-
 ## The PONZI home
 
 ::: ponzi_spec.home

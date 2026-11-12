@@ -1,0 +1,9 @@
+# single-path: the single-path detection with the code's defaults. The ceiling calibration's codes flagged at
+# 50 (-log10 p 2.5), dated by Et from one anchor before to four after the first flag, no gap bridged, exclusive
+# dating windows, no episodes.
+calibration_kind: ceiling
+code: 50
+gap: 0
+dating_pre: 1
+dating_post: 4
+windows: exclusive

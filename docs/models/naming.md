@@ -6,21 +6,21 @@ The rules are code, `ponzi_spec.naming` (ponzi-core CR-052, CR-070), and ponzi-c
 
 | What | Name | Example | Where it sits |
 | --- | --- | --- | --- |
-| panel spec | `<design>-<scope>[-<change>]` | `majortom-global` | `panel_specs/majortom-global/`; built: `$PONZI_HOME/panels/majortom-global/` |
-| training spec | `<family>-<inputs>` | `tide-weather` | `training_specs/tide/weather.yaml` |
-| variant | `<training spec>-<change>...` | `tide-weather-fill-median` | `training_specs/tide/candidates/fill-median.yaml` |
-| test case's training spec | `<training spec>-<case>-<change>` | `tide-weather-gaza-finetune` | `testcases/gaza/training.yaml` |
+| panel spec | `<design>-<scope>[-<change>]` | `majortom-global` | `specs/panel_specs/majortom-global/`; built: `$PONZI_HOME/panels/majortom-global@<hash8>/` |
+| training spec | `<family>-<inputs>` | `tide-weather` | `specs/training_specs/tide/tide-weather.yaml` |
+| variant | `<training spec>-<change>...` | `tide-weather-fill-median` | `specs/training_specs/tide/candidates/tide-weather-fill-median.yaml` |
+| test case's training spec | `<training spec>-<case>-<change>` | `tide-weather-gaza-finetune` | `specs/training_specs/tide/tide-weather-gaza-finetune.yaml` |
 | fit at another seed | `<training spec>-seed<N>` | `tide-weather-fill-median-seed43` | `ponzi-models train --seed 43` |
-| model | `<training spec>--<panel spec>` | `tide-weather--majortom-global` | the artifact `export` writes, the registry entry |
-| scoring spec | `<forecaster>-<scoring>[-<change>]` | `rolling-ols-pyramid` | `scoring_specs/rolling-ols-pyramid.yaml` (CR-058) |
-| coherence spec | `<backend>-<window>[-<change>]` | `isce3-gaussian` | `coherence_specs/isce3-gaussian.yaml` |
-| onboarding spec | `<steps>[-<change>]` | `all-steps`, `mask-only` | `onboarding_specs/all-steps.yaml` |
-| detection spec | `<method>[-<change>]` | `single-path`, `single-path-loose` | `detection_specs/single-path.yaml` |
+| model | `<training spec>@<hash8>--<panel spec>@<hash8>` | `tide-weather@59bfd3dc--majortom-global@77941f85` | the artifact `export` writes, the registry entry |
+| scoring spec | `<forecaster>-<scoring>[-<change>]` | `rolling-ols-pyramid` | `specs/scoring_specs/rolling-ols-pyramid.yaml` (CR-058) |
+| coherence spec | `<backend>-<window>[-<change>]` | `isce3-gaussian` | `specs/coherence_specs/isce3-gaussian.yaml` |
+| onboarding spec | `<steps>[-<change>]` | `all-steps`, `mask-only` | `specs/onboarding_specs/all-steps.yaml` |
+| detection spec | `<method>[-<change>]` | `single-path`, `single-path-gaza-release` | `specs/detection_specs/single-path.yaml` |
 | standard | `<sensor>-<scope>` | `s1-general`, `s1-gaza` | `standards/s1-general-2.0.0.yaml`; cited `s1-general@2.0.0` |
 
-A word is letters and digits, and a name starts with a letter. The double hyphen of a model id separates its two names, since each may hold single hyphens. A model id has no `@`, because a registry reference already uses it: `registry:tide-weather--majortom-global@sha256:<digest>`.
+A word is letters and digits, and a name starts with a letter. The double hyphen of a model id separates the two spec versions it was made from, since each name may hold single hyphens. A registry reference ends in the artifact's digest and is read on its last `@sha256:`: `registry:tide-weather@59bfd3dc--majortom-global@77941f85@sha256:<digest>`.
 
-A spec has no version: it is known by its name and its content hash, and a changed spec is a new name, the old one with its change added (`majortom-global-dense`). The name is a label, not part of the hash ([Standard versions and naming](versions.md#specs-a-name-and-a-hash)).
+A spec is named by its file: `tide-weather-fill-median.yaml` is `tide-weather-fill-median`, and a panel spec by its folder. No spec file says its name (a `training_id` in a training spec or an `id` in a `panel.yaml` is refused), and a name is unique within its kind (ponzi-core CR-081). A spec's version is its content hash, cited `name@<hash8>` (ponzi-core CR-083): a spec is edited in place under its name, and a new name is for another spec, the old one with its change added (`majortom-global-dense`). The name is a label, not part of the hash ([Standard versions and naming](versions.md#specs-a-name-and-a-hash)).
 
 A standard's id is its sensor and its scope, both listed in `ponzi_spec.naming` (`SENSORS`, `SCOPES`, `TESTCASES`). The sensor is the one exception to "no sensor in a name": a standard runs one sensor's data, and its model card names the same sensor. `check-standard`, `register-standard` and the suite's tests refuse any other form. Its version is not in the id: it is cited as `<id>@<version>`.
 
@@ -30,14 +30,14 @@ A spec is a file a person writes, validated by PONZI, that says how something is
 
 | Spec | Says how this is made | Folder (suite and home) |
 | --- | --- | --- |
-| training spec | a trained model | `training_specs/<family>/<inputs>.yaml`, `candidates/` |
-| scoring spec | the runs of a model over a burst | `scoring_specs/<name>.yaml` |
-| panel spec | a built panel | `panel_specs/<id>/` (`panel.yaml` and its two geojson) |
-| detection spec | the events and cells from p-values | `detection_specs/<name>.yaml` |
-| coherence spec | a burst's coherence store | `coherence_specs/<name>.yaml` |
-| onboarding spec | a store's sidecar and pixel sample | `onboarding_specs/<name>.yaml` |
+| training spec | a trained model | `specs/training_specs/**/<name>.yaml` (`tide/`, `tide/candidates/`) |
+| scoring spec | the runs of a model over a burst | `specs/scoring_specs/<name>.yaml` |
+| panel spec | a built panel | `specs/panel_specs/<name>/` (`panel.yaml` and its two geojson) |
+| detection spec | the events and cells from p-values | `specs/detection_specs/<name>.yaml` |
+| coherence spec | a burst's coherence store | `specs/coherence_specs/<name>.yaml` |
+| onboarding spec | a store's sidecar and pixel sample | `specs/onboarding_specs/<name>.yaml` |
 
-A command takes a spec as `--<kind>-spec NAME|FILE` (`--training-spec`, `--scoring-spec`, `--panel-spec`, `--detection-spec`, `--coherence-spec`, `--onboarding-spec`). A path is taken as it is. A name is looked up in the home's folder first, then in the suite's (`$PONZI_SUITE`, else the `ponzi-suite` checkout beside ponzi-core), by `ponzi_spec.specs.find_spec`; a training spec is also found by its `training_id`. The keys inside a spec's file are its content. The standard, the model, the calibration, the built panel, the workflow, the site file, the cluster profile and the server settings are not specs.
+A command takes a spec as `--<kind>-spec NAME|FILE` (`--training-spec`, `--scoring-spec`, `--panel-spec`, `--detection-spec`, `--coherence-spec`, `--onboarding-spec`). A path is taken as it is. A name is looked up in the home's folder first, then in the suite's (`$PONZI_SUITE`, else the `ponzi-suite` checkout beside ponzi-core), by `ponzi_spec.specs.find_spec`: the file `<name>.yaml` anywhere under the kind's folder (subfolders only arrange the files), or a panel spec's folder `<name>/`. The keys inside a spec's file are its content. The standard, the model, the calibration, the built panel, the workflow, the site file, the cluster profile and the server settings are not specs.
 
 ## Words in use
 
@@ -55,24 +55,6 @@ A command takes a spec as `--<kind>-spec NAME|FILE` (`--training-spec`, `--scori
 
 Add a word here when a new one is needed, so the same thing is always called the same.
 
-## Former names
+## Before
 
-Every training spec renamed by CR-052 keeps its old id as `formerly:`, so the fits, artifacts and registry entries made under it can still be found:
-
-| Name | Formerly |
-| --- | --- |
-| `tide-weather` | `tide_c30_pdcompact` |
-| `tide-weather-fill-constant` | `tide_c30_pdcompact_constant` |
-| `tide-weather-fill-median` | `tide_c30_pdcompact_median` |
-| `tide-weather-fill-previous` | `tide_c30_pdcompact_previous` |
-| `tide-weather-fill-previous-augmented` | `tide_c30_pdcompact_previous_aug` |
-| `tide-weather-fill-previous-augmented-radar-moisture` | `tide_c30_pdcompact_previous_aug_s1` |
-| `tide-weather-fill-previous-context-dropout` | `tide_c30_pdcompact_previous_cd` |
-| `tide-weather-fill-sentinel` | `tide_c30_pdcompact_sentinel_flag` |
-| `tide-weather-fill-sentinel-no-flags` | `tide_c30_pdcompact_sentinel` |
-| `tide-weather-gaza-finetune` | `tide_c30_gaza_f1p` |
-| `rolling-ols-pyramid` (scoring spec) | `exp_b5h5_base` |
-
-Models registered before keep their names (`tide_c30_pdcompact_mt0.4`, `tide_s1_mt04`); the headers of the specs refer to them as they were registered.
-
-CR-070 renamed the files a person writes to specs (fit spec to training spec, run config to scoring spec, panel definition to panel spec, detection recipe to detection spec, coherence and onboarding configs to coherence and onboarding specs) and dropped the panel's version: the panel `majortom-global@0.4.0` is the panel spec `majortom-global`, and the model `tide-weather--majortom-global-0.4.0` is registered again as `tide-weather--majortom-global`.
+The former names of the specs are in ponzi-core [CR-052](../history/requests/CR-052-readable-names.md). CR-070 renamed the files a person writes to specs (fit spec to training spec, run config to scoring spec, panel definition to panel spec, detection recipe to detection spec, coherence and onboarding configs to coherence and onboarding specs) and dropped the panel's version: the panel `majortom-global@0.4.0` is the panel spec `majortom-global`, and the model `tide-weather--majortom-global-0.4.0` was registered again as `tide-weather--majortom-global`, and since CR-083 is `tide-weather@<hash8>--majortom-global@<hash8>`.

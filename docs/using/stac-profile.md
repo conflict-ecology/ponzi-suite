@@ -30,13 +30,13 @@ A path (`ponzi detect-path`, `ponzi tile`) combines bursts of one track seen in 
 
 ## The PONZI extension
 
-Schema: <a href="../../schemas/ponzi/v0.1.0/schema.json"><code>schemas/ponzi/v0.1.0/schema.json</code></a> (published by this site's build from `ponzi-spec`), listed in every Item's `stac_extensions`.
+Schema: <a href="../../schemas/ponzi/v0.2.0/schema.json"><code>schemas/ponzi/v0.2.0/schema.json</code></a> (published by this site's build from `ponzi-spec`), listed in every Item's `stac_extensions`.
 
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `ponzi:content_id` | yes | the Item's [content id](content-ids.md) |
-| `ponzi:stage` | yes | `{name, version}` of the stage that made it |
-| `ponzi:spec_hash` | no | the hash of the spec the stage ran (scoring spec, coherence spec, ...; `ponzi:config_hash` before ponzi-core CR-070) |
+| `ponzi:stage` | yes | `{name, code}` of the stage that made it: its name and the major of each distribution that computed it, `{}` for an ingest (ponzi-core CR-085) |
+| `ponzi:spec_hash` | no | the hash of the spec the stage ran (scoring spec, coherence spec, ...) |
 | `ponzi:request` | no | the request fields that do not change the result, for the record |
 | `ponzi:standard` | no | the standard it was made under |
 | `ponzi:tags` | no | assigned by the server as it serves an analysis Item (runs, p-values, events, events of a cell): the tags of the watched areas of its burst or tile ([Watched areas](watched-areas.md#tags)). Never set by a stage, never stored in the Item and never part of its content id |

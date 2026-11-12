@@ -16,7 +16,7 @@ Producer: whoever calls `write_labels`; no command or worker stage writes one. C
 | `weight` | `(y, x)` | float32 | NaN | Optional |
 | `stratum` | `(y, x)` | int16 | 0 | Optional reporting dimension |
 
-Further arrays a producer adds (`write_labels(..., extra=)`, on the label grid, with or without a leading `time`) are ignored by the evaluation. Chunks: one per acquisition, the whole grid each. Attrs: `label_schema` (1), `label_names {code: name}`, `stratum_names`, free producer attrs; `open_labels` adds `bag_from_legacy_window` to the attrs it returns for a converted `window` store. The label grid equals the run grid (`expect_shape`), or for a sampled run the pixel order, dims `(px,)`.
+Further arrays a producer adds (`write_labels(..., extra=)`, on the label grid, with or without a leading `time`) are ignored by the evaluation. Chunks: one per acquisition, the whole grid each. Attrs: `label_schema` (the hash of C11's declaration, ponzi-core CR-085), `label_names {code: name}`, `stratum_names`, free producer attrs. A `window` array of the old repositories' label stores is not read: without `bag` the caller's anchor window applies to every pixel (ponzi-core CR-086). The label grid equals the run grid (`expect_shape`), or for a sampled run the pixel order, dims `(px,)`.
 
 ## Bags
 
@@ -39,4 +39,4 @@ Bags 5 and 6 are adjacent with different labels, which is why the id and not a r
 
 ## Functions
 
-`open_labels(path, *, expect_shape=None, T=None) -> LabelSet` (`LabelSet.bags()` tabulates the bags), `write_labels(path, label, *, bag, onset, weight, stratum, names, stratum_names, attrs, extra)` (refuses a bag layer that breaks the id invariants), `bag_table(bag, label_t) -> BagTable`, `bags_from_window(window)` (the `window` conversion), `validate_class_sets(labels, positive_sets, negative_sets)`.
+`open_labels(path, *, expect_shape=None, T=None) -> LabelSet` (`LabelSet.bags()` tabulates the bags), `write_labels(path, label, *, bag, onset, weight, stratum, names, stratum_names, attrs, extra)` (refuses a bag layer that breaks the id invariants), `bag_table(bag, label_t) -> BagTable`, `validate_class_sets(labels, positive_sets, negative_sets)`.

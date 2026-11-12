@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("readd a base country layer. it looks like admin 0 doesn't cover everything", then "The NDLSA covers it. add that in. describe it docs", then "the link with admin 0 all layers has all of them no need for NDSLA")
 - **Status:** implemented (unreleased), owner sign-off pending
+- **Superseded in part:** `boundaries.sqlite3` format 2 is a hash (CR-086).
 
 ## Why
 The World Bank's Admin 0 file holds the countries and territories but leaves out the areas whose legal status the World Bank has not determined (NDLSA): Jammu and Kashmir (the parts under India and under Pakistan), Aksai Chin and the smaller areas along the India and China border, Arunachal Pradesh, Western Sahara, the Golan Heights, the Shebaa Farms, the UN buffer zone in Cyprus, Abyei, the Ilemi Triangle, the Falklands, South Georgia and the British Indian Ocean Territory. 24 areas in all, about 600,000 km². The World Bank publishes them in two forms in the same dataset: a file of their own (NDLSA) and the "Admin 0_all_layers" file, which holds the countries and territories of the plain Admin 0 file and these areas together.

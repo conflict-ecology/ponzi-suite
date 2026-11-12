@@ -17,16 +17,12 @@ What moves where:
 
 Not carried over: Earth Engine (repeat_ccd's GEE ingest and CCD), repeat_ccd's other coherence backends (SNAP, HyP3, ISCE2, BUD, CSLC), and every store, model and calibration made before the overhaul. The new system starts on a clean slate and its first standard is trained and calibrated on ISCE3 coherence.
 
-## Coherence methods
-
-Why coherence is estimated in radar geometry, and how the backends repeat_ccd explored compared, will be written up from repeat_ccd's notes when `ponzi-pipeline` is built (phase 5).
-
 ## Decision log
 
 The library's earlier decisions are in the monorepo's `docs/decisions.md` and in the change requests below (CR-000 onward).
 
 ## Change requests
 
-Nothing in ponzi-core changes without a written request the owner signs off. The requests are kept here (`docs/history/requests/`, since CR-071; the form is [TEMPLATE.md](requests/TEMPLATE.md)). Several also change ponzi-service, ponzi-visual or this suite.
+Nothing in ponzi-core changes without a written request the owner signs off. The requests are kept here (`docs/history/requests/`, since CR-071; the form is [TEMPLATE.md](requests/TEMPLATE.md)). Several also change ponzi-service, ponzi-visual or this suite. A request that no longer applies, because a later one replaced or removed what it did, says so on a `Stale` line under its status; one that applies only in part says what no longer holds on a `Superseded in part` line. The table shows both.
 
 <!-- ponzi:requests -->

@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (phase 2 of the overhaul plan, `ponzi-service/docs/overhaul-plan.md`)
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10)
+- **Superseded in part:** run configs are scoring specs under `specs/scoring_specs/` (CR-048, CR-070, CR-078).
 
 ## Why
 

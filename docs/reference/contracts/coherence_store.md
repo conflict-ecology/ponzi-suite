@@ -8,14 +8,14 @@ Producer: `ponzi_pipeline.assemble.assemble` (`ponzi-pipeline assemble`, worker 
 
 Consumers: `ponzi.core.runner.open_input` (which calls `open_coherence_store`), `ponzi.contracts.validate` (`ponzi validate-store`, C15), `ponzi_pipeline.onboard` (reads the store, writes C2 and C3, never the store), `ponzi_models` (panels, training, `export-pixels`, all through `open_input`).
 
-Archive stores are immutable and may be zarr v2: the opener reads v2 and v3, the writers write v3. The reader never accepts a flat `(sample, y, x)` layout; converting one is a producer concern.
+A store is zarr v3: the writers write it, and the opener refuses another zarr format. Archive stores are immutable. The reader never accepts a flat `(sample, y, x)` layout; converting one is a producer concern.
 
 ## Arrays and tables
 
 | Name | Dims | dtype | Fill | Chunks | Notes |
 |---|---|---|---|---|---|
 | `coh` | `(time, y, x, baseline)` | float32 | NaN | `(1, Y, X, B)` | NaN = no pair or no data. The time chunk MUST be 1; spatial chunks smaller than the grid are allowed (warn); the baseline chunk is unconstrained |
-| `time` | `(time,)` | datetime64[ns] | | | Strictly increasing dates of the later image of each pair; an assembled series lists every acquisition, also those without a pair. CF-encoded integers (a `units` attr, v2 stores) are decoded on read (`ponzi.contracts.time_axis.decode_time`) |
+| `time` | `(time,)` | datetime64[ns] | | | Strictly increasing dates of the later image of each pair; an assembled series lists every acquisition, also those without a pair. `validate-store` fails `time_axis` on an axis of another dtype, such as the CF-encoded integers of the old engine's archive stores (`ponzi.contracts.time_axis.decode_time`; ponzi-core CR-086) |
 | `y`, `x` | `(y,)`, `(x,)` | float64 | | | Pixel-centre coordinates in `epsg` |
 | `baseline` | `(baseline,)` | int | | | Index `0..B-1`; the days are in the attrs |
 | `valid_pixels` | `(y, x)` | uint8 | 0 | any | Required. 1 where the burst footprint has data (`CoherenceWriter`: where any acquisition is finite) |
@@ -25,19 +25,19 @@ Archive stores are immutable and may be zarr v2: the opener reads v2 and v3, the
 | `secondary_date` | `(time, baseline)` | datetime64[ns] | NaT | | Optional. Earlier image of the pair; when present it gives the pair partners of the runner's pair transforms and of the sidecar's `era5_pd_*` (C2) |
 | `cell_quality` | `(time, baseline)` | | | | Optional producer table; nonzero = a low-validity cell |
 
-Any other variable is preserved. The runner reads every `(time,)` and `(time, baseline)` variable as a forecaster covariate (`runner._time_covariates`: numeric ones as float32, the baselines subset to the run's) and the `(y, x)` layers `built` and `land`, when present, as the L0 strata. Coordinates carry `_ARRAY_DIMENSIONS` (v2) or `dimension_names` (v3) so xarray opens the store directly.
+Any other variable is preserved. The runner reads every `(time,)` and `(time, baseline)` variable as a forecaster covariate (`runner._time_covariates`: numeric ones as float32, the baselines subset to the run's) and the `(y, x)` layers `built` and `land`, when present, as the L0 strata. Every array carries `dimension_names`, so xarray opens the store directly.
 
 ## Attrs
 
 | Attr | Type | Meaning |
 |---|---|---|
-| `baseline_days` | list[int], len B, strictly increasing, positive | Temporal baseline of position `b` in days. Also read from the `baseline` array's attrs when the group has none |
+| `baseline_days` | list[int], len B, strictly increasing, positive | Temporal baseline of position `b` in days |
 | `revisit_days` | int > 0 | Nominal acquisition cadence |
 | `epsg` | int | CRS of `y`, `x` |
 | `burst_id` | str | Identifier of the grid, copied into every output. Without it the reader takes the file name without `.coh.zarr`, `_coh.zarr` or `.zarr` |
 | `sensor` | str | e.g. `S1`. Read as `S1` when absent |
-| `producer` | str | The writer (`ponzi-pipeline {version}` for an assembled store). Without it the reader takes `writer_command` or `schema`, else the empty string |
-| `contract_version` | int | 1. Read as 0 when absent |
+| `producer` | str | The writer (`ponzi-pipeline {version}` for an assembled store). Read as the empty string when absent |
+| `contract_version` | str | the hash of the contract's declaration (ponzi-core CR-085; pinned in `test_contract_versions.py`): its variables, dims, dtypes, attrs, meta model and the check thresholds and catalogue of C18. Read as empty when absent; `validate-store` warns when it is not ours |
 | `relative_orbit`, `orbit_state` | int, str | Optional (`ponzi.contracts.orbit`): the track and `ascending` or `descending`. Without them the track comes from a `burst_id` of the form `tNNN_NNNNNN_iwN` and the state is unknown |
 | `estimator_params` | JSON str or dict | Optional: `looks_rg`, `looks_az`, `sigma_rg`, `sigma_az` of the coherence estimator, optionally `truncate` (the Gaussian window's truncation in sigmas; without it the half width is 2 samples) and `kind`. From it `noise_floor` derives the zero coherence level used by `state_machine.noise_floor: derived` (C4) and by the ceiling. An assembled store records it from its coherence spec (`ponzi_pipeline.assemble.estimator_params`) |
 | `coherence_spec`, `coherence_spec_hash` | JSON, str | An assembled store: its `ponzi_pipeline.coherence_spec.CoherenceSpec` and its `spec_hash` |
@@ -61,7 +61,7 @@ How a delivered store is judged (the checks, their thresholds and severities): C
 `ponzi.contracts.coherence`:
 
 - `CoherenceMeta` (pydantic): the attrs above plus `T, Y, X, B` and the chunk shape; built from a store, never by hand.
-- `open_coherence_store(path, sidecar=None) -> CoherenceDataset`: opens v2 or v3 and parses the meta without validating (`coherence_meta` raises `ContractError` only on what makes a store unreadable: no `coh`, a wrong rank or dimension order, no `valid_pixels`, no `baseline_days`, `revisit_days` or `epsg`), merges the sidecar (C2, the sidecar wins), and returns `.ds`, `.meta`, `.coh` (lazy), `.valid_pixels` (uint8 ndarray, fill applied), `.time` (DatetimeIndex) and `.baseline_index(days)`.
+- `open_coherence_store(path, sidecar=None) -> CoherenceDataset`: opens the store and parses the meta without validating (`coherence_meta` raises `ContractError` only on what makes a store unreadable: no `coh`, a wrong rank or dimension order, no `valid_pixels`, no `baseline_days`, `revisit_days` or `epsg`), merges the sidecar (C2, the sidecar wins), and returns `.ds`, `.meta`, `.coh` (lazy), `.valid_pixels` (uint8 ndarray, fill applied), `.time` (DatetimeIndex) and `.baseline_index(days)`.
 - `write_coherence_store(path, ds, chunks=None, *, consolidate=True)`: a conforming v3 store, every array other than `coh` in one chunk.
 - `CoherenceWriter(path, time, y, x, baseline_days, attrs, tables=None)`: the same format one acquisition at a time; `write(t, slab)` writes a `(Y, X, B)` slab and counts `n_finite`, `finish(tables, attrs)` writes the remaining tables, `n_finite` and `valid_pixels` and consolidates.
 - `noise_floor(attrs)`: the estimator's zero coherence level from `estimator_params`; ValueError when the store records none.

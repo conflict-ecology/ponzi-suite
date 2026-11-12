@@ -23,12 +23,14 @@ PONZI makes its own coherence stores with `ponzi-pipeline`, an ISCE3 chain run b
 ## Commands
 
 ```
-ponzi-pipeline discover  --burst ID --start DATE --end DATE --work DIR
-ponzi-pipeline pairs     --burst ID --work DIR
-ponzi-pipeline acquire   --burst ID --work DIR --burst-map FILE
-ponzi-pipeline dem       --burst ID --work DIR --burst-map FILE
-ponzi-pipeline coherence --burst ID --work DIR --burst-map FILE --index N     # in the isce3 environment
-ponzi-pipeline assemble  --burst ID --work DIR --burst-map FILE --out DIR
+ponzi-pipeline discover  --burst ID --start DATE --end DATE [--work DIR]
+ponzi-pipeline pairs     --burst ID [--work DIR]
+ponzi-pipeline acquire   --burst ID [--work DIR] --burst-map FILE
+ponzi-pipeline dem       --burst ID [--work DIR] --burst-map FILE
+ponzi-pipeline coherence --burst ID [--work DIR] --burst-map FILE --index N     # in the isce3 environment
+ponzi-pipeline assemble  --burst ID [--work DIR] --burst-map FILE [--out DIR]
 ```
 
-All take `--coherence-spec NAME|FILE`, the coherence spec (looks, window, grid, DEM, platforms, baselines; `coherence_specs/`, [Naming](../models/naming.md#spec-folders)), whose hash names the computation; without it, the code's defaults.
+`--work` defaults to `$PONZI_HOME/work/` (one folder per burst), `assemble --out` to the burst's own work folder (the store `<burst>.coh.zarr`; CR-088), and the SLCs, orbits and DEM tiles go to `$PONZI_HOME/downloads/` unless `--slc-dir`, `--orbit-dir` or `--dem-dir` say else (CR-079, CR-080). ISCE3's scratch goes to `$PONZI_HOME/tmp/` (CR-088).
+
+All take `--coherence-spec NAME|FILE`, the coherence spec (looks, window, grid, DEM, platforms, baselines; `specs/coherence_specs/`, [Naming](../models/naming.md#spec-folders)), whose hash names the computation; without it, the code's defaults.

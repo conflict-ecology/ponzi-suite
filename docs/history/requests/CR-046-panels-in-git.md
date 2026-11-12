@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-04 ("I want a panel that is kept track of by git. the burst.geojson, cells.geojson as well as a meta data file containing version. the naming convention should be just a descriptive name not by sensor. majortom-global. so <design><variant>."), after the owner chose the Major TOM panel as what the Gaza work trains and calibrates on.
 - **Status:** implemented on the owner's instruction (2026-11-04), awaiting review; uncommitted
+- **Superseded in part:** a panel spec has no `version`: its hash is its version, and it lives under `specs/panel_specs/` (CR-047, CR-048, CR-078, CR-083).
 
 ## Why
 

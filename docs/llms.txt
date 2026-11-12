@@ -20,7 +20,7 @@ Agents use PONZI through ponzi-client when a server is running (client mode), el
 ## Interacting with PONZI
 
 - [Watched areas](using/watched-areas/): areas of Major TOM tiles and what a daily look computes
-- [The map](using/map/): ponzi-visual, choosing tiles, the Monitored page
+- [The map](using/map/): ponzi-visual, choosing tiles, the monitored tiles
 - [The clients](using/clients/): Python, command line, TypeScript
 - [STAC profile](using/stac-profile/): collections, the PONZI extension, lineage links
 - [Manifests](using/manifests/): provenance of an output
@@ -55,6 +55,7 @@ Agents use PONZI through ponzi-client when a server is running (client mode), el
 
 - [ponzi-spec](reference/ponzi-spec/): shared schemas
 - [Store contracts](reference/contracts/): store formats C1 to C26
+- [Versions](reference/versions/): every version, who sets it and what it is computed from
 - [Terminology](reference/terminology/): the words PONZI uses
 - [References](reference/references/): papers, data and software
 
@@ -63,4 +64,4 @@ Agents use PONZI through ponzi-client when a server is running (client mode), el
 - [Roadmap](contributing/roadmap/): what is done and what is left, as a checklist
 - [Change process](contributing/process/): change requests and versions
 - [A new stage](contributing/new-stage/): adding a processing component
-- [PONZI extension schema](schemas/ponzi/v0.1.0/schema.json)
+- [PONZI extension schema](schemas/ponzi/v0.2.0/schema.json)

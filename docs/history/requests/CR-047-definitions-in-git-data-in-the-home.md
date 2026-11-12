@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-04: "I want the specs for the files necessary for a panel defined in core. but no data should live within any of the repos. they should be generated and placed in ~/.ponzi or whatever path is provided"; "coherence stores and sidecars catalog registry and standards should also live in .ponzi"; "If I copy .ponzi to another system, I should be able to run the same code from the repos"; and, on where the panel definitions go, "ponzi-core should have the root panels dir that is git tracked". The Gaza test case stays in `testcases/`.
 - **Status:** implemented on the owner's instruction (2026-11-04), awaiting review; uncommitted
+- **Superseded in part:** built panels are named by the spec hash, not a semver version (CR-083).
 
 ## Why
 

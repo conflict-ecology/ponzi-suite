@@ -21,7 +21,7 @@ Producer: `ponzi.core.runner` with `RunRequest.forecasting_stats` (`--forecastin
 | `valid_cnt_{s}_per_t`, `exceed_cnt_{s}_per_t`, `crps_sum_{s}_per_t_uw`, `crps_cnt_{s}_per_t_uw`, `rmse_sum_{s}_per_t_uw`, `rmse_cnt_{s}_per_t_uw` | as above | | Per stratum `s`: `built` (`built >= 0.1`) and `landnb` (`land >= 0.5`, not built), inside the process mask; a stratum whose covariate the input lacks is absent |
 | `z_thresh_exceed` | `(Z,)` | float32 | The thresholds, `(2, 3, 4)` |
 | `overlap` | `(B, H)` | bool | The valid-channel mask |
-| `run_t_lo`, `run_t_hi`, `run_mode`, `schema_version` (1), `scoring_spec_hash` | scalars | | Provenance; `read_forecasting_stats` returns them as python `int` and `str` |
+| `run_t_lo`, `run_t_hi`, `run_mode`, `schema_version` (the hash of C10's declaration, ponzi-core CR-085), `scoring_spec_hash` | scalars | | Provenance; `read_forecasting_stats` returns them as python `int` and `str` |
 
 Written with `np.savez` (uncompressed), keys in sorted order, no pickled objects.
 

@@ -1,43 +1,25 @@
 # Configuration
 
-## The deployment config
+## The PONZI home
 
-Each installation (a local machine, a cluster account, a cloud deployment) has one `ponzi.yaml`. Every distribution reads it the same way (`ponzi_spec.config.load_config`).
+Everything an installation keeps lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`, its layout fixed by `Layout`). Nothing else names a folder (CR-088): the server, the worker, the client loop, the SLURM tasks and every command run by hand read and write there, and there is no config file that moves a part of it elsewhere. To run on other storage, set `PONZI_HOME`; on a cluster, set it to storage the login node and the compute nodes share ([Running on the cluster](hpc.md#where-the-client-loop-runs)). The server and the worker make the folders when they start. The layout and every environment variable are in [Paths and environment variables](../getting-started/paths.md).
 
-```yaml
-roots:                          # plain paths or URIs: file://, s3://, gs://
-  data: /storage/ponzi/data     # default the PONZI home ($PONZI_HOME, else ~/.ponzi)
-  cache: /storage/ponzi/cache   # default {data}/cache
-  registry: s3://bucket/registry  # default {data}/registry
-  scratch: /tmp/ponzi           # default {data}/tmp
-server: {url: https://ponzi.example.org, key_env: PONZI_KEY}
-cluster_profile: mycluster@2026.11.05  # workers on a SLURM cluster
-```
+What is not a folder is set where it is used:
 
-**Where it is read from**: the first file that exists of `--config`, `$PONZI_CONFIG`, `./ponzi.yaml`, `$XDG_CONFIG_HOME/ponzi/config.yaml` (default `~/.config`).
-
-**Precedence**: command-line overrides > environment > file > defaults. Environment names nest with a double underscore:
-
-| Variable | Sets |
+| What | Where |
 | --- | --- |
-| `PONZI_ROOTS__DATA`, `PONZI_ROOTS__CACHE`, ... | `roots.*` |
-| `PONZI_SERVER__URL`, `PONZI_SERVER__KEY_ENV` | `server.*` |
-| `PONZI_CLUSTER_PROFILE` | `cluster_profile` |
-| `PONZI_DATA_ROOT`, `PONZI_MODEL_REGISTRY` | older aliases of `roots.data` and `roots.registry`, below the names above |
-
-Other `PONZI_*` variables belong to individual commands (for example the run's arguments) and are not part of this config.
+| the server a client or the client loop talks to | `--url`, else `$PONZI_URL` |
+| the key | `$PONZI_KEY` (or the variable `--key-env` names), else the file `$PONZI_KEY_FILE` |
+| how the server runs (leases, outputs mode, downloads, database server) | its settings file ([The server](server.md#settings)) |
+| the SLURM cluster | the site file and the profile in `$PONZI_HOME/cluster/` ([Running on the cluster](hpc.md#the-profile)) |
 
 ## Paths
 
-Code never holds a hostname, a cluster path or a user name. A location is a `pathlib.Path` when local and a URI string when remote (`ponzi_spec.paths`: `is_local`, `to_path`, `join`), so the same installation works on a local machine, a cluster and object storage by changing the config only.
+Code never holds a hostname, a cluster path or a user name: every folder is a part of the home (`pathlib.Path`, through `ponzi_spec.home`), so the same code runs on a laptop and a cluster by setting `PONZI_HOME` only.
 
 ## Secrets
 
-Keys and credentials (Earthdata, the Copernicus CDS, wandb, the server key) are read from the environment or from the files their own tools read, never from `ponzi.yaml`. Earthdata, for the ASF downloads, comes from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, or else from the `urs.earthdata.nasa.gov` entry of the netrc file (`$NETRC`, else `~/.netrc`). The CDS reads `~/.cdsapirc`. The config has no credentials section: the former `credentials.file`, which no command read, is refused with this answer (CR-059). [Authentication](../getting-started/authentication.md) says what each credential is for and where it goes.
-
-## The PONZI home
-
-Everything an installation computes lives in one folder, the PONZI home: `$PONZI_HOME`, else `~/.ponzi` (`ponzi_spec.home`). These docs write it `$PONZI_HOME`, the variable that sets it. A worker's home is `roots.data` of its `ponzi.yaml` when that is a local path; `roots.data` itself defaults to the PONZI home, so without a config a worker's home is `$PONZI_HOME` (`~/.ponzi`) too ([The worker](worker.md)). Its full structure and every environment variable are in [Paths and environment variables](../getting-started/paths.md). Its layout is fixed (`Layout`): `server/`, `keys/`, `standards/`, `outputs/`, `catalog/`, `cache/`, `registry/`, `panels/`, the six spec folders (`training_specs/`, `scoring_specs/`, `panel_specs/`, `detection_specs/`, `coherence_specs/`, `onboarding_specs/`: working copies looked in before ponzi-suite's, CR-070), `downloads/` (`slc/`, `orbits/`, `dem/`), `cluster/` (the SLURM sites, the profiles a worker makes and their snapshots, CR-061; no cluster is shipped in the repositories, CR-065) and `logs/` (every log written to files: `slurm/<batch>/` the SLURM tasks', `client/` the client loop's when it runs as a SLURM job, CR-064). The server and the worker create it when they start. The repositories hold only code and the files PONZI runs from, so a home copied to another machine runs unchanged with the same repositories.
+Keys and credentials are read from the environment or from the files their own tools read, never from a PONZI file. [Authentication](../getting-started/authentication.md) says what each credential is for and where it goes.
 
 ## Composition
 

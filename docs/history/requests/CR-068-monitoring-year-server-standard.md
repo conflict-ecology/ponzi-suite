@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("This UI is only for tile submission with a monitoring year. So runs should be removed. The back end should handle all the model logic. Add a collapsable tab to access settings, add another page with currently monitored.").
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** the Monitored page was removed (CR-075).
 
 ## Why
 

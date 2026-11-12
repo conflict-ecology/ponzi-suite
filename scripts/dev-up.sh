@@ -45,7 +45,8 @@ chmod 700 "$keys"
 
 # The settings: the given file, or none, with public_url (the address of the assets the server hands out) set to
 # this server when the file has none. Written to a temporary file, removed once the server has started (or on exit).
-settings="$(mktemp "${TMPDIR:-/tmp}/ponzi-dev-up.XXXXXX.yaml")"
+mkdir -p "$home/tmp"
+settings="$(mktemp "$home/tmp/ponzi-dev-up.XXXXXX.yaml")"     # in the home's tmp/ (ponzi-core CR-088)
 pids=()
 # shellcheck disable=SC2329  # called by the EXIT trap
 stop() {

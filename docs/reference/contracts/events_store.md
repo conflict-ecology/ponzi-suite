@@ -10,7 +10,7 @@ Location: `<run folder>/events_<calibration id>.zarr` for a burst (`events_store
 
 ## The detection spec
 
-`ponzi.products.DetectionSpec` (`detection_spec.py`), a yaml file of its fields, any subset, composed ([Composition](../../service/configuration.md#composition)); `--detection-spec NAME|FILE` (ponzi-suite `detection_specs/`, `ponzi_spec.specs.find_spec`), the defaults without one. A `preset` field is refused with a message (named presets are gone: build on the file with `extends`). The fields and their defaults: `calibration_kind` `ceiling` (the kind of p-value store read; another is refused), `code` 50, `gap` 0, `dating_pre` 1, `dating_post` 4, `windows` `exclusive` (or `overlapping`), `episode_days` None (no episodes), `start_date` None, `provisional` false (left out of the dump and the hash when false). The Gaza release's values are ponzi-suite `testcases/gaza/detection.yaml`.
+`ponzi.products.DetectionSpec` (`detection_spec.py`), a yaml file of its fields, any subset, composed ([Composition](../../service/configuration.md#composition)); `--detection-spec NAME|FILE` (ponzi-suite `specs/detection_specs/`, `ponzi_spec.specs.find_spec`), the defaults without one. An unknown field is refused; build on another spec's file with `extends`. The fields and their defaults: `calibration_kind` `ceiling` (the kind of p-value store read; another is refused), `code` 50, `gap` 0, `dating_pre` 1, `dating_post` 4, `windows` `exclusive` (or `overlapping`), `episode_days` None (no episodes), `start_date` None, `provisional` false (left out of the dump and the hash when false). The Gaza release's values are ponzi-suite `single-path-gaza-release`.
 
 ## Arrays
 

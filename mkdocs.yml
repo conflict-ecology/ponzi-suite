@@ -114,6 +114,7 @@ nav:
           - ponzi-client: reference/api/ponzi-client.md
           - ponzi-visual: reference/api/ponzi-visual.md
       - Store contracts: reference/contracts.md
+      - Versions: reference/versions.md
       - Terminology: reference/terminology.md
       - References: reference/references.md
   - Contributing:
@@ -125,6 +126,15 @@ nav:
           - contributing/agents/index.md
           - Using PONZI: contributing/agents/usage.md
           - Contributing: contributing/agents/contributing.md
+  - Discoveries:
+      - discoveries/index.md
+      - Coherence computation: discoveries/coherence.md
+      - Sensors and acquisitions: discoveries/acquisition.md
+      - The time series: discoveries/time-series.md
+      - Stores: discoveries/stores.md
+      - Running on the cluster: discoveries/cluster.md
+      - Campaigns: discoveries/campaigns.md
+      - Detection and scoring: discoveries/detection.md
   - History:
       - history/index.md
       - The overhaul plan: history/overhaul-plan.md

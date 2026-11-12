@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("add these links for the admin boundaries when the server starts to select areas to monitor ... a drop down to select admin level 0-2 ... hover over the admin boundary, select it, enter a date range and orbit, then submit").
 - **Status:** implemented on the owner's instruction (2026-11-05), awaiting review; uncommitted
+- **Superseded in part:** areas are no longer made from a boundary, pass and dates (CR-067).
 
 ## Why
 

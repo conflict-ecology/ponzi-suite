@@ -49,7 +49,7 @@ pixi run dev           # another shell: http://localhost:5173
 | 9 | Watched areas | done |
 | 10 | ponzi-visual | done; browser end-to-end tests open |
 | 11 | Docs | done; docstring backlog open |
-| 12 | Retire the old repositories | archiving open (owner) |
+| 12 | Retire the old repositories | done |
 
 ## Phase 8: the SLURM executor
 
@@ -79,8 +79,8 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] The coherence chain as worker stages: `discover`, `dem`, `coherence` (one job per pair) and `assemble`. The assembled store passes `ponzi validate-store` (`test_standard.py`).
 - [x] `ponzi-models standard-workflow`: a standard bundle as the server runs it. A rehearsed standard runs through the server and a worker (`test_standard.py`).
 - [x] Definitions in git, data in the PONZI home. The specs and test cases are in ponzi-suite, and commands take their paths (CR-046 to CR-048), or their names (CR-070). Panel specs are checked by `ponzi-models panel-check`. The coherence stores, the registry, built panels, standards and the catalogs are in `$PONZI_HOME`, made at start by the server and the worker (CR-045, CR-047).
-- [x] Composable yaml: every config can build on another with `extends:`; presets are gone, and the detection rules are yaml files (CR-043), now detection specs (CR-070). Specs, models and standards follow one [naming convention](../models/naming.md) (CR-052, CR-070).
-- [x] A staged (format 3) calibration from commands: `null-runs --staged`, then `calibrate-staged` (CR-051).
+- [x] Composable yaml: every spec and standard can build on another with `extends:`; presets are gone, and the detection rules are yaml files (CR-043), now detection specs (CR-070). Specs, models and standards follow one [naming convention](../models/naming.md) (CR-052, CR-070).
+- [x] A staged calibration from commands: `null-runs --staged`, then `calibrate-staged` (CR-051).
 - [ ] **Coherence stores for the panel's bursts.** HPC.
     - List the Major TOM bursts with `ponzi-models panel-cells --burst-map`. Make their stores with the worker's chain: `discover`, then `dem`, `coherence` and `assemble`, as SLURM batches.
     - Earthdata credentials come from `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else from `~/.netrc` (CR-044).
@@ -120,7 +120,8 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] **A standard names its panel.** The model and the calibrations must match it; no training cell may be a test cell (CR-055).
 - [x] **Versions are held against the one before.** Within a major the runs may not change, within a minor the outputs (CR-055).
 - [x] **Library versions in content ids.** The majors of the code that computes a stage (CR-054).
-- [x] **Specs, and only the standard versioned.** The files a person writes are training, scoring, panel, detection, coherence and onboarding specs, in folders of those names in ponzi-suite and the PONZI home, each known by its name and hash, frozen once used, and recorded in a `specs:` block with its suite commit. A standard is `<sensor>-<scope>`, names its specs, and is written and registered by `new-standard`, `bump-standard` and `register-standard`; every stage is at identity version `2`, so everything is made again (CR-070).
+- [x] **Specs, and only the standard versioned.** The files a person writes are training, scoring, panel, detection, coherence and onboarding specs, in folders of those names in ponzi-suite and the PONZI home, each known by its name and recorded in a `specs:` block with its suite commit. A standard is `<sensor>-<scope>`, names its specs, and is written and registered by `new-standard`, `bump-standard` and `register-standard` (CR-070).
+- [x] **Versions from hashes and tags.** A spec's version is its hash, cited `name@<hash8>`, and the registry archives every version used (CR-083); a standard lists no stages (CR-084); stages have no version, store contracts and record files are versioned by the hash of their declaration, and every distribution by its git tags (CR-085). See [Versions](../reference/versions.md).
 
 ## Phase 9: watched areas
 
@@ -130,10 +131,16 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] An area's `start_date` and `end_date` bound its jobs (CR-053).
 - [x] Areas from an administrative boundary on one orbit pass (CR-053, chosen tracks CR-057), then from one Major TOM cell (CR-066). Both were replaced by areas from tiles only (CR-067); the boundaries are now for drawing only.
 - [x] Areas from Major TOM tiles only: 1 to 64 tiles over land, every burst of both passes meeting them, its jobs made at once, and tags the server adds to the analysis outputs of its tiles (CR-067). Areas made before from bursts or a boundary keep running.
+- [x] An area may be more than 64 tiles: the map and the form warn past 64, the server makes it and logs a warning (CR-074).
+- [x] The monitored tiles on the map: monitored in one colour, with outputs and not monitored in another, each opened in a side panel that replaces the Monitored page (CR-075).
+- [x] Select tiles by an Admin 0, 1 or 2 boundary: a click adds every tile over land that meets it (CR-076).
 - [x] The server chooses an area's standard when none is given: `default_standard`, else the one standard it holds, else a 422 saying to set it (CR-068).
 - [x] The World Bank's disputed areas (NDLSA) are level 0 boundaries and land, so their tiles can be watched; the map draws the land from the level 0 boundaries (CR-069).
 - [x] A job lists the Items it made (`Job.items`), so an area's outputs are its done jobs' Items (CR-042).
 - [x] Outputs reach the server by upload or by a shared path, as the server's `outputs` setting says (CR-041).
+- [ ] **Presigned uploads to object storage.** local.
+    - Assets go to the server's disk for now, by upload or by a shared path.
+    - Done when the loop can upload a final asset straight to object storage, through a URL the server signs.
 - [ ] **Run the scheduler in a deployment.** Owner.
     - `scheduler_seconds` in `server.yaml`, default 300; set 0 to turn it off.
     - Done when an active area's jobs appear daily on a deployed server.
@@ -170,7 +177,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 ## Phase 11: documentation
 
 - [x] Pages for the quickstart, authentication, standards, watched areas, the HPC route, the worker, the service, the clients, the paths and the references. This roadmap.
-- [x] The store contracts checked against the code, and published with the change requests from ponzi-core at build time (CR-050).
+- [x] The store contracts checked against the code (CR-050), and kept in this suite with the change requests (CR-071).
 - [x] Every public function has a docstring in ponzi-service, ponzi-spec and ponzi-pipeline. The tests hold that, and a ratchet in ponzi-core (`test_docstrings.py`) holds the rest.
 - [ ] **Burn down the docstring backlog.** local.
     - 178 names in `ponzi` (126) and `ponzi_models` (52), listed in `packages/core/tests/data/docstring_allowlist.txt`. Document a module, take its names off the list, and run `pixi run test`.
@@ -181,7 +188,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 
 ## Phase 12: retire the old repositories
 
-- [x] **Retire the old repositories.** The model jobs no longer run from them, and they are gone; what was ported is in ponzi-core's history.
+- [x] **Retire the old repositories.** Nothing runs from them or refers to them; what was ported is in ponzi-core's history, and the readers of their formats are removed (CR-082, CR-086).
 
 ## Decisions still open
 

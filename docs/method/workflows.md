@@ -166,9 +166,9 @@ The model, its calibrations and the standard are made with `ponzi-models`, from 
 
 ```mermaid
 flowchart LR
-  def["panel spec<br/>panel_specs/majortom-global<br/>(panel-check)"] --> build["panel-build<br/>stores and masks<br/>in home/panels"]
+  def["panel spec<br/>specs/panel_specs/majortom-global<br/>(panel-check)"] --> build["panel-build<br/>stores and masks<br/>in home/panels"]
   build --> prep["prepare<br/>train and val windows,<br/>layer sample_train"]
-  spec["training spec<br/>training_specs/&lt;family&gt;/...<br/>(default: tide)"] --> prep
+  spec["training spec<br/>specs/training_specs/&lt;family&gt;/...<br/>(default: tide)"] --> prep
   prep --> train["train<br/>keeps the best<br/>val epoch"]
   train --> export["export<br/>the artifact<br/>(TiDE: TorchScript + meta.json)"]
   export --> reg["register-model<br/>model id + ONE scoring spec:<br/>its hash fixed here"]
@@ -182,7 +182,7 @@ flowchart LR
   runs --> rows["null-rows<br/>the runs' own anomaly<br/>scores where finite"]
   rows --> build["calibrate<br/>plain and ceiling"]
   build --> regcal["register-calibration<br/>under the model; records the<br/>scoring spec hash and library version"]
-  runs -. "--staged" .-> staged["calibrate-staged<br/>one mapping per stage<br/>(format 3)"]
+  runs -. "--staged" .-> staged["calibrate-staged<br/>one mapping per stage"]
   staged -.-> regcal
 ```
 
@@ -212,8 +212,8 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | --- | --- | --- |
 | Library (`ponzi`, `ponzi-pipeline`) | its version, `0.y` the major below 1.0 | a new major gives new content ids to the stages its code computes (CR-054), and a calibration refuses runs of another major (CR-020) |
 | Coherence spec, onboarding spec | its name and hash, named by the standard | new coherence stores and sidecars, and everything after |
-| Panel spec | its name and hash (`panel.yaml` and its files) | a new panel spec name, a new model and calibration: the model id carries the panel spec's name |
-| Training spec | its name and hash, in `training_specs/` | a new fit, a new model |
+| Panel spec | its name and hash (`panel.yaml` and its files) | a new hash, so a new model and calibration: the model id carries the panel spec's name and hash |
+| Training spec | its name and hash, in `specs/training_specs/` | a new fit, a new model |
 | Scoring spec | its hash, fixed at `register-model` | new runs; a calibration is made for one hash and refuses others |
 | Calibration | its id under the model, the scoring spec hash | new p-values and events; runs reused |
 | Detection spec | its name and hash, named by the standard | new events and cells; runs and p-values reused |

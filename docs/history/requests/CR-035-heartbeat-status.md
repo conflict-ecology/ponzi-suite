@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (phase 8 of the overhaul plan: the SLURM executor and its approval gate)
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10)
+- **Superseded in part:** the `awaiting_approval` status was removed (CR-062).
 
 ## Why
 

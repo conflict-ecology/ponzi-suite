@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-04 ("this should be downloaded whenever the server starts at the default location of ~/.ponzi all the data as well should be there"). Decisions, all as recommended: one root for everything; the server serves at once and makes the catalog in the background; the GeoJSON builder moves to ponzi-spec; a worker elsewhere fetches its own burst map.
 - **Status:** implemented on the owner's instruction (2026-11-04), awaiting review; uncommitted
+- **Superseded in part:** a worker's home is no longer `roots.data` of a deployment config, and the server's folders can no longer be moved out of the home: the home is `$PONZI_HOME` everywhere (CR-088).
 
 ## Why
 

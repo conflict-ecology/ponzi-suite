@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 (approved a per-track choice for boundary areas).
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** tracks are no longer chosen for an area, and the boundaries' `/tracks` route is gone (CR-067).
 
 ## Why
 

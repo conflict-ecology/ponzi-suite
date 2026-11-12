@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 ("build through phase 8b-12 ... some functionality off the gpu on disk")
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10). The HPC part of 8b is open: see ponzi-docs `contributing/roadmap.md`
+- **Superseded in part:** `tests/test_retired.py` was deleted (CR-087).
 
 ## Why
 

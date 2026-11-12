@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("remove all ceoas references including the cluster profile from code and docs. (move that to ~/.ponzi for now) all worker jobs should check for it and run based on the spec and create it if it does not exist.")
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** the phase 0 port reference kit it edited was deleted (CR-087). A site's `roots.data` and the profile's `cache` are gone; `{data}` in a profile means the PONZI home (CR-088).
 
 ## Why
 

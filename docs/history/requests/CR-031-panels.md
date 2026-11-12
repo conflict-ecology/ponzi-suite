@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (phase 5b of the overhaul plan; decisions D14, D17, D18, D19)
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10)
+- **Superseded in part:** panel spec files and artifact names follow the spec hash, not a version (CR-046, CR-052, CR-083).
 
 ## Why
 

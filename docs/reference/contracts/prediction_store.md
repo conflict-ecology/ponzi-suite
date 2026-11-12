@@ -21,8 +21,6 @@ Attrs: as C7 ([Grid and attrs of a run's stores](score_store.md#grid-and-attrs-o
 
 The stacked stores (C5, C6, C21; `create_stack_store`) have the grid of C7 and chunks `(1, tile, tile, ...)`: one anchor, a spatial tile, every other dimension whole; `process_pixels` is chunked `(tile, tile)`. `tile = min(pred_tile, Y, X)`, with `RunRequest.pred_tile` (`--pred-tile`, default 512). In C5 and C6 `baseline` and `horizon` have no coordinate arrays; the days are the stamp's `ponzi_baseline_days`.
 
-A legacy `pred_quantiles.zarr` (`pred_quantiles (time, y, x, baseline, horizon, level) float16`, attrs `quantile_levels`, `t_range`, `baseline_days`, `horizon_length` required and `fm_context_depth` optional) still opens as family `quantile` with `legacy = True`, no stamp and no support (read as zeros).
-
 ## Invariants
 
 - Written anchors are exactly the stamp window; outside it the arrays read fill.
@@ -30,4 +28,4 @@ A legacy `pred_quantiles.zarr` (`pred_quantiles (time, y, x, baseline, horizon, 
 
 ## Functions
 
-`ponzi.contracts.pred`: `PRED_ARRAYS`, `PredMeta`, `PredDataset` (`.read_pred_slice(t)`, `.family`, `.legacy`, `.levels`, `.stamp`, `.window`, `.context_depth`, `.baseline_days`, `.horizon`), `open_prediction_store` (validates), `create_prediction_store(path, grid, stamp, process_pixels, family, B, H, levels=None, tile=512)`, `write_pred_slice`, `read_pred_slice(source, t) -> Predictive` (a path or a `PredDataset`), `validate_prediction_store` (checks `structure`, `stamp`, `window`, `consolidated`, `family`, `levels`; the legacy layout `structure`, `legacy_attrs`), `is_legacy_store`, `create_stack_store`.
+`ponzi.contracts.pred`: `PRED_ARRAYS`, `PredMeta`, `PredDataset` (`.read_pred_slice(t)`, `.family`, `.levels`, `.stamp`, `.window`, `.context_depth`, `.baseline_days`, `.horizon`), `open_prediction_store` (validates), `create_prediction_store(path, grid, stamp, process_pixels, family, B, H, levels=None, tile=512)`, `write_pred_slice`, `read_pred_slice(source, t) -> Predictive` (a path or a `PredDataset`), `validate_prediction_store` (checks `structure`, `stamp`, `window`, `consolidated`, `family`, `levels`), `create_stack_store`. A store without the C5 layout and stamp (the old repositories' `pred_quantiles.zarr`) fails `structure` and `stamp` (ponzi-core CR-086).

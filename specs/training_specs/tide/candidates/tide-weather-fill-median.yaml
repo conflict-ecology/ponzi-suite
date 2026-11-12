@@ -1,0 +1,15 @@
+# tide-weather-fill-median: a missing coherence of the past window is the median of the pixel's observed values
+# of that baseline in the window, with the obs flags.
+# Common to the fill specs (tide-weather-fill-*): the future rows' obs channels are what a run gives the model
+# (`future_obs: one`, constant 1), a missing covariate in a window is an error and never a filled value
+# (`strict_covariates`), and in a run the model honours the scoring spec's `context.min_support` as the rolling
+# forecaster does (`support: gated`; the fit does not filter on it, and its model card breaks the val loss down by
+# the number of observed values).
+# Fitted at seeds 42 and 43: `ponzi-models train --training-spec tide-weather-fill-median` and again with `--seed 43`.
+extends: ../tide-weather.yaml
+missing:
+  fill: median
+  flag: true
+future_obs: one
+strict_covariates: true
+support: gated

@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (phase 3 of the overhaul plan; plan decisions: ponzi-models absorbed into ponzi-core, without its git history; a clean slate, D6)
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10)
+- **Superseded in part:** a standard has no workflow list (CR-084), the run config hash is the scoring spec hash (CR-070), and detection is a spec, not fields or a preset (CR-043, CR-070).
 
 ## Why
 

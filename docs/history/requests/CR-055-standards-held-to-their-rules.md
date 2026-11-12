@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 (approved the second change request of the versioning gaps; "add a standards file").
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** specs are cited by hash, not version (CR-083), a standard has no workflow (CR-084), and the standard file is now 2.0.0.
 
 ## Why
 

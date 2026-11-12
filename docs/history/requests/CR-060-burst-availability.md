@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("temporal availability of the bursts"; chose "server asks ASF").
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** the boundary availability route and the visual's drawing of bursts by acquisition were removed (CR-067).
 
 ## Why
 

@@ -16,7 +16,7 @@ Check first: `ponzi-client standards` answers in client mode; a connection error
 
 ## Client mode
 
-`ponzi-client` is a REST client, so it needs a running server: `--url` or `server.url` of `ponzi.yaml`, and a key in `PONZI_KEY` or the file `$PONZI_KEY_FILE` ([Authentication](../../getting-started/authentication.md)). In this mode:
+`ponzi-client` is a REST client, so it needs a running server: `--url`, else `$PONZI_URL`, and a key in `PONZI_KEY` or the file `$PONZI_KEY_FILE` ([Authentication](../../getting-started/authentication.md)). In this mode:
 
 - Do not import `ponzi`, `ponzi_pipeline` or `ponzi_models`; the server's workers compute.
 - Do not read or write the server's storage or a worker's cache directly (both are in a PONZI home).
@@ -28,7 +28,7 @@ Check first: `ponzi-client standards` answers in client mode; a connection error
 | --- | --- | --- | --- |
 | Find bursts over an area | `c.bursts(bbox=...)` | `ponzi-client bursts --bbox ...` | burst ids look like `t028_058198_iw3` |
 | See what can be run | `c.standards()` | `ponzi-client standards` | a standard id has a version: `s1-general@2.0.0` |
-| Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...])` | `ponzi-client area-create --cells C[,C] --tags T[,T]` | needs a `client:write` key; 1 to 64 tiles over land; the standard is optional (the server's); see [Watched areas](../../using/watched-areas.md) |
+| Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...])` | `ponzi-client area-create --cells C[,C] --tags T[,T]` | needs a `client:write` key; 1 or more tiles over land (past 64 a warning); the standard is optional (the server's); see [Watched areas](../../using/watched-areas.md) |
 | Pause or change a watched area | `c.update_area(area_id, active=False)` | `ponzi-client area-update ID --active false` | fields left out stay as they are |
 | Find the outputs of tagged areas | `c.search(tags=[...])` | `ponzi-client search --tags T[,T]` | analysis Items only ([Tags](../../using/watched-areas.md#tags)) |
 | Look at an area now | `c.discover_area(area_id)` | `ponzi-client area-discover ID` | whatever its cadence |
@@ -79,5 +79,5 @@ The [STAC profile](../../using/stac-profile.md) lists the contract of every Coll
 
 - Identify results by content id, not by path; paths differ between installations.
 - Before submitting, search: an identical request costs nothing the second time, but it is still a request.
-- A run needs a standard; do not compose configs yourself (in either mode).
+- A run needs a standard; do not compose specs yourself (in either mode).
 - Report a failure with the job id and the `Problem` body the server returned.

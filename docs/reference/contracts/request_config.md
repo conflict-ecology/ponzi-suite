@@ -1,10 +1,10 @@
-# C17: Request config (onboarding spec)
+# C17: Onboarding spec
 
 `ponzi_pipeline.onboard.onboarding_spec`. HOW a coherence store is onboarded (where and when are the caller's): which steps run, the edge margin, the ERA5 route and variables, the pair-difference baselines. The values used are stamped into `onboard_meta.json` beside the sidecar (C2).
 
 ## Producer and consumers
 
-Written by hand: an onboarding spec of ponzi-suite `onboarding_specs/` (its fields at the top level), or any yaml file with an `onboarding:` section (every other top-level section is then ignored). The file is composed first ([Composition](../../service/configuration.md#composition)). Read by `load_onboarding_spec(path)` for `ponzi-pipeline onboard --onboarding-spec NAME|FILE` (none: the defaults) and `ponzi-pipeline weather-prefetch --onboarding-spec NAME|FILE` (which needs `weather_area`); names are found by `ponzi_spec.specs.find_spec`. The worker stage `onboard` takes an `OnboardingSpec` as its identity params.
+Written by hand: an onboarding spec of ponzi-suite `specs/onboarding_specs/` (its fields at the top level), or any yaml file with an `onboarding:` section (every other top-level section is then ignored). The file is composed first ([Composition](../../service/configuration.md#composition)). Read by `load_onboarding_spec(path)` for `ponzi-pipeline onboard --onboarding-spec NAME|FILE` (none: the defaults) and `ponzi-pipeline weather-prefetch --onboarding-spec NAME|FILE` (which needs `weather_area`); names are found by `ponzi_spec.specs.find_spec`. The worker stage `onboard` takes an `OnboardingSpec` as its identity params.
 
 ## Model
 

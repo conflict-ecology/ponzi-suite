@@ -24,7 +24,7 @@ The pair differences are `v(t) - v(t - d days)`, signed (a rise and a fall are d
 
 ## Attrs
 
-`contract_version` (1), `producer` (`ponzi_pipeline.onboard`), `source_store`, `source_digest`, `sidecar_of`, `onboard_steps`, and the provenance of each step: `built_source`, `land_source`; `{var}_source`, `weather_source` and the source's own (`weather_url`, `cds_dataset`, `weather_area`, `cds_area`, `cds_area_key`, `n_cells`, `era5_cell_lat`, `era5_cell_lon`, `era5_burst_value`); `era5_pd_source`, `era5_pd_baselines`, `era5_pd_levels`.
+`contract_version` (the hash of C2's declaration, ponzi-core CR-085; `validate_sidecar` fails another), `producer` (`ponzi_pipeline.onboard`), `source_store`, `source_digest`, `sidecar_of`, `onboard_steps`, and the provenance of each step: `built_source`, `land_source`; `{var}_source`, `weather_source` and the source's own (`weather_url`, `cds_dataset`, `weather_area`, `cds_area`, `cds_area_key`, `n_cells`, `era5_cell_lat`, `era5_cell_lon`, `era5_burst_value`); `era5_pd_source`, `era5_pd_baselines`, `era5_pd_levels`.
 
 The margin lives in the `edge_margin` attr of `process_mask`: the runner stamps it into `run_meta.pixels.edge_margin` and `ponzi_edge_margin` (C7), and the `sample` step into the C3 sample. Without a `process_mask` the runner processes the whole valid footprint and records margin 0; with one it processes `process_mask & valid_pixels`.
 

@@ -5,7 +5,7 @@ Checklists for agents that change PONZI's code. People follow the same rules in 
 ## Before any change
 
 - [ ] A change request exists in ponzi-suite `docs/history/requests/` and the owner has signed it off.
-- [ ] You know whether the change alters results for an existing config. If it does, it is RESULTS-CHANGING.
+- [ ] You know whether the change alters results for an existing spec. If it does, it is RESULTS-CHANGING.
 - [ ] You do not commit, tag or push unless the owner asks; leave changes in the working tree for review.
 - [ ] You do not access a cluster, submit a job or move data without the owner's approval for that action.
 
@@ -20,7 +20,7 @@ Checklists for agents that change PONZI's code. People follow the same rules in 
 
 ## Changing what a store holds (code first)
 
-A store's format is defined by the code (`ponzi.contracts`, and `ponzi.core.scoring_spec`, `ponzi.core.runner`, the onboarding spec for the config contracts); its [contract](../../reference/contracts.md) describes it. Keep them in step, in this order:
+A store's format is defined by the code (`ponzi.contracts`, and `ponzi.core.scoring_spec`, `ponzi.core.runner`, the onboarding spec for the spec contracts); its [contract](../../reference/contracts.md) describes it. Keep them in step, in this order:
 
 - [ ] **Code first.** Change the schema, the writer and the checks in the code, with their tests, until they are green. Never write a contract for behaviour the code does not have yet.
 - [ ] **Then the contract, in the same change.** Update the contract page in ponzi-suite `docs/reference/contracts/` to say what the code now does: arrays or columns, dtypes, fills, chunks, attrs, invariants, the producer and the readers. A new store gets a new contract and a row in the index.

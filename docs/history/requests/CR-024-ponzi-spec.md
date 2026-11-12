@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (phase 1 of the overhaul plan, `ponzi-service/docs/overhaul-plan.md`, decision D1)
 - **Status:** implemented on the owner's instruction (2026-10-23, "start phase 1"), awaiting review; uncommitted (plan decision D10)
+- **Superseded in part:** the stage version left the content id (CR-085). The deployment config (`ponzi_spec.config`, `ponzi.yaml`) was removed; the home is `$PONZI_HOME` (CR-088).
 
 ## Why
 

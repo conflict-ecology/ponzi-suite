@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-04 ("lets make all changes", the recommendations on organizing the Markdown files; "update all the contracts to match the current repo functionality"; "remove what is necessary").
 - **Status:** implemented on the owner's instruction (2026-11-04), awaiting review; uncommitted
+- **Superseded in part:** contracts and change requests live in ponzi-suite, not the ponzi-core checkout (CR-071).
 
 ## Why
 

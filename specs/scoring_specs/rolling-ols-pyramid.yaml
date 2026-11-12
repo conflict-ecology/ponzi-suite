@@ -1,0 +1,7 @@
+# rolling-ols-pyramid: the reference scoring spec. The rolling OLS forecaster, scored on the pyramid (baselines
+# 12 to 60 days, horizon 5).
+context: {C: 30, min_support: 6}
+forecaster: {name: rolling_ols, params: {harmonic_order: 0, pooled: false}}
+scoring: {baseline_days: [12, 24, 36, 48, 60], H: 5, alpha: 3.0}
+aggregate: {min_channels: 5, struct_weight: true}
+state_machine: {alpha: null, delta: -0.1, recovery_steps: 1, noise_floor: 0.03, nms_window: 0}

@@ -14,7 +14,7 @@ Producer: `ponzi.core.runner` through `ZarrScoreSink` (`{out_dir}/score.zarr`; `
 | `difference` | `(time, y, x)` | float32 | NaN | Aggregate `obs - predicted median` |
 | `sensitivity` | `(time, y, x)` | float32 | NaN | Aggregate minimum detectable drop at `scoring.alpha` |
 | `predicted_median` | `(time, y, x)` | float32 | NaN | Aggregate predicted median |
-| `ceiling_score` | `(time, y, x)` | float32 | NaN | The score the pixel would get if every channel were observed at the noise floor: the largest alarm it can raise. Optional for a reader: a store without it validates with the `optional` check at info |
+| `ceiling_score` | `(time, y, x)` | float32 | NaN | The score the pixel would get if every channel were observed at the noise floor: the largest alarm it can raise. Required: a store without it fails `structure` (ponzi-core CR-086) |
 | `n_channels` | `(time, y, x)` | uint8 | 0 | Valid `(b, h)` channels aggregated; 0 iff `anomaly_score` is NaN inside the window |
 
 Chunks `(1, Y, X)` by default, or the request's `chunks` (`RunRequest.chunks`, `ponzi run --chunks t,y,x`); `process_pixels` takes the spatial part. There are no `baseline` or `horizon` coordinates; the baselines are the stamp's `ponzi_baseline_days`.
@@ -29,7 +29,7 @@ Every output store of a run (C5, C6, C7, C8, C21, C24, C26) has:
 
 | Attr | Type | Meaning |
 |---|---|---|
-| `ponzi_contract_version` | int | 1 |
+| `ponzi_contract_version` | str | the hash of the run stamp's declaration, its window fields included (ponzi-core CR-085) |
 | `ponzi_version` | str | `ponzi.__version__` |
 | `ponzi_scoring_spec_hash` | str | C4 `spec_hash` |
 | `ponzi_scoring_spec_name` | str | C4 `name`, else the scoring spec file's stem |
@@ -40,9 +40,8 @@ Every output store of a run (C5, C6, C7, C8, C21, C24, C26) has:
 | `ponzi_edge_margin` | int | The margin of the input's process mask (the sidecar's `process_mask` attr, C2, or the sample's `edge_margin`, C3); 0 when it records none |
 | `ponzi_struct_weight` | bool | |
 | `ponzi_alpha`, `ponzi_change_alpha`, `ponzi_delta`, `ponzi_noise_floor` | float | Scoring z, change threshold, difference threshold, detectability floor (`state_machine.noise_floor` resolved: `derived` is the input's `noise_floor(attrs)`, C1) |
-| `ponzi_ceiling_floor` | float, optional | The coherence the ceiling was evaluated at: the estimator's derived floor where the input's attrs give it, else `ponzi_noise_floor` |
+| `ponzi_ceiling_floor` | float in (0, 1) | The coherence the ceiling was evaluated at: the estimator's derived floor where the input's attrs give it, else `ponzi_noise_floor` |
 | `ponzi_recovery_steps`, `ponzi_nms_window` | int | Resolved (`nms_window` never 0 here) |
-| `ponzi_window_schema` | int | 1 |
 | `ponzi_run_mode` | str | `monitoring` or `detection` |
 | `ponzi_t_lo`, `ponzi_t_hi` | int | Scored anchor index range, inclusive (in a staged run, the last anchor with a final score) |
 | `ponzi_t_requested` | list[int], optional | Requested range before clamping to `[C, T - H]` |
@@ -60,6 +59,6 @@ Every output store of a run (C5, C6, C7, C8, C21, C24, C26) has:
 
 ## Functions
 
-`ponzi.contracts.score`: `SCORE_ARRAYS`, `GridMeta` (shape, the three coordinates and the input attrs to copy; each input view of the runner builds it, `sample_grid_meta` for a sample), `PixelScores` (one anchor without the time axis; `ceiling_score` None is written as NaN), `ScoreMeta`, `open_score_store(path) -> ScoreDataset` (validates; `.ds` lazy, `.meta`, `.stamp`, `.window` with `t_lo`, `t_hi`, `run_mode` (alias `mode`) and `n_anchors`), `create_score_store(path, grid, stamp, process_pixels, chunks=None) -> zarr.Group` (allocates the arrays and consolidates; the sink only writes slices), `write_score_slice(group, t, scores)`, `validate_score_store(path)` (checks `structure` (fail: arrays, dims, dtypes, fills, `dimension_names`, coordinate lengths), `optional` (info), `stamp` (fail), `window` (fail unless `t_lo <= t_hi <= T - 1`), `consolidated`), `store_attrs(path)`.
+`ponzi.contracts.score`: `SCORE_ARRAYS`, `GridMeta` (shape, the three coordinates and the input attrs to copy; each input view of the runner builds it, `sample_grid_meta` for a sample), `PixelScores` (one anchor without the time axis; `ceiling_score` None is written as NaN), `ScoreMeta`, `open_score_store(path) -> ScoreDataset` (validates; `.ds` lazy, `.meta`, `.stamp`, `.window` with `t_lo`, `t_hi`, `run_mode` (alias `mode`) and `n_anchors`), `create_score_store(path, grid, stamp, process_pixels, chunks=None) -> zarr.Group` (allocates the arrays and consolidates; the sink only writes slices), `write_score_slice(group, t, scores)`, `validate_score_store(path)` (checks `structure` (fail: arrays, dims, dtypes, fills, `dimension_names`, coordinate lengths), `stamp` (fail), `window` (fail unless `t_lo <= t_hi <= T - 1`), `consolidated`), `store_attrs(path)`.
 
 `ponzi.contracts.stamp`: `RunStamp` with `to_attrs()`, `from_attrs()`, `has_stamp()`; `RunWindow.stamp_fields` (`ponzi.core.windows`) fills the window part.

@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("Remove selection by admin level and only by major tom tile (this will make keeping track of data easier as that will be the format of the outputs)"; "Several tiles. limit adding 64 tiles at a time"; "the default to be click to add or remove OR click and hold and drag"; "Only tiles which overlap an admin0 vector should be included"; "Add the admin levels as toggles on the map to view, with labels added. The admins should not be selectable"; "Remove the play bar at the bottom. There should not be a burst selection"; "remove orbit as an option; both will be downloaded and monitored"; "instead of naming the area, add tags to those tiles which will be attached to all analysis for those tiles (not downloads)"; "add a toggle on the map that toggles viewing ascending or descending bursts"; "move the skin to a settings page").
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** the 64-tile limit is a warning (CR-074), and boundaries can be selected by (CR-076).
 
 ## Why
 

@@ -5,7 +5,7 @@
 
 A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grids](../method/grids.md)) that keep being run under one standard. The outputs are made on the same grid, so the tiles of an area are the tiles of its outputs.
 
-- **Tiles only.** An area is 1 to 64 tiles. A tile must meet land, a level 0 outline of the administrative boundaries: a country or territory, or one of the disputed areas below. The server lists no tile over open sea and refuses one in an area.
+- **Tiles only.** An area is 1 or more tiles; past 64 the map and the server warn of a large area, and it is still made (CR-074). A tile must meet land, a level 0 outline of the administrative boundaries: a country or territory, or one of the disputed areas below. The server lists no tile over open sea and refuses one in an area.
 - **Every burst.** The server watches every burst, of both passes, whose footprint meets the union of the tiles. There is no burst, pass or track to choose.
 - **The standard is the server's.** An area may name its standard; one made without, as the front end makes them, takes the server's setting `default_standard`, else the one standard the server holds. A server holding several standards and no `default_standard` (or none, or a `default_standard` it does not hold) refuses such an area with a 422 that says to set it (ponzi-core CR-068). `cadence_hours` may be left out too: 24 hours.
 - **At once.** Making an area makes its jobs, one `workflow` job per burst, so the scenes of its bursts are found and downloaded as soon as a worker claims them. After that the scheduler, every `scheduler_seconds` (default 300), makes each due area's jobs at its cadence.
@@ -40,7 +40,7 @@ An area made before areas were made from tiles (from a list of bursts, or from a
 
 ## On the map
 
-ponzi-visual makes areas the same way, and makes nothing else: it submits tiles, tags and a span of days (`start_date` and `end_date`, both may be empty), and no standard and no cadence, so the server chooses what runs them. Its **Monitored** page lists the areas, made from tiles or before, and pauses, resumes, looks now or deletes them. How to choose tiles, what the overlays and the burst footprints show, and the pages of the front end are in [The map](map.md).
+ponzi-visual makes areas the same way, and makes nothing else: it submits tiles, tags and a span of days (`start_date` and `end_date`, both may be empty), and no standard and no cadence, so the server chooses what runs them. Its map colours the tiles monitored and those with outputs that nothing monitors; a click opens a tile's areas, to pause, resume, look now or delete them (CR-075). How to choose tiles, what the overlays and the burst footprints show, and the pages of the front end are in [The map](map.md).
 
 ## Tags
 

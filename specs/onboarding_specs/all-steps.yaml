@@ -1,0 +1,7 @@
+# all-steps: a coherence store's sidecar and pixel sample, every step (built, weather, pairdiff, mask, sample)
+# with the code's defaults: an edge margin of 20 pixels and the ERA5 variables from the EDH (the code's default
+# list, ponzi_pipeline.onboard.weather.DEFAULT_VARIABLES).
+steps: [built, weather, pairdiff, mask, sample]
+edge_margin: 20
+weather_source: edh
+pairdiff_baselines: [12, 24, 36, 48, 60]

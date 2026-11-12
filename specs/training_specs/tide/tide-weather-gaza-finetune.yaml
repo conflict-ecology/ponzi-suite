@@ -1,0 +1,12 @@
+# tide-weather-gaza-finetune: tide-weather fine-tuned for Gaza. It starts from a tide-weather fit (`init_from`)
+# and trains three epochs at a third of the learning rate, with the windows of the Gaza outside-Strip sample stores
+# (`extra_samples`) that end before 2023-10-07 as half of every epoch (`extra_share`), keeping the last epoch.
+extends: tide-weather.yaml
+lr: 0.0001
+epochs: 3
+min_epochs: 1
+extra_samples: ${PONZI_HOME}/gaza/train_samples
+extra_until: '2023-10-07'
+init_from: ${PONZI_HOME}/training/majortom_v0.2/tide-weather/checkpoint.pt
+extra_share: 0.5
+keep_last_epoch: true

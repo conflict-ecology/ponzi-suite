@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-15
 - **Status:** implemented on branch `housekeeping` (not merged)
+- **Superseded in part:** the calibration file's integer format is a hash (CR-086), and a results-changing release is a major (CR-085).
 
 ## Why
 

@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (D16 approved: the phase 0 HPC job)
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10). Not yet run: the owner submits it from the HPC login node
+- **Stale:** its port reference kit, `port-check` and their tests were deleted when phase 0 was dropped; only `GeoGrid` remains (CR-087).
 
 ## Why
 

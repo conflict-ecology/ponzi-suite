@@ -2,6 +2,8 @@
 
 - **Requested by / date:**
 - **Status:** draft | signed off (date) | implemented (version)
+- **Stale:** (only once it no longer applies) why, and the request that replaced it
+- **Superseded in part:** (only once part of it no longer applies) which part, and the request that replaced it
 
 ## Why
 Which analysis, conflict, experiment or paper claim needs this, and the evidence from the lab.

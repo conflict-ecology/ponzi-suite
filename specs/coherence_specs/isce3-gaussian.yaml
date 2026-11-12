@@ -1,0 +1,13 @@
+# isce3-gaussian: a burst's coherence store from the ISCE3 chain, 10 by 2 looks with the Gaussian window of sigma
+# 1 truncated at 2, on the burst's fixed 40 m grid, VV of Sentinel-1A at baselines of 12 to 60 days: the code's
+# defaults, written out (a default written out does not change the hash).
+backend: isce3
+polarisation: VV
+platforms: [S1A]
+revisit_days: 12
+baseline_days: [12, 24, 36, 48, 60]
+pair_tolerance_days: 1.0
+looks: {range: 10, azimuth: 2}
+window: {kind: gaussian, sigma_range: 1.0, sigma_azimuth: 1.0, truncate: 2.0}
+grid: {posting_m: 40.0, buffer_m: 0.0}
+dem: {source: glo_30, margin_km: 5.0}

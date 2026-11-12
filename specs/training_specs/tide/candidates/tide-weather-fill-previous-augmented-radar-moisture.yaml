@@ -1,0 +1,63 @@
+# tide-weather-fill-previous-augmented-radar-moisture: tide-weather-fill-previous-augmented plus a Sentinel-1
+# moisture covariate, against the false alarms of rain onsets (the weather inputs have no precipitation):
+#   s1_pd_vv_db_{12,24,36,48,60}d, the pair differences of the burst's non-built median VV backscatter (dB), one
+#   series per burst, from the extra sidecars <burst>_s1.zarr. Label free: a scene-wide wetting moves the burst
+#   median, a local change does not.
+# Prepared, fitted and run with the extra sidecars (`ponzi-models prepare` and `train --extra-sidecar-dir DIR`; a
+# run's `extra_sidecar`). An area needs its own Sentinel-1 sidecars.
+# Fitted at seeds 42 and 43, compared with tide-weather-fill-previous-augmented on the model card's tables.
+extends: ../tide-weather.yaml
+era5_vars:
+- era5_swvl1
+- era5_snow_depth
+- era5_snow_cover
+- era5_pd_swvl1_12d
+- era5_pd_swvl1_24d
+- era5_pd_swvl1_36d
+- era5_pd_swvl1_48d
+- era5_pd_swvl1_60d
+- era5_pd_snow_depth_12d
+- era5_pd_snow_depth_24d
+- era5_pd_snow_depth_36d
+- era5_pd_snow_depth_48d
+- era5_pd_snow_depth_60d
+- era5_pd_snow_cover_12d
+- era5_pd_snow_cover_24d
+- era5_pd_snow_cover_36d
+- era5_pd_snow_cover_48d
+- era5_pd_snow_cover_60d
+- s1_pd_vv_db_12d
+- s1_pd_vv_db_24d
+- s1_pd_vv_db_36d
+- s1_pd_vv_db_48d
+- s1_pd_vv_db_60d
+missing:
+  fill: previous
+  flag: true
+future_obs: one
+strict_covariates: true
+support: gated
+augment:
+- kind: truncate_context
+  p: 0.3
+  min_keep: 1
+- kind: unknown_future
+  p: 0.3
+- kind: drop_acquisitions
+  p: 0.2
+  n:
+  - 1
+  - 3
+- kind: outage
+  p: 0.1
+  length:
+  - 2
+  - 6
+- kind: drop_baseline
+  p: 0.1
+  baselines:
+  - 1
+  - 2
+  length:
+  - 3
+  - 10

@@ -197,11 +197,27 @@ def on_files(files, config):
     return files
 
 
+STALE = "- **Stale:**"
+IN_PART = "- **Superseded in part:**"
+
+
+def _line(text: str, mark: str) -> str:
+    """The rest of a change request's line that starts with ``mark``, else empty."""
+    for line in text.splitlines():
+        if line.startswith(mark):
+            return line[len(mark):].strip()
+    return ""
+
+
 def _index(paths: list[Path], folder: str, page_dir: str) -> str:
-    rows = ["| Page | Title |", "| --- | --- |"]
+    """The index table of the change requests: each one's link, title, and what of it no longer applies."""
+    rows = ["| Page | Title | No longer applies |", "| --- | --- | --- |"]
     for p in paths:
-        title = _title(p.read_text(encoding="utf-8"), p.stem).replace("|", "\\|")
-        rows.append(f"| [{p.stem}]({os.path.relpath(folder, page_dir)}/{p.name}) | {title} |")
+        text = p.read_text(encoding="utf-8")
+        title = _title(text, p.stem).replace("|", "\\|")
+        stale, part = _line(text, STALE), _line(text, IN_PART)
+        note = f"**Stale:** {stale}" if stale else (f"In part: {part}" if part else "")
+        rows.append(f"| [{p.stem}]({os.path.relpath(folder, page_dir)}/{p.name}) | {title} | {note.replace('|', chr(92) + '|')} |")
     return "\n".join(rows)
 
 

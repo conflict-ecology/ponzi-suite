@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-12
 - **Status:** implemented 2026-10-12, awaiting owner review
+- **Stale:** the `ponzi.pipeline` subpackage it moved in was replaced the same day by `ponzi.onboarding`, which later became the onboarding of the `ponzi-pipeline` distribution (CR-008, CR-029).
 
 ## Why
 Next step of the restructure (monorepo `docs/target_architecture_2026-10-09.md`): one library with subpackages. The work before the run (sensors, catalogue, validation, onboarding) is the monorepo package `ponzi_pipeline`; it becomes the subpackage `ponzi.pipeline` so that it is versioned and tested with the contracts and the run it feeds.

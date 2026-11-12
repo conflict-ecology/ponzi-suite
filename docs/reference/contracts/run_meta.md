@@ -12,7 +12,7 @@ Producer: `ponzi.core.runner` at finalise; its presence marks a finished run. Co
 
 | Key | Type | Content |
 |---|---|---|
-| `contract_version` | int | 1 |
+| `contract_version` | str | the hash of the contract's declaration (ponzi-core CR-085; pinned in `test_contract_versions.py`) |
 | `ponzi_version` | str | `ponzi.__version__` |
 | `package_versions` | dict[str, str] | numpy, scipy, xarray, zarr, pydantic |
 | `scoring_spec` | object | `ScoringSpecRecord`: `name`, `hash`, `resolved` (the full `ScoringSpec.model_dump()`) |

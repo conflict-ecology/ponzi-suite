@@ -2,7 +2,7 @@
 
 `ponzi.contracts.validate` (PONZI's side) and `ponzi_pipeline.engine` (the engine's side). Two things the coherence engine and PONZI agree on without sharing code:
 
-1. **The check catalogue**: every check a delivered store is judged by, with its rule, threshold, severity, and who runs it. The thresholds are written down here and as the constants at the top of `ponzi/contracts/validate.py` (`GAP_FACTOR`, `MIN_VALID_FRACTION`, `RANGE_SAMPLE_STEPS`, `LOW_VALIDITY_FLOOR`, `SNAP_TOLERANCE_DAYS`, `FINITE_FLOOR`; the catalogue itself is `CATALOGUE`); the engine repeats them in `ponzi_pipeline/engine.py`. A change to either is a `contract_version` bump.
+1. **The check catalogue**: every check a delivered store is judged by, with its rule, threshold, severity, and who runs it. The thresholds are written down here and as constants of `ponzi/contracts/coherence.py`, beside C1's declaration, which `ponzi.contracts.validate` imports (`GAP_FACTOR`, `MIN_VALID_FRACTION`, `RANGE_SAMPLE_STEPS`, `LOW_VALIDITY_FLOOR`, `SNAP_TOLERANCE_DAYS`, `FINITE_FLOOR`; the catalogue itself is `CATALOGUE`); the engine repeats them in `ponzi_pipeline/engine.py`. They are part of C1's declaration, so a change to them changes C1's `contract_version` (ponzi-core CR-085); a test holds the engine's equal to them.
 2. **The engine report**: a JSON file the engine writes beside every store it publishes, in the vocabulary of the catalogue, so PONZI can read it however the store was produced and flag any disagreement per check.
 
 The two sides are independent implementations of this page and C1: the engine's checks read the store with zarr and numpy only and import nothing of `ponzi.contracts.validate`. Drift is caught, not prevented: the diff shows in the `engine_report` check of `ponzi validate-store` (C15).
@@ -18,8 +18,8 @@ Written by the coherence engine (`ponzi_pipeline.engine.checks` and `report`, ca
 ```json
 {
   "schema": "ponzi.engine_report",
-  "schema_version": 1,
-  "contract_version": 1,
+  "schema_version": "d3584839241858096bc1b2ee105ca69a",
+  "contract_version": "d30f943e410871ccabe4ee78e978dbf4",
   "burst_id": "t021_043813_iw2",
   "store": "t021_043813_iw2.coh.zarr",
   "producer": "ponzi-pipeline 0.4.2",
@@ -36,8 +36,8 @@ Written by the coherence engine (`ponzi_pipeline.engine.checks` and `report`, ca
 
 | Field | Meaning |
 |---|---|
-| `schema`, `schema_version` | `ponzi.engine_report`, 1. PONZI warns on another schema or a newer version |
-| `contract_version` | the C1 version the checks were written against (1). A mismatch with PONZI's is a warning that names both, never a failure |
+| `schema`, `schema_version` | `ponzi.engine_report`, the hash of the report's declaration (`ENGINE_REPORT_SCHEMA_VERSION`, `ponzi.contracts.validate`; the engine imports it). PONZI warns on another schema or another version |
+| `contract_version` | the C1 version the checks were written against (C1's hash; the engine imports it). A mismatch with PONZI's is a warning that names both, never a failure |
 | `burst_id`, `store` | the burst and the store's directory name |
 | `producer`, `validator` | the writer and the validator, name and version |
 | `validated_at` | UTC timestamp. Allowed here: the report is the engine's record; PONZI's own report stays reproducible |
@@ -60,20 +60,20 @@ Level `burst`. "engine" means the check is required in every engine report; "eng
 | `valid_pixels` | present, `(y, x)`, at least one nonzero pixel (NaN counts as 0); below `MIN_VALID_FRACTION` (1 %) or a dtype other than uint8 warns | fail, warn | engine |
 | `range` | finite values in `[0, 1]`, sampled on `RANGE_SAMPLE_STEPS` (2) evenly spaced time steps, baseline 0 | warn | engine |
 | `crs` | `epsg` attr present, an int; `value` = the int | fail | engine |
-| `identity` | `sensor`, `producer`, `contract_version` attrs present (PONZI also takes `writer_command` or `schema` as the producer) | warn | engine |
+| `identity` | `sensor`, `producer`, `contract_version` attrs present; PONZI also warns when `contract_version` is not C1's | warn | engine |
 | `consolidated` | consolidated metadata present | warn | engine |
 | `complete_sentinel` | `_complete` sibling present (info for a store not named `*.coh.zarr`) | fail | engine |
 | `partial` | no `.partial` sibling (info for a store not named `*.coh.zarr`) | fail | engine |
 | `pairs_declared` | `n_pairs_packed` attr equals the populated cells of the platform table (fail); cell collisions (`n_cell_collisions`) or a `secondary_date` off `time - baseline_days[b]` by more than `SNAP_TOLERANCE_DAYS` (3) days warn; info without a platform table | fail, warn, info | engine |
-| `chunk_completeness` | every `coh` chunk holding a declared pair exists on disk (a directory listing, zarr v3 or v2 layout), and every other array has all its chunks; absent chunks without declared pairs and whole absent baseline blocks are info | fail, info | engine |
+| `chunk_completeness` | every `coh` chunk holding a declared pair exists on disk (a directory listing of the zarr v3 layout), and every other array has all its chunks; absent chunks without declared pairs and whole absent baseline blocks are info | fail, info | engine |
 | `availability_matrix` | from `n_finite (time, baseline)` (C1): a declared cell with `n_finite` 0 outside an absent chunk is lost data (fail); data in an undeclared cell warns. PONZI never reads the slabs and, without the table, trusts the engine and says so (info) | fail, warn, info | engine |
 | `finite_fraction` | per populated acquisition, the best baseline's `n_finite` over the valid footprint at or above `FINITE_FLOOR` (0.5); `items` = the slices below; info without `n_finite` or valid pixels | warn, info | engine |
 | `generation` | the archive folder (`coherence/<generation>/`) equals the `estimation_strategy` attr and the expected generation (`validate_store(expected_generation=)`); info outside an archive tree | warn, info | engine (optional) |
 | `cell_quality` | populated cells flagged low validity (`cell_quality`) at most `LOW_VALIDITY_FLOOR` (10 %); info without the table | warn, info | engine (optional) |
-| `engine_report` | this report against PONZI's run, compared last: info when absent (fail with `require_engine_report=True`); warn on an unreadable file, another schema, a newer schema version, a contract version other than PONZI's, a verdict `published_with_fail` or outside the three, or any catalogue check present in both whose severity differs (`items` = those checks) | fail, warn, info | PONZI |
+| `engine_report` | this report against PONZI's run, compared last: info when absent (fail with `require_engine_report=True`); warn on an unreadable file, another schema, another schema version, a contract version other than PONZI's, a verdict `published_with_fail` or outside the three, or any catalogue check present in both whose severity differs (`items` = those checks) | fail, warn, info | PONZI |
 
 ## What the engine does with it
 
 Per burst, before publishing (`ponzi_pipeline.assemble.assemble`): write into `{burst}.coh.zarr.partial` one acquisition at a time (counting `n_finite`), consolidate the metadata, run its own checks (every `engine` row above; the two sentinel checks state what publication then makes true), write the report, and on `pass` rename to `{burst}.coh.zarr` and write `_complete`. A store that fails stays `.partial` and the failure is raised (`AssembleError`); the engine writes no `published_with_fail`.
 
-The two implementations give every shared check the same severity on a conforming store, a float64 `coh` store and a store with a declared pair's chunk absent (ponzi-pipeline `tests/test_engine_agreement.py`). They differ only where the engine checks a store being published: the two sentinel checks, and `chunk_completeness`, which reads the zarr v3 layout only, the one the engine writes.
+The two implementations give every shared check the same severity on a conforming store, a float64 `coh` store and a store with a declared pair's chunk absent (ponzi-pipeline `tests/test_engine_agreement.py`). They differ only where the engine checks a store being published: the two sentinel checks.

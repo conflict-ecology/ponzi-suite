@@ -4,7 +4,7 @@
 
 ## Producer and consumers
 
-Producer: the user. Scoring specs live in ponzi-suite `scoring_specs/` (and the PONZI home's working copies, looked in first: [Naming](../../models/naming.md#spec-folders)); a model's scoring spec is also kept as `scoring_spec.yaml` beside the model in the registry, verbatim, or composed when it uses `extends` (`ponzi_models.registry.store.copy_scoring_spec`).
+Producer: the user. Scoring specs live in ponzi-suite `specs/scoring_specs/` (and the PONZI home's working copies, looked in first: [Naming](../../models/naming.md#spec-folders)); a model's scoring spec is also kept as `scoring_spec.yaml` beside the model in the registry, verbatim, or composed when it uses `extends` (`ponzi_models.registry.store.copy_scoring_spec`).
 
 Consumers: `ponzi run` (`--scoring-spec NAME|FILE`, found by `ponzi_spec.specs.find_spec`; `RunRequest.scoring_spec`, C4a); the worker stage `run` (`RunParams.scoring_spec`, a composed mapping: one that still names a base with `extends` is refused; written to `_config/{scoring_spec_name}.yaml` in its work folder and handed to `RunRequest`); ponzi-models (`calibration.null_runs`, which checks the loaded hash against the model card's `scoring_spec_hash`; the registry; the standards workflow; `rehearsal`).
 
@@ -16,7 +16,6 @@ A file may build on others with `extends:` ([Composition](../../service/configur
 
 | Block | Field | Type | Constraint | Default | Meaning |
 |---|---|---|---|---|---|
-| top | `schema_version` | int | = 1 | 1 | Part of the hash |
 | top | `name` | str or null | | file stem | Label only; NOT part of the hash |
 | `context` | `C` | int | > 0 | required | Context length in acquisitions |
 | `context` | `min_support` | int | 1..C | required | Minimum non-NaN context observations for a pixel-channel to be fitted |
@@ -37,12 +36,11 @@ Defaults are load-bearing: the hash covers resolved values, so a yaml that omits
 
 `forecaster.params` passes through `_validate_forecaster_params(name, params)`: a name in the forecaster registry (`ponzi.core.forecast.registry`) gets its params model's resolved defaults (so they are hashed), a rejected value is a `ValueError`, an unregistered name keeps `params` as given. A `tide` spec names its weights by `params.artifact`, a path or a registry reference `registry:<model id>@sha256:<digest>` (`ponzi.core.forecast.artifacts`), so the hash says which weights, not where they lie; loading it needs an artifact resolver (`use_resolver`, or the `ponzi.artifact_resolvers` entry point).
 
-`spec_hash` is `ponzi_spec.identity.spec_hash` of `model_dump(mode="json")` without `name`: BLAKE2b (16 bytes, hex) of the canonical JSON (sorted keys, compact separators). Exposed as the function `spec_hash(cfg)` and the property `ScoringSpec.spec_hash`; stamped as `ponzi_scoring_spec_hash` into every output store (C7) and as `scoring_spec.hash` into `run_meta.json` (C9).
+`spec_hash` is `ponzi_spec.identity.spec_hash` of `model_dump(mode="json")` without `name`: BLAKE2b (16 bytes, hex) of the canonical JSON (sorted keys, compact separators). Exposed as the function `spec_hash(cfg)` and the property `ScoringSpec.spec_hash`; stamped as `ponzi_scoring_spec_hash` into every output store (C7) and as `scoring_spec.hash` into `run_meta.json` (C9). The hash is the spec's version, cited `name@<hash8>` (ponzi-core CR-083); the spec has no `schema_version`.
 
-Example, the reference `rolling-ols-pyramid` (ponzi-suite `scoring_specs/rolling-ols-pyramid.yaml`):
+Example, the reference `rolling-ols-pyramid` (ponzi-suite `specs/scoring_specs/rolling-ols-pyramid.yaml`):
 
 ```yaml
-schema_version: 1
 context: {C: 30, min_support: 6}
 forecaster: {name: rolling_ols, params: {harmonic_order: 0, pooled: false}}
 scoring: {baseline_days: [12, 24, 36, 48, 60], H: 5, alpha: 3.0}
@@ -50,7 +48,7 @@ aggregate: {min_channels: 5, struct_weight: true}
 state_machine: {alpha: null, delta: -0.1, recovery_steps: 1, noise_floor: 0.03, nms_window: 0}
 ```
 
-A copy is `packages/core/tests/data/rolling-ols-pyramid.yaml`; its hash `acfd26a53eefa49557b0da18cdc46fed` is a golden value in `packages/core/tests/test_scoring_spec.py`.
+A copy is `packages/core/tests/data/rolling-ols-pyramid.yaml`; its hash `a8e69b6b8b407d33ba8e4b800ede8d3a` is a golden value in `packages/core/tests/test_scoring_spec.py`.
 
 ## Invariants
 
@@ -61,4 +59,4 @@ A copy is `packages/core/tests/data/rolling-ols-pyramid.yaml`; its hash `acfd26a
 
 ## Functions
 
-`ponzi.core.scoring_spec`: `SCHEMA_VERSION`, `ScoringSpec`, `ScoringContext`, `ScoringForecaster`, `ScoringPyramid`, `ScoringAggregate`, `ScoringStateMachine`, `load_scoring_spec(path)` (composes, applies the file-stem default for `name`, constructs), `composed_scoring_spec(path)` (the flat composed mapping), `spec_hash(cfg) -> str`, `dump_scoring_spec(cfg, path)` (the resolved, flat values including `name`, sorted keys).
+`ponzi.core.scoring_spec`: `ScoringSpec`, `ScoringContext`, `ScoringForecaster`, `ScoringPyramid`, `ScoringAggregate`, `ScoringStateMachine`, `load_scoring_spec(path)` (composes, applies the file-stem default for `name`, constructs), `composed_scoring_spec(path)` (the flat composed mapping), `spec_hash(cfg) -> str`, `dump_scoring_spec(cfg, path)` (the resolved, flat values including `name`, sorted keys).

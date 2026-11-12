@@ -11,7 +11,7 @@ Producer: `ponzi.core.runner` with `RunRequest.save_channels` (`ponzi run --save
 | Name | Dims | dtype | Fill | Notes |
 |---|---|---|---|---|
 | `u`, `z`, `d`, `s`, `m` | `(time, y, x, baseline, horizon)` | float32 | NaN | `ChannelScores` (PIT, drop-positive z, observed minus median, sensitivity, predicted median); NaN = invalid channel |
-| `c` | `(time, y, x, baseline, horizon)` | float32 | NaN | The ceiling: the z the channel would get if observed at the noise floor. Optional for a reader (validator `optional`, info); NaN throughout where scores were made without a predictive |
+| `c` | `(time, y, x, baseline, horizon)` | float32 | NaN | The ceiling: the z the channel would get if observed at the noise floor. Required (ponzi-core CR-086); NaN throughout where scores were made without a predictive |
 
 Grid and attrs as C7, chunks the stacked layout of [C5](prediction_store.md#stacked-layout); no `family` attr.
 
@@ -21,4 +21,4 @@ Grid and attrs as C7, chunks the stacked layout of [C5](prediction_store.md#stac
 
 ## Functions
 
-`ponzi.contracts.channels`: `CHANNEL_ARRAYS`, `ChannelMeta`, `ChannelDataset`, `open_channel_store` (validates), `create_channel_store(path, grid, stamp, process_pixels, B, H, tile=512)`, `write_channel_slice`, `validate_channel_store` (checks `structure`, `optional`, `stamp`, `window`, `consolidated`). The same module holds C21.
+`ponzi.contracts.channels`: `CHANNEL_ARRAYS`, `ChannelMeta`, `ChannelDataset`, `open_channel_store` (validates), `create_channel_store(path, grid, stamp, process_pixels, B, H, tile=512)`, `write_channel_slice`, `validate_channel_store` (checks `structure`, `stamp`, `window`, `consolidated`). The same module holds C21.

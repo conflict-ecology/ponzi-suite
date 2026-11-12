@@ -1,0 +1,20 @@
+# tide-weather-fill-previous-context-dropout: one model of context 30 that also serves short histories.
+# tide-weather-fill-previous plus context dropout: in training, half of the windows (share 0.5) get their k oldest
+# context acquisitions set to missing, k uniform from 0 to 29 (min_keep 1), exactly as a real missing acquisition is
+# (the coherence of every baseline missing, so the previous fill and obs indicators 0, and the |bperp| of the
+# dropped pairs missing; the weather stays). Nothing changes at inference: the scoring spec's context.min_support
+# decides when scores count. The val loss and the selection are on the real val windows; the model card's
+# val_by_context (the val loss and coverage with the context cut to 1, 2, 3, 5, 8, 12, 16, 20, 25 and 30
+# acquisitions) compares it with tide-weather-fill-previous. The prepared files are tide-weather's:
+# the dropout is applied when batches are gathered.
+# Fitted at seed 42: `ponzi-models train --training-spec tide-weather-fill-previous-context-dropout`.
+extends: ../tide-weather.yaml
+missing:
+  fill: previous
+  flag: true
+future_obs: one
+strict_covariates: true
+support: gated
+context_dropout:
+  share: 0.5
+  min_keep: 1

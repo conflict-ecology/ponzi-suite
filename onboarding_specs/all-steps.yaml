@@ -1,8 +1,0 @@
-# An onboarding spec (ponzi-core CR-070; ponzi_pipeline.onboard.onboarding_spec.OnboardingSpec): how a coherence
-# store's sidecar and pixel sample are made. all-steps runs every step (built, weather, pairdiff, mask, sample) with
-# the code's defaults: an edge margin of 20 pixels and the ERA5 variables from the EDH. The variables are the
-# code's default list (ponzi_pipeline.onboard.weather.DEFAULT_VARIABLES); the hash covers it either way.
-steps: [built, weather, pairdiff, mask, sample]
-edge_margin: 20
-weather_source: edh
-pairdiff_baselines: [12, 24, 36, 48, 60]

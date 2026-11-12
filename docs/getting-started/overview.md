@@ -20,9 +20,11 @@ Models and calibrations are made by `ponzi-models` from panels: sets of pixels o
 ## The components
 
 ```
-ponzi-visual, agents
-        │
-        ▼
+ponzi-visual  ──── REST ──────────────┐
+                                      ▼
+agents
+   │
+   ▼
 ponzi-client  ──── REST ────►  ponzi-server
    │    serve: the only long-running process;
    │    it always asks, the server never calls out
@@ -34,9 +36,9 @@ ponzi-worker job   (one short call per step of a job)
 ```
 
 - **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It never imports the computing distributions.
-- **ponzi-client** (Python, and the `ponzi-client` command) is the only part that talks to a running server: submitting runs, watching areas, reading outputs, and, as `ponzi-client serve`, the one long-running loop that claims jobs, has the worker do them, delivers the final outputs (uploaded, or written into a folder the server also sees) and completes them (CR-063).
+- **ponzi-client** (Python, and the `ponzi-client` command) is the Python way to a running server: submitting runs, watching areas, reading outputs, and, as `ponzi-client serve`, the one long-running loop that claims jobs, has the worker do them, delivers the final outputs (uploaded, or written into a folder the server also sees) and completes them (CR-063). ponzi-visual makes the same calls with its own TypeScript client, typed from the server's `openapi.json`.
 - **ponzi-worker** never talks to the server and never stays running. `ponzi-worker job` is one short call on one job: it runs the job's workflow here, or submits and checks its SLURM jobs, and answers with what is done; the client calls it again until the job is finished. It keeps intermediate outputs in its own cache by content id, so each call goes on from where the last stopped. Code can also use PONZI without a server: the ponzi-core libraries and their commands directly (`ponzi run`, `ponzi-pipeline`, `ponzi-models`), or a worker on its own (`ponzi-worker run` runs a workflow on this machine or through SLURM, with its cache, and no server).
-- **ponzi-visual** shows the watched areas and their outputs over time on a map, and makes new areas from Major TOM tiles (with their tags) over a span of days, and lists the areas monitored. The server chooses what runs them.
+- **ponzi-visual** talks to the server directly over REST. It shows the watched areas and their outputs over time on a map, and makes new areas from Major TOM tiles (with their tags) over a span of days, and lists the areas monitored. The server chooses what runs them.
 
 ## Dependencies
 
@@ -80,7 +82,7 @@ Which distribution needs which: solid arrows are install dependencies (`pyprojec
 <text class="pz-small" x="312" y="198">panels, training, registry</text>
 <rect class="pz-dep-suite" x="20" y="160" width="160" height="50" rx="7"/>
 <text class="pz-title" x="32" y="181">ponzi-suite</text>
-<text class="pz-small" x="32" y="198">panels, forecasters, configs</text>
+<text class="pz-small" x="32" y="198">specs, standards, test cases</text>
 <rect class="pz-dep-core" x="110" y="260" width="180" height="50" rx="7"/>
 <text class="pz-title" x="122" y="281">ponzi-pipeline</text>
 <text class="pz-small" x="122" y="298">acquisition, ISCE3, onboard</text>

@@ -1,0 +1,113 @@
+# Versions
+
+Four numbers in PONZI are set by a person: the release tags, a standard's version, the REST API's version and the PONZI STAC extension's version. Every other version is computed by the code, from one of three sources:
+
+- the **major of a release tag**, for stages and their content ids;
+- the **hash of a file's content**, for specs, models and built panels;
+- the **hash of a declared layout**, for store contracts and record files.
+
+Nothing else is raised by hand, so no version can be forgotten (ponzi-core CR-083, CR-085, CR-086). This page lays the system out; the pages it links hold the details.
+
+```
+release tag (person) ──► installed version ──► major ──► content id of every Item ──► cache reused or work made again
+                                                 └─────► calibrations accepted or refused (CR-020)
+spec file (person) ────► spec hash ──► name@hash8 ──► model id, built panel, standard's references
+contract declaration ──► contract hash ──► attr or field in each store and file ──► reader accepts or refuses
+standard (person) ─────► id@version ──► specs, model, calibrations, requires ──► what a watched area runs
+```
+
+## Set by a person
+
+| Version | Where | Form | Raised when |
+| --- | --- | --- | --- |
+| **release** | git tags, one prefix per distribution (below) | `MAJOR.MINOR.PATCH` | a release is cut, by the [version rules](../contributing/process.md#versions) |
+| **standard** | the `version` field of a bundle in ponzi-suite `standards/` | `MAJOR.MINOR.PATCH`, cited `s1-general@2.0.0` | anything in the bundle changes; `bump-standard` and `register-standard` choose the number ([Standard versions](../models/versions.md)) |
+| **REST API** | `ponzi_spec.api.API_VERSION`, the path prefix and openapi's `info.version` | `v1` | a breaking change to the API ([REST API](../service/rest-api.md)) |
+| **STAC extension** | `ponzi_spec.stac.PONZI_EXTENSION_VERSION`, its schema's folder and `$id` | `v0.2.0` | the `ponzi:*` fields change ([STAC profile](../using/stac-profile.md)) |
+
+## Releases: the tags
+
+Every distribution takes its version from git tags at install time (`hatch-vcs`, `fallback-version = "0.0.0"`); no `pyproject.toml` or `package.json` holds a number.
+
+| Repository | Distribution | Tag |
+| --- | --- | --- |
+| ponzi-core | `ponzi` | `vX.Y.Z` |
+| | `ponzi-spec` | `spec-vX.Y.Z` |
+| | `ponzi-pipeline` | `pipeline-vX.Y.Z` |
+| | `ponzi-models` | `models-vX.Y.Z` |
+| ponzi-service | `ponzi-client` | `client-vX.Y.Z` |
+| | `ponzi-server` | `server-vX.Y.Z` |
+| | `ponzi-worker` | `worker-vX.Y.Z` |
+| ponzi-visual | the app | `vX.Y.Z`, read by `git describe --tags --match 'v*' --dirty` at build and shown at the foot of the drawer |
+
+- A commit after a tag carries the distance and the commit: `0.2.5.dev3+gabc1234` for a Python distribution, `v0.2.5-3-gabc1234-dirty` for the app.
+- `ponzi-server` reports its version at `/v1/health`; `ponzi-worker stages` prints each stage's code majors.
+- **A results-changing release is a MAJOR** (below 1.0, `0.y`), as is a change of a store format: the major is what makes work again ([Change process](../contributing/process.md#versions)).
+
+## Stages: the majors of their code
+
+A stage has no version. `StageSpec.code` names the distributions whose code computes it, and their majors enter its content id:
+
+```
+content id = sha256(canonical_json({"stage": name, "inputs": sorted ids, "config": identity params,
+                                    "code": {distribution: major}}))[:32]
+```
+
+- A patch or minor release keeps every id, so the cache is reused; a major gives everything its distribution computes a new id, so it is made again ([Content ids](../using/content-ids.md)).
+- Every Item and manifest step records `ponzi:stage = {name, code}`, the releases that made it.
+- A stage that computes nothing (`ingest-coherence`, `ingest-calibration`) and the server's jobs and batches (`workflow-job`, `slurm-batch`) name no code: their ids follow their payload alone.
+- A calibration made under another `ponzi` major is refused (CR-020).
+- A standard's `requires` gives the releases it runs on; a worker whose installed versions do not meet it fails the job (CR-055).
+
+## Specs, models and panels: the content hash
+
+A spec has no version field: its version is its `spec_hash`, cited `name@<hash8>` (CR-083). Comments, `description`, `notes`, key order and a default written out do not change it; a changed setting or code default does. A spec that names another takes in its hash.
+
+| What | Version | Example |
+| --- | --- | --- |
+| a spec (panel, coherence, onboarding, detection, training, scoring) | `spec_hash` | `majortom-global@2436d8cb` |
+| a model | its training spec's and panel spec's hashes | `tide-weather-fill-previous@93771aa3--majortom-global@2436d8cb` |
+| a built panel | its panel spec's hash | `$PONZI_HOME/panels/majortom-global@2436d8cb/` |
+| a calibration | the sha256 of its files, and the staged rule's version (below) | |
+
+Where a spec is used it is recorded as `{name, hash, suite_commit}`, and the registry archives every version used ([Standard versions](../models/versions.md#specs-a-name-and-a-hash)).
+
+## Store contracts and record files: the hash of the declaration
+
+Each contract declares its layout as data in its module (`CONTRACT`, or `SCHEMA` or `RULE`): dims, variables and dtypes, required attrs, its meta model, and for C1 its check thresholds. Its version is `ponzi_spec.contract_hash` of that: 32 hex digits, written into each store or file it describes. Docstrings and field descriptions are not hashed; a field, a dtype, a threshold or the declaration's `notes` is.
+
+| Contract or file | Constant | Written as |
+| --- | --- | --- |
+| C1 coherence store | `ponzi.contracts.coherence.CONTRACT_VERSION` | attr `contract_version` |
+| C2 covariates sidecar | `ponzi_pipeline.onboard.CONTRACT_VERSION` | attr `contract_version` |
+| C2 `onboard_meta.json` | `ponzi_pipeline.onboard.STAMP_VERSION` | `stamp_version` |
+| C3 pixel sample | `ponzi.core.sample.CONTRACT_VERSION` | attr `contract_version` |
+| C7/C8 run stamp | `ponzi.contracts.stamp.STAMP_CONTRACT_VERSION` | attr `ponzi_contract_version` |
+| C9 `run_meta.json` | `ponzi.contracts.run_meta.RUN_META_CONTRACT_VERSION` | `contract_version` |
+| C10 forecasting accumulators | `ponzi.core.forecasting_stats.CONTRACT_VERSION` | `schema_version` |
+| C11 label store | `ponzi.evaluation.labels.LABEL_SCHEMA` | attr `label_schema` |
+| C18 engine report | `ponzi.contracts.validate.ENGINE_REPORT_SCHEMA_VERSION` (the writer, `ponzi_pipeline.engine`, imports it) | `schema_version` |
+| C20 row set | `ponzi.contracts.row_set.ROW_SET_CONTRACT_VERSION` | `contract_version` in the npz's `meta` |
+| C23 mask store | `ponzi.contracts.masks.CONTRACT_VERSION` | attr `contract_version` |
+| staged rule | `ponzi.core.staged.RULE_VERSION` | a calibration's `staged_rule.version` |
+| `panel.json` | `ponzi_models.panels.panel.SCHEMA_VERSION` | `schema_version` |
+| manifest | `ponzi_spec.manifest.MANIFEST_VERSION` | `manifest_version` |
+| calibration file | `ponzi.calibration.product.FORMAT` (one for the unstaged and the staged layout; CR-086) | `format` in the npz's `meta` |
+| burst catalog `bursts.sqlite3` | `ponzi_spec.catalog.FORMAT` (CR-086) | the `format` row of its `meta` table |
+| prepared training folder | `ponzi_models.training.prepare.FORMAT` (CR-086) | `features.format` of `prepare.json`, part of the folder's tag |
+| `boundaries.sqlite3` (ponzi-server) | `ponzi_server.boundaries.FORMAT` (CR-086) | the `format` row of its `meta` table |
+
+- **Each hash is pinned by a test** (ponzi-core `packages/core/tests/test_contract_versions.py` for `ponzi`'s; `test_onboard.py`, `test_engine_agreement.py`, `test_panel_build.py`, `test_manifest.py`, `test_home_catalog.py` and `test_training_data.py` for the others; ponzi-service `test_server_boundaries.py` for the boundaries). A changed declaration fails it; the change is then a new version: update the pin, the contract's page in [Store contracts](contracts.md), and the CHANGELOG, as a major.
+- **Hashes have no order.** A reader can only tell "ours" from "not ours": a sidecar, a sample, a `panel.json`, a calibration file or the boundaries of another version are refused, a catalog or a prepared folder of another version is built again, `validate-store` and the engine report warn. A file of another version is made again, never migrated (CR-085).
+- **The limit:** a change of meaning the declaration does not hold, such as a variable's units, does not change the hash. Write it into the declaration's `notes`, which is hashed.
+
+## Changing something: which version moves
+
+| You change | You do | What follows by itself |
+| --- | --- | --- |
+| code, same results | release a minor or patch | nothing: ids, caches and calibrations stay |
+| code, new results | release a major of the distribution that computes it | new content ids for its outputs, work made again, old calibrations refused |
+| a store's or a file's layout | change its declaration, update the pin, release a major | a new contract hash; files of the old layout refused |
+| a spec | edit the file | a new hash, so new model ids, built panels and content ids where it enters |
+| what a standard runs | `bump-standard`, then `register-standard` | a new `id@version`, new jobs on the server |
+| the API or the `ponzi:*` fields | raise `API_VERSION` or the extension's version | |

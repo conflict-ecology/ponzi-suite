@@ -1,6 +1,6 @@
 # Troubleshooting
 
-The failures met most often, as you see them, with their cause and what to do. The server answers an error as a problem document (RFC 9457) with a status, a title and a detail; ponzi-client prints it as `status title: detail`, and ponzi-visual shows the same line where the call was made (the note at the top of the map, the panel, the Monitored page). The texts quoted below are the server's and the tools' own.
+The failures met most often, as you see them, with their cause and what to do. The server answers an error as a problem document (RFC 9457) with a status, a title and a detail; ponzi-client prints it as `status title: detail`, and ponzi-visual shows the same line where the call was made (the note at the top of the map, the side panel). The texts quoted below are the server's and the tools' own.
 
 | You see | Section |
 | --- | --- |
@@ -15,12 +15,13 @@ The failures met most often, as you see them, with their cause and what to do. T
 | `No burst of the catalog meets them.` | [No bursts](#no-burst-of-the-catalog-meets-the-tiles) |
 | `PONZI runs on Linux (x86-64) only for now: ...` | [Platform](#dev-install-or-dev-up-stops-at-once) |
 | pixi refuses `ml-gpu` or `isce3` | [CUDA](#pixi-refuses-ml-gpu-or-isce3) |
+| `ENOSPC: System limit for number of file watchers reached` | [File watchers](#the-front-ends-dev-server-runs-out-of-file-watchers) |
 
 ## Where to look
 
 - **The server's log.** `ponzi-server serve` logs to its standard error: the home, the database and how many keys are active, the outputs, a `default_standard` it does not hold, the progress of the boundaries and the burst catalog, the scheduler's warnings, and one access line per call (who, address, method, path, status, time). Under `pixi run dev-up` it is appended to `$PONZI_HOME/logs/server/serve.log`.
 - **`$PONZI_HOME/logs/`** holds every log PONZI writes to files (CR-064): each SLURM task's output in `logs/slurm/<batch>/<stage>_<job>_<task>.out`, the client loop's in `logs/client/`, and, under `pixi run dev-up`, the server's and the front end's in `logs/server/` and `logs/visual/` ([Paths](../getting-started/paths.md#the-ponzi-home)).
-- **A job's error.** A failed job keeps the error its worker reported: `ponzi-client jobs --area AREA_ID` (or `--status failed`) lists it. The Monitored page counts an area's failed jobs. For a SLURM batch, `ponzi-worker batch BATCH` reads the failed tasks from `sacct` ([Running on the cluster](hpc.md#logs)).
+- **A job's error.** A failed job keeps the error its worker reported: `ponzi-client jobs --area AREA_ID` (or `--status failed`) lists it. An area's card, in the map's panel, counts its failed jobs. For a SLURM batch, `ponzi-worker batch BATCH` reads the failed tasks from `sacct` ([Running on the cluster](hpc.md#logs)).
 
 ## The boundaries or the burst catalog are being prepared
 
@@ -84,7 +85,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 **Cause.** A standard can name the distributions and versions a worker must have (`requires`, PEP 440 specifiers; ponzi-core CR-055). The worker checks them before it runs the job and refuses when its environment does not meet them. The failure is reported to the server, which queues the job again while attempts remain (`max_attempts`, default 3) and then marks it failed.
 
-**Fix.** Install a release of the worker's environment that meets the standard's `requires`, An area's next look on a later day makes new jobs (a job is named by its payload, which holds its last day), so they run again; **Look now** on the same day finds the same failed jobs. A one-off run submitted again (`ponzi-client submit`) gives its failed jobs another round of attempts. See [The worker](worker.md) and [Standard versions and naming](../models/versions.md).
+**Fix.** Install a release of the worker's environment that meets the standard's `requires`. An area's next look on a later day makes new jobs (a job is named by its payload, which holds its last day), so they run again; **Look now** on the same day finds the same failed jobs. A one-off run submitted again (`ponzi-client submit`) gives its failed jobs another round of attempts. See [The worker](worker.md) and [Standard versions and naming](../models/versions.md).
 
 ## A box on the map adds no tiles, or only some
 
@@ -93,7 +94,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 **Cause.**
 
 - Below ×32 there are no tiles, and a left drag pans. The note says `Zoom in to ×32 to choose Major TOM tiles`.
-- One area is at most 64 tiles. A box that would pass 64 adds only what fits, and the note says `64 tiles is the most one area takes: remove one to add another`.
+- Past 64 tiles the map and the panel warn (`More than 64 tiles: a large area, with many bursts to fetch`), but the area is still made (CR-074). An area is refused only when its bursts pass 5000: `GET /v1/majortom/bursts` and `/tracks` take at most 64 tiles a request, so a client asks for more in groups.
 - A box adds only the tiles loaded for the view. While the note says `Loading tiles…`, some are not there yet.
 - There are no tiles over open sea, and none at all while the boundaries are being prepared ([above](#the-boundaries-or-the-burst-catalog-are-being-prepared)).
 - Shift held while dragging removes tiles instead.
@@ -128,3 +129,11 @@ The pixi workspaces of ponzi-core, ponzi-service and ponzi-visual are solved for
 **Cause.** The two environments are on the platform `linux-64-cuda`: they need an NVIDIA driver for CUDA 12.9 (575 or later), which pixi checks through its virtual package `__cuda`.
 
 **Fix.** On a machine with such a driver, update the driver. On one without a GPU (a CI runner, a laptop), `CONDA_OVERRIDE_CUDA=12.9` installs them anyway. See [GPUs and CUDA](../getting-started/install.md#gpus-and-cuda).
+
+## The front end's dev server runs out of file watchers
+
+**You see.** `pixi run dev` in ponzi-visual (or `pixi run dev-up`) stops with `ENOSPC: System limit for number of file watchers reached`.
+
+**Cause.** Other programs have used up Linux's inotify watchers, which the dev server needs to follow the source files.
+
+**Fix.** Raise the limit with `sudo sysctl fs.inotify.max_user_watches=524288`, and add `fs.inotify.max_user_watches=524288` to `/etc/sysctl.d/99-inotify.conf` to keep it.

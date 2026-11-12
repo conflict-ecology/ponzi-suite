@@ -21,7 +21,7 @@ cd ponzi-visual && pixi run dev      # http://localhost:5173
 
 Connect with the key the server printed; every scope's key is in `ponzi-visual/.e2e/demo/keys.json`.
 
-The demo's five bursts are synthetic and on no land, so the map has no tiles to choose at first. The demo's server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, set `boundaries:` in `.e2e/demo/server.yaml` to a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`. For the bursts of the tiles chosen, build every Sentinel-1 burst with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or set `bursts:` in `server.yaml` to `.e2e/bursts.sqlite3`. A `client:write` key can create areas in the app, and submit runs from Python or the command line.
+The demo's five bursts are synthetic and on no land, so the map has no tiles to choose at first. The demo's folder, `.e2e/demo`, is the server's PONZI home (CR-088). Its server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, copy a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`, into `.e2e/demo/catalog/`. For the bursts of the tiles chosen, build every Sentinel-1 burst with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or copy `.e2e/bursts.sqlite3` into `.e2e/demo/catalog/`. A `client:write` key can create areas in the app, and submit runs from Python or the command line.
 
 From ponzi-service, in Python or a shell:
 

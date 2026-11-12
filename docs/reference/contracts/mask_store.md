@@ -6,7 +6,7 @@
 
 Producer: whoever defines the selection, through `write_mask_store`; for a panel, `ponzi_models.panels.draw.draw_panel` (`ponzi-models panel-build`), with the layers `cell_<split>` (the processable pixels of the split's cells) and `sample_<split>` (the drawn pixels) and the attrs `panel` (the panel spec's id), `panel_spec_hash` (its `spec_hash`) and `draw_seed`. Consumers: `ponzi.core.runner.open_input` (`WindowedInput`), and through it `ponzi run`, the panel null runs (`ponzi-models null-runs`) and the masked input of a panel burst (`ponzi_models.panels.masked_input`: training, `ponzi-models export-pixels`).
 
-Location: never inside the sidecar, which stays byte-identical. A panel's are in the panel folder, `<panel>/<burst>/<burst>_masks.zarr` (default panel folder `{PONZI home}/panels/<id>`), recorded relative to it in the panel record (`Panel.masks_path`).
+Location: never inside the sidecar, which stays byte-identical. A panel's are in the panel folder, `<panel>/<burst>/<burst>_masks.zarr` (default panel folder `{PONZI home}/panels/<id>@<hash8>`), recorded relative to it in the panel record (`Panel.masks_path`).
 
 ## Arrays
 
@@ -15,7 +15,7 @@ Location: never inside the sidecar, which stays byte-identical. A panel's are in
 | `y`, `x` | `(y,)`, `(x,)` | float64, one chunk | the coherence store's coordinates, value for value |
 | `<layer>` | `(y, x)` | bool, one chunk, fill false | one named selection; any number of layers; attr `n_pixels` (its true pixels) |
 
-Group attrs: `source_store` (path of the coherence store the masks are for), `source_digest` (its `store_digest`, empty where the writer could not know it), `layers` (sorted names), `producer` (`ponzi.contracts.masks`), `contract_version` (1), plus the writer's own.
+Group attrs: `source_store` (path of the coherence store the masks are for), `source_digest` (its `store_digest`, empty where the writer could not know it), `layers` (sorted names), `producer` (`ponzi.contracts.masks`), `contract_version` (the hash of C23's declaration, ponzi-core CR-085), plus the writer's own.
 
 ## Invariants
 

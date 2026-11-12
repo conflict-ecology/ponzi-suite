@@ -24,6 +24,7 @@ The loop needs little: it polls the server, heartbeats, calls `ponzi-worker job`
 #SBATCH --partition=<partition> --account=<account>
 #SBATCH --cpus-per-task=1 --mem=2G
 #SBATCH --time=<the longest your partition allows>
+export PONZI_HOME=/shared/scratch/ponzi           # the home, on storage the compute nodes share
 export PONZI_KEY_FILE=~/ponzi-worker.key          # a worker key (Authentication)
 ponzi-client serve --worker-id <name> -- --executor slurm --site <site>
 ```
@@ -42,7 +43,7 @@ Before relying on it, check on your cluster:
 - **The network:** a compute node must reach the server's URL. Many clusters allow outbound connections from the login node only. Try it from a short interactive job, for example `curl -sI <server url>/v1/standards`.
 - **Submitting from a job:** with `--executor slurm`, the loop's `ponzi-worker job` calls run `sbatch` and `sacct` from inside the loop's job. Try `sbatch --test-only <any script>` from an interactive job.
 - **The time limit:** the partition's `MaxTime` and your QOS's `MaxWall` (`scontrol show partition`, `sacctmgr show qos`) bound how long the job lives. A snapshot of the cluster records both (`partitions.txt`, `qos.psv`).
-- **The shared file system:** the worker's home (`roots.data` of the cluster's `ponzi.yaml`) must be on storage the compute nodes share, so the loop's job and the SLURM tasks see one cache.
+- **The shared file system:** the home, `$PONZI_HOME`, must be on storage the compute nodes share, so the loop's job and the SLURM tasks see one cache. Each task's script exports the worker's `PONZI_HOME`, so a task finds the home whatever its own environment (CR-088).
 
 Restarting is safe. When the loop's job ends (its time limit, a node failure, maintenance), the job it held returns to the server's queue once its lease expires; a restarted loop claims it again, finds every finished output in the cache, and does not submit a batch twice. To restart it automatically, use `scrontab` where the cluster enables it, or a cron entry on the login node that submits the job again when `squeue` no longer shows it.
 
@@ -50,7 +51,7 @@ One loop carries out one job at a time. More loops, each with its own `--worker-
 
 ## Logs
 
-Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM task's output in `logs/slurm/<batch>/<stage>_<job>_<task>.out`, the folder made when the batch is rendered, and the client loop's in `logs/client/`. `batch.json` in `$PONZI_HOME/cache/slurm/<batch>/` names its log folder, and `ponzi-worker batch` reads the failed tasks from `sacct`. On a cluster, `$PONZI_HOME` is the home of the cluster's `ponzi.yaml` (`roots.data`), so the logs sit on the shared file system with the cache.
+Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM task's output in `logs/slurm/<batch>/<stage>_<job>_<task>.out`, the folder made when the batch is rendered, and the client loop's in `logs/client/`. `batch.json` in `$PONZI_HOME/cache/slurm/<batch>/` names its log folder, and `ponzi-worker batch` reads the failed tasks from `sacct`. On a cluster, `$PONZI_HOME` is set to the shared file system, so the logs sit on it with the cache.
 
 ## How a batch is made
 
@@ -64,9 +65,9 @@ Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM t
 A profile is made, not written by hand, from two inputs:
 
 - **A snapshot of the cluster**: read-only SLURM queries of the partitions, the nodes with their cpus, memory, GPUs and state, your accounts, the limits, and your recent jobs.
-- **A site file**, written once for the cluster at `$PONZI_HOME/cluster/sites/<site>.yaml` (or any file given to `--site`). It holds what a snapshot cannot say: the roots, the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
+- **A site file**, written once for the cluster at `$PONZI_HOME/cluster/sites/<site>.yaml` (or any file given to `--site`). It holds what a snapshot cannot say: the roots other than the home (`lab`, where the releases are installed), the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
 
-Every job checks for the profile first. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml`; with none, they take the snapshot on the login node, make the profile from it and the site file, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `--site` names the site; with one site file in `$PONZI_HOME/cluster/sites/`, it is that one, and with none the job fails saying where to write it. `ponzi-worker profile` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `roots.data` of the cluster's `ponzi.yaml`, typically the shared scratch root; with no `roots.data` it is `$PONZI_HOME`, else `~/.ponzi` in your cluster home folder. The `roots` of the site file are where the SLURM jobs work and do not choose this folder:
+Every job checks for the profile first. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml`; with none, they take the snapshot on the login node, make the profile from it and the site file, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `--site` names the site; with one site file in `$PONZI_HOME/cluster/sites/`, it is that one, and with none the job fails saying where to write it. `ponzi-worker profile` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `$PONZI_HOME`, typically on the shared scratch, else `~/.ponzi` in your cluster home folder. A site file names no `data` root (refused): `{data}` in its templates, such as a redirect `TMPDIR: "{data}/tmp/slurm"`, is the home (CR-088):
 
 ```
 $PONZI_HOME/cluster/
@@ -79,6 +80,19 @@ $PONZI_HOME/cluster/
 Remaking the profile of an unchanged cluster keeps its version, so a batch already rendered keeps its id and is not submitted twice. A changed cluster, such as a node going down, gives a new version named by the day (`2026.11.05`, then `2026.11.05.2`). `--profile FILE` uses a given profile instead.
 
 By hand, `ROOTS=... RELEASES=... bash snapshot.sh <site>` (in ponzi-core's `packages/spec/src/ponzi_spec/cluster/`) takes the same snapshot on the login node, and `ponzi-worker profile --snapshot DIR --site <site> --out FILE` makes the profile from it anywhere; `python -m ponzi_spec.cluster.create` does the same without the worker.
+
+A snapshot is one folder of files, each the output of a read-only command:
+
+| File | Command | Gives the profile |
+| --- | --- | --- |
+| `partitions.txt`, `partitions_summary.txt` | `scontrol show partition`, `sinfo -s` | partitions, allowed accounts, state |
+| `nodes.psv`, `nodes_full.txt` | `sinfo -N -o "%N\|%P\|%c\|%m\|%G\|%f\|%T"`, `scontrol show node` | nodes out of service (excluded), GPUs, the note of each role, the fit check |
+| `assoc.psv`, `qos.psv` | `sacctmgr show assoc`, `sacctmgr show qos` | the user's accounts and limits |
+| `config.txt` | `scontrol show config` (limits only) | the array throttle, within `MaxArraySize` |
+| `sacct.psv` | `sacct` of the last 60 days | memory and walltime of the stages that ran as `ponzi-<stage>` jobs |
+| `storage.txt`, `releases.txt` | `df -h` of the home and the roots, a listing of the release folder | warnings for a missing root or release |
+
+`sacct.psv` lists past job names, nodes and accounts: it stays in the home, never in a repository.
 
 From the snapshot, the profile takes:
 

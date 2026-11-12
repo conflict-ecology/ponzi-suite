@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-12
 - **Status:** signed off and implemented 2026-10-12
+- **Superseded in part:** `ponzi pvalues` takes `--calibration FILE`, not `--model ID --calibration ID` (CR-028).
 
 ## Why
 The calibrated values of a run were written by scripts outside any package, as two stores per run (`pcodes.zarr` and `<config>_cc/pcodes.zarr`) under a name that says nothing about their content, and a job killed while writing left a store that the next submission skipped as done.

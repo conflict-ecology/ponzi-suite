@@ -1,0 +1,17 @@
+# tide-weather-fill-sentinel-no-flags: a missing coherence of the past window is the sentinel -1, without obs
+# flags: the model reads the gap off the value alone, and its input has five channels fewer (no obs channel in the
+# past or the future rows, `future_obs: none`).
+# Common to the fill specs (tide-weather-fill-*): the future rows' obs channels are what a run gives the model
+# (constant 1, or none here), a missing covariate in a window is an error and never a filled value
+# (`strict_covariates`), and in a run the model honours the scoring spec's `context.min_support` as the rolling
+# forecaster does (`support: gated`; the fit does not filter on it, and its model card breaks the val loss down by
+# the number of observed values).
+# Fitted at seeds 42 and 43: `ponzi-models train --training-spec tide-weather-fill-sentinel-no-flags` and again with `--seed 43`.
+extends: ../tide-weather.yaml
+missing:
+  fill: sentinel
+  value: -1.0
+  flag: false
+future_obs: none
+strict_covariates: true
+support: gated

@@ -1,6 +1,6 @@
 # Authentication
 
-What each part of PONZI needs to log in to, and where to put it. A secret is never written in a PONZI config, a standard or a repository: each one is read from the environment or from the file its own tool reads (`ponzi.yaml` refuses a `credentials:` section, CR-059).
+What each part of PONZI needs to log in to, and where to put it. A secret is never written in a PONZI file, a standard or a repository: each one is read from the environment or from the file its own tool reads (`ponzi.yaml` has no `credentials:` section).
 
 ## What needs what
 
@@ -9,7 +9,7 @@ What each part of PONZI needs to log in to, and where to put it. A secret is nev
 | **Earthdata Login** (NASA) | the worker, `ponzi-pipeline acquire` | downloading the SLCs and orbit files from ASF | `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else the netrc file |
 | **Earth Data Hub** token (DestinE) | the worker, onboarding with weather source `edh` or `edh_cdsgrid` | ERA5-Land weather for the sidecar | the netrc file |
 | **Copernicus CDS** key | the worker, onboarding with weather source `cdsgrid` or `edh_cdsgrid` | ERA5-Land weather newer than the Earth Data Hub store | `~/.cdsapirc` |
-| **PONZI server key** | `ponzi-client` (and its loop, `ponzi-client serve`), ponzi-visual | every call to a running server | `PONZI_KEY` (or the variable `server.key_env` names), else the file `$PONZI_KEY_FILE` |
+| **PONZI server key** | `ponzi-client` (and its loop, `ponzi-client serve`), ponzi-visual | every call to a running server | `PONZI_KEY` (or the variable `--key-env` names), else the file `$PONZI_KEY_FILE` |
 | **wandb** key | `ponzi-models train` with `--wandb online` (its default) | logging training runs | wandb's own: `WANDB_API_KEY` or `wandb login` |
 
 Needs no login: ASF's burst search (`discover`, and the server's [burst availability](../service/rest-api.md)), the Copernicus GLO-30 DEM, the GHSL built-up layers and the World Bank boundaries the server downloads.
@@ -72,7 +72,7 @@ export PONZI_KEY_FILE=~/hpc-worker.key      # a file keeps the key out of the en
 export PONZI_KEY=pz_...
 ```
 
-The deployment config may name another variable (`server: {url: ..., key_env: PONZI_WORKER_KEY}`); the file `$PONZI_KEY_FILE` is read when that variable is unset. ponzi-visual asks for a key in the browser and sends it as `Authorization: Bearer <key>`, as every client does.
+`--key-env` may name another variable (`--key-env PONZI_WORKER_KEY`); the file `$PONZI_KEY_FILE` is read when that variable is unset. ponzi-visual asks for a key in the browser and sends it as `Authorization: Bearer <key>`, as every client does.
 
 ## On the cluster
 

@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-23 (phase 2 of the overhaul plan, section 4b)
 - **Status:** implemented on the owner's instruction (2026-10-23), awaiting review; uncommitted (plan decision D10)
+- **Superseded in part:** `ponzi.models` is `ponzi_models` (CR-028), and the default registry is the home's (CR-086).
 
 ## Why
 

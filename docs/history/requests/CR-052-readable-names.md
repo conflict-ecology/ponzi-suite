@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("add in a human readable naming convention for forecasters and panels"; the ids renamed too, the old ones kept).
 - **Status:** implemented on the owner's instruction (2026-11-05), awaiting review; uncommitted
+- **Superseded in part:** model ids are `<training>@<hash8>--<panel>@<hash8>` (CR-083), and `formerly` is no longer read (CR-081, CR-082).
 
 ## Why
 

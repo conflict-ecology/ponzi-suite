@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-10-14
 - **Status:** signed off 2026-10-14; implemented on branch `dating-recipe` (not merged)
+- **Superseded in part:** the recipe (`DetectionRecipe`, `--recipe`) is the detection spec (CR-070), and the presets left the library (CR-043).
 
 ## Why
 

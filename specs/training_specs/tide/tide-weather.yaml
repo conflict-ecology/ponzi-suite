@@ -1,0 +1,55 @@
+# tide-weather: the TiDE forecaster with a context of 30 acquisitions and a horizon of 5 over the five baselines,
+# and the weather: soil moisture, snow depth and snow cover from ERA5, with the compact set of their pair
+# differences at the five baselines (covariate layer norm off). No key declares a treatment of missing values, so
+# a missing coherence is 0.5 with the obs flags, with the real future flags and a filled bperp.
+# The base of every tide-weather-* spec.
+model: tide
+context_length: 30
+horizon_length: 5
+covariates: true
+baseline_days:
+- 12
+- 24
+- 36
+- 48
+- 60
+quantile_levels: zu11
+era5_vars:
+- era5_swvl1
+- era5_snow_depth
+- era5_snow_cover
+- era5_pd_swvl1_12d
+- era5_pd_swvl1_24d
+- era5_pd_swvl1_36d
+- era5_pd_swvl1_48d
+- era5_pd_swvl1_60d
+- era5_pd_snow_depth_12d
+- era5_pd_snow_depth_24d
+- era5_pd_snow_depth_36d
+- era5_pd_snow_depth_48d
+- era5_pd_snow_depth_60d
+- era5_pd_snow_cover_12d
+- era5_pd_snow_cover_24d
+- era5_pd_snow_cover_36d
+- era5_pd_snow_cover_48d
+- era5_pd_snow_cover_60d
+hidden_size: 32
+num_encoder_layers: 2
+num_decoder_layers: 2
+decoder_output_dim: 16
+temporal_decoder_hidden: 16
+temporal_width_future: 4
+use_layer_norm: true
+covariate_layer_norm: false
+dropout: 0.2
+batch_size: 256
+lr: 0.0003
+grad_clip: 1.0
+epochs: 30
+min_epochs: 10
+early_stopping_patience: 5
+early_stopping_min_delta: 1.0e-05
+mask_missing_targets: true
+seed: 42
+wandb_project: ponzi-tide
+wandb_log_steps: 100

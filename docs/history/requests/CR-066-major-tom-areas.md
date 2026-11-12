@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("add in major tom tile capability"; chose "Major TOM tiles" beside Admin 0, 1 and 2 in the map's layer drop-down, the 10 km cells drawn when zoomed in, hover naming a cell, click selecting it, and Watch making an area of the bursts meeting that cell).
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** `AreaCreate.cell` and the single-cell tracks and availability routes were removed (CR-067).
 
 ## Why
 

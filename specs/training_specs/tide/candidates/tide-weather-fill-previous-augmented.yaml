@@ -1,0 +1,48 @@
+# tide-weather-fill-previous-augmented: one model of context 30 for every situation a run meets.
+# tide-weather-fill-previous plus `augment`: five kinds, each hitting a training window with its own probability,
+# independently (about 35 % of the windows stay as they are: 0.71 * 0.76 * 0.8 * 0.9 * 0.9, the draws k = 0 and
+# s = 5 changing nothing):
+#   truncate_context  p 0.3, min_keep 1: a short history (the series starts k rows into the context, k uniform 0..29);
+#   unknown_future    p 0.3: the future covariate rows s..4 unknown (s uniform 1..5), stage s of progressive scoring;
+#   drop_acquisitions p 0.2, n 1 to 3: single missing acquisitions in the context;
+#   outage            p 0.1, length 2 to 6: consecutive missing acquisitions from a context row on (may straddle the
+#                     anchor);
+#   drop_baseline     p 0.1: the 1 or 2 longest baselines missing over 3 to 10 rows (pairs without a partner, as
+#                     around a sensor switch).
+# Each kind makes a window exactly what the library builds from an input where that situation is real. Nothing
+# changes at inference except that progressive scoring passes the unknown future rows as unknown. The val loss and
+# the selection are on the real val windows; the model card's val_by_context, val_by_stage and val_by_scenario
+# (`ponzi-models eval-breakdowns`) compare it with tide-weather-fill-previous and the -context-dropout spec. The
+# prepared files are tide-weather's: the augmentation is applied when batches are gathered.
+# Fitted at seed 42: `ponzi-models train --training-spec tide-weather-fill-previous-augmented`.
+extends: ../tide-weather.yaml
+missing:
+  fill: previous
+  flag: true
+future_obs: one
+strict_covariates: true
+support: gated
+augment:
+- kind: truncate_context
+  p: 0.3
+  min_keep: 1
+- kind: unknown_future
+  p: 0.3
+- kind: drop_acquisitions
+  p: 0.2
+  n:
+  - 1
+  - 3
+- kind: outage
+  p: 0.1
+  length:
+  - 2
+  - 6
+- kind: drop_baseline
+  p: 0.1
+  baselines:
+  - 1
+  - 2
+  length:
+  - 3
+  - 10

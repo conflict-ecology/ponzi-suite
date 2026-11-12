@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("add in ponzi-core modules the worker can use to produce a profile of the slurm system, to be saved in the right spot").
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** the shipped `ceoas` profile and snapshot were removed (CR-065), and approval with them (CR-062). A site's `roots.data` and the profile's `cache` are gone; `{data}` in a profile means the PONZI home (CR-088).
 
 ## Why
 

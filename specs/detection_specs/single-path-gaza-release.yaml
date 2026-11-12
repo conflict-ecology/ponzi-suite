@@ -1,0 +1,11 @@
+# single-path-gaza-release: the single-path detection of the Gaza damage releases, for one path. One-anchor gaps
+# bridged, 60-day episodes, overlapping dating windows, events from the first acquisition after 2023-10-07. The
+# releases' cross-path confirmation is not part of a detection spec.
+calibration_kind: ceiling
+code: 50
+gap: 1
+dating_pre: 1
+dating_post: 4
+episode_days: 60
+start_date: '2023-10-07'
+windows: overlapping

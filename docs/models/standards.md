@@ -24,24 +24,24 @@ The rehearsal runs the functions of the real lifecycle on the synthetic world (`
 The checks of a standard (ponzi-core CR-055):
 
 - **The id:** `<sensor>-<scope>`, its sensor the model card's ([Naming](naming.md)).
-- **The specs:** each name it gives is found (the home, then the suite) and has the hash its name was first used with in the registry (`specs.json`). Spec fields given inline are refused.
+- **The specs:** each it names, as `name` or `name@<hash>` (`new-standard` writes the latter), is found: the home, then the suite, then the registry's archive for a version (ponzi-core CR-083).
 - **The registry:** the model, its artifact by reference when it has one, its scoring spec, and the calibrations, each made for that scoring spec on the standard's panel spec. A trained model was trained on that panel spec (the same hash).
 - **The panel:** with the built panel in the home, no training or validation cell of the model is a test cell of the panel, the calibrations' null.
 - **`requires`:** the installed distributions meet it. A worker also refuses a job of a standard whose `requires` its own versions do not meet.
-- **The version before it:** the latest registered version, else the previous one beside the file. Within a major, nothing that changes the runs may change (workflow, coherence and onboarding specs, panel spec, model, scoring spec). Within a minor, only the description, `requires` and the status.
+- **The version before it:** the latest registered version, else the previous one beside the file; the change must fit the number raised ([When to raise which number](versions.md#when-to-raise-which-number)).
 - **Drafts:** a draft (`status: draft`) is checked for its form and its specs only, and `standard-workflow` refuses it. The general standard, ponzi-suite `standards/s1-general-2.0.0.yaml`, is a draft.
 
-Its registry (`<out>/registry`) and its standard `s1-rehearsal@1.0.0` (`<out>/standards/`, registered with `--allow-uncommitted`, since its specs are written into `<out>` and are in no ponzi-suite commit) behave like real ones, and the worker runs them. `<out>` is the rehearsal's home for its specs: a command given `--home <out>` finds them.
+Its registry (`<out>/registry`) and its standard `s1-rehearsal@1.0.0` (`<out>/standards/`, registered with `--allow-uncommitted`, since its specs are written into `<out>` and are in no ponzi-suite commit) behave like real ones, and the worker runs them. `<out>` is the rehearsal's home for its specs: a command run with `PONZI_HOME=<out>` finds them (CR-088).
 
 ## From bundle to server
 
 ```
-pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY --out s1-general-2.0.0.yaml \
+pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY \
     --source pipeline --set burst_map=... --set slc_dir=... --set orbit_dir=... --set dem_dir=... \
     --set start_date=2025-01-01
 ```
 
-This writes the standard as the server runs it, with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir` and `dem_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `$PONZI_HOME/downloads/`). The steps are:
+This writes the standard as the server runs it, by default to `$PONZI_HOME/standards/<id>-<version>.yaml` where the server of that home reads it (`--out` names any file; for another home, set `PONZI_HOME`; CR-080, CR-088), with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir` and `era5_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `$PONZI_HOME/downloads/`). The steps are:
 
 1. The coherence chain, either way:
     - `--source pipeline`: `discover`, `dem`, `coherence` (one job per pair), `assemble`;

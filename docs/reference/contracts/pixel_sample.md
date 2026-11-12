@@ -29,7 +29,7 @@ Chunks: `coh` `(T, min(4096, n_px), B)`, every other array one chunk. There are 
 |---|---|---|
 | every attr of the source store | as C1 | Copied first, then the ones below are set |
 | `baseline_days`, `revisit_days`, `epsg`, `burst_id`, `sensor` | as C1 | Of the source (`baseline_days` of the extracted baselines) |
-| `producer`, `contract_version` | str, int | `ponzi.core.sample` (an export: `ponzi-models export-pixels`), 1 |
+| `producer`, `contract_version` | str, str | `ponzi.core.sample` (an export: `ponzi-models export-pixels`), the hash of the contract's declaration (ponzi-core CR-085; pinned in `test_contract_versions.py`); another fails `identity` |
 | `source_store`, `source_digest` | str | Name and structural digest of the coherence store |
 | `edge_margin` | int | Required. The margin the pixels were drawn with (the onboarding takes it from the sidecar's `process_mask`, C2); a run over the sample stamps it into `run_meta.pixels.edge_margin` and `ponzi_edge_margin` (C7) |
 | `n_px` | int | Number of pixels |
@@ -39,7 +39,7 @@ Chunks: `coh` `(T, min(4096, n_px), B)`, every other array one chunk. There are 
 
 ## Invariants
 
-- The pair tables travel in a dtype a zarr v3 store can hold: `ponzi_pipeline.onboard.onboard.writable_time_tables` casts the VLenUTF8 `platform` and `platform_secondary` of a v2 store (numpy `object` in xarray) to fixed-width unicode, and object dates to `datetime64[ns]`, before the extraction; a `(time,)` or `(time, baseline)` table with no writable form is left out with a logged note. They are carried because the runner hands every such variable to the forecaster (`runner._time_covariates`), so a sampled run sees what the full run sees.
+- The pair tables travel as the coherence store holds them. They are carried because the runner hands every such variable to the forecaster (`runner._time_covariates`), so a sampled run sees what the full run sees.
 - `pix_y`, `pix_x` are inside the source grid and unique as pairs.
 - Folded grid: `G = ceil(sqrt(n_px))`, pixels row-major, padding cells invalid; the folded grid is processed whole (no second erosion). A sampled run's output stores carry `sample_n_px`, `sample_grid_side` and `frames_edge_margin` in their attrs (`sample_grid_meta`).
 - A run over the sample equals the full run at `(pix_y, pix_x)` bit for bit, for every C7 and C8 array.

@@ -12,23 +12,23 @@ Where each input of PONZI comes from, who fetches it and where it lands. The ser
 | [Acquisitions](#slcs-and-orbit-files) (ASF search) | worker, `discover` | per job | the job's `ponzi-pairs` Item | none |
 | [SLCs and orbit files](#slcs-and-orbit-files) (ASF) | worker, `coherence` | per pair | `$PONZI_HOME/downloads/slc/`, `orbits/` | Earthdata |
 | [DEM](#the-dem) (Copernicus GLO-30) | worker, `dem` | per burst | `$PONZI_HOME/downloads/dem/` | none |
-| [Weather](#era5-land-weather) (ERA5-Land) | worker, `onboard` | per store | the sidecar | Earth Data Hub or CDS |
-| [Built-up and land](#ghsl-built-up-and-land) (GHSL) | worker, `onboard` | per store | the sidecar's cache entry | none |
+| [Weather](#era5-land-weather) (ERA5-Land) | worker, `onboard` | per burst and month | `$PONZI_HOME/downloads/era5/` (CDS); Earth Data Hub is read in place | Earth Data Hub or CDS |
+| [Built-up and land](#ghsl-built-up-and-land) (GHSL) | worker, `onboard` | per tile | `$PONZI_HOME/downloads/ghsl/` | none |
 
-On a worker, `$PONZI_HOME` is its home: `roots.data` of its deployment config when that is a local path, else the PONZI home ([The worker](../service/worker.md)).
+`$PONZI_HOME` is the home of every part: the server's, the worker's, the SLURM tasks' (CR-088; [The worker](../service/worker.md)).
 
 ## Fetched by the server on its first start
 
 The server makes the burst catalog and the boundaries in the background when they are missing, each in its own thread, and keeps answering meanwhile. Until one is ready its routes answer 503, and so do the Major TOM tile routes, which need the boundaries. A download goes through a `.part` file, is checked against its pinned sha256, then renamed; a file that does not match is removed and refused. A failure is logged, and the routes then say why. A built file records the sha256 of its source, so a new pin in the code makes the server rebuild it on its next start.
 
-To skip the downloads, give the files in the server's settings (`bursts`, `boundaries`), or turn them off with `fetch_catalog: false` and `fetch_boundaries: false` ([Quickstart](../getting-started/quickstart.md)).
+To skip the downloads, copy built files into the home's `catalog/` (`bursts.sqlite3`, `boundaries.sqlite3`; `ponzi-pipeline burst-catalog` writes the first there), which the server uses whatever built them, or turn them off with `fetch_catalog: false` and `fetch_boundaries: false` ([Quickstart](../getting-started/quickstart.md)).
 
 ### The burst catalog
 
 Every Sentinel-1 IW burst with its footprint in lon/lat, about 1.1 million bursts, from the OPERA burst database (burst_db). The server lists bursts and finds a watched area's bursts with it.
 
 - **Source:** `burst-id-geometries-simple-0.18.0.geojson.zip` of the burst_db 0.18.0 release (59.7 MB), pinned by URL and sha256 in `ponzi_spec.catalog.GEOMETRIES` (CR-038, CR-045).
-- **Built** by `ponzi_spec.catalog.ensure_catalog` with the standard library only: the GeoJSON is streamed and written to `bursts.sqlite3` (format 1), with an R*Tree over the boxes. A burst across the antimeridian has two index entries; a burst repeated with the same footprint is kept once (burst_db 0.18.0 repeats about 141,000). The layout is the contract `ponzi_server.catalog` reads with `sqlite3` only.
+- **Built** by `ponzi_spec.catalog.ensure_catalog` with the standard library only: the GeoJSON is streamed and written to `bursts.sqlite3` (its `format` the hash of `ponzi_spec.catalog.CONTRACT`, CR-086), with an R*Tree over the boxes. A burst across the antimeridian has two index entries; a burst repeated with the same footprint is kept once (burst_db 0.18.0 repeats about 141,000). The layout is the contract `ponzi_server.catalog` reads with `sqlite3` only.
 - **Lands in** `$PONZI_HOME/catalog/`: the zip as downloaded, and `bursts.sqlite3`.
 - **Other ways:** `ponzi-pipeline burst-catalog` (or `pixi run catalog VERSION` in ponzi-visual) builds a catalog from another release, which the settings then name as `bursts`. A small JSON list of bursts also works (a demo, a test).
 
@@ -45,7 +45,7 @@ The administrative units of the World Bank Official Boundaries, drawn on the map
     | 2 | `Admin 2` | their second subdivisions |
 
 - **The disputed areas** (CR-069): the plain Admin 0 file leaves out the NDLSA areas (Jammu and Kashmir, Aksai Chin, Western Sahara, Abyei, the Golan Heights, the Falklands and others); the "all layers" file holds them, so level 0 covers the land. They are kept with `disputed` true. They have no code in the file: theirs is `NDLSA-` and the name in capitals with dashes, with the sovereign's ISO code after it when two share a name (`NDLSA-JAMMU-AND-KASHMIR-IND`, `NDLSA-JAMMU-AND-KASHMIR-PAK`). Each belongs to no country.
-- **Built** by `ponzi_server.boundaries.ensure_boundaries` (with `pyarrow` and `shapely`) into `boundaries.sqlite3`, format 2: each outline made valid and simplified to `SHAPE`, 0.001 degrees (about 100 m), with an R*Tree over the boxes. The map's outlines are simplified further to its scale when asked.
+- **Built** by `ponzi_server.boundaries.ensure_boundaries` (with `pyarrow` and `shapely`) into `boundaries.sqlite3` (its `format` the hash of `ponzi_server.boundaries.CONTRACT`, CR-086): each outline made valid and simplified to `SHAPE`, 0.001 degrees (about 100 m), with an R*Tree over the boxes. The map's outlines are simplified further to its scale when asked.
 - **Lands in** `$PONZI_HOME/catalog/`: the Parquet files in `boundaries/`, and `boundaries.sqlite3`.
 
 ## The Major TOM grid
@@ -91,8 +91,8 @@ The weather series of the sidecar (`era5_*`; by default 2 m temperature, total p
 | `cdsgrid` | the gridded ERA5-Land of the Copernicus CDS, one request per calendar month, a few days behind real time | CDS key in `~/.cdsapirc`, and the ERA5-Land licence accepted on the CDS |
 | `edh_cdsgrid` | `edh` for what its store covers, `cdsgrid` for the newer acquisitions | both |
 
-A burst's value is the mean over the valid ERA5-Land cells (0.1 degree) covering its footprint and one cell around it. The CDS downloads land in `era5/` of the onboarding's output, in the worker's cache, unless the step's request names a shared folder (`era5_cache`). With `weather_area` (CR-023), the bursts of one area share one request per month.
+A burst's value is the mean over the valid ERA5-Land cells (0.1 degree) covering its footprint and one cell around it. The CDS downloads land in `$PONZI_HOME/downloads/era5/`, shared by every burst (CR-079: a standard's `onboard` step names `${era5_dir}`, which a worker fills from its home; `ponzi-pipeline onboard --era5-cache` defaults to it too). With `weather_area` (CR-023), the bursts of one area share one request per month.
 
 ### GHSL built-up and land
 
-The `built` and `land` layers of the sidecar, from the Global Human Settlement Layer of the European Commission's JRC: the built-up surface fraction `GHS_BUILT_S` (R2023A, epoch 2020) and the land fraction `GHS_LAND` (R2022A), both at 100 m on the World Mollweide grid, in 1000 km tiles (`ponzi_pipeline.onboard.built`). The `onboard` stage's `built` step downloads the tiles a burst meets from the JRC's open data server, unzips them and averages them onto the burst's grid. They land in `ghsl/` of the onboarding's output, in the worker's cache (`$PONZI_HOME/cache/ponzi-sidecar/<content id>/`), unless the step's request names a shared folder (`ghsl_cache`). No login.
+The `built` and `land` layers of the sidecar, from the Global Human Settlement Layer of the European Commission's JRC: the built-up surface fraction `GHS_BUILT_S` (R2023A, epoch 2020) and the land fraction `GHS_LAND` (R2022A), both at 100 m on the World Mollweide grid, in 1000 km tiles (`ponzi_pipeline.onboard.built`). The `onboard` stage's `built` step downloads the tiles a burst meets from the JRC's open data server, unzips them and averages them onto the burst's grid. They land in `$PONZI_HOME/downloads/ghsl/`, downloaded once for every burst that meets them (CR-079: `${ghsl_dir}`, filled from the worker's home; `ponzi-pipeline onboard --ghsl-cache` defaults to it too). No login.
