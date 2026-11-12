@@ -1,4 +1,4 @@
-# Manifests
+# Provenance (manifests)
 
 A manifest is the readable provenance of one output: every step from the Sentinel-1 scenes to the events, with the stages and the code releases, specs and models that made them.
 
@@ -8,7 +8,7 @@ It is built by walking the output's lineage links back to the external sources (
 manifest_version: b5e69bf8aca0dfcf87ae17458ca6d388   # the hash of the manifest's declaration (CR-085)
 subject: ponzi-events-t028_058198_iw3-9c1e4d2a7b10
 content_id: 9c1e4d2a7b10...
-standard: s1-general@2.0.0
+standard: s1-general@3f9a12c4
 created: '2026-11-04T10:12:03Z'
 sources:
 - content_id: 3fa1...

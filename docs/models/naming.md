@@ -1,4 +1,4 @@
-# Naming
+# Naming rules
 
 Specs, models and standards have names a person can read: lowercase words joined by hyphens, from the general to the specific. A name says what the thing is. How it is versioned and where it came from are written in the file, never in the name: no version, date, sensor, seed or abbreviation code (`c30`, `pdcompact`, `f1p`, `mt0.4`). The one exception is a standard's sensor (below).
 
@@ -16,13 +16,13 @@ The rules are code, `ponzi_spec.naming` (ponzi-core CR-052, CR-070), and ponzi-c
 | coherence spec | `<backend>-<window>[-<change>]` | `isce3-gaussian` | `specs/coherence_specs/isce3-gaussian.yaml` |
 | onboarding spec | `<steps>[-<change>]` | `all-steps`, `mask-only` | `specs/onboarding_specs/all-steps.yaml` |
 | detection spec | `<method>[-<change>]` | `single-path`, `single-path-gaza-release` | `specs/detection_specs/single-path.yaml` |
-| standard | `<sensor>-<scope>` | `s1-general`, `s1-gaza` | `standards/s1-general-2.0.0.yaml`; cited `s1-general@2.0.0` |
+| standard | `<sensor>-<scope>` | `s1-general`, `s1-gaza` | `standards/s1-general.yaml`, cited `s1-general@<hash8>` ([Versions](versions.md#the-id-the-version-and-the-key); CR-089) |
 
 A word is letters and digits, and a name starts with a letter. The double hyphen of a model id separates the two spec versions it was made from, since each name may hold single hyphens. A registry reference ends in the artifact's digest and is read on its last `@sha256:`: `registry:tide-weather@59bfd3dc--majortom-global@77941f85@sha256:<digest>`.
 
-A spec is named by its file: `tide-weather-fill-median.yaml` is `tide-weather-fill-median`, and a panel spec by its folder. No spec file says its name (a `training_id` in a training spec or an `id` in a `panel.yaml` is refused), and a name is unique within its kind (ponzi-core CR-081). A spec's version is its content hash, cited `name@<hash8>` (ponzi-core CR-083): a spec is edited in place under its name, and a new name is for another spec, the old one with its change added (`majortom-global-dense`). The name is a label, not part of the hash ([Standard versions and naming](versions.md#specs-a-name-and-a-hash)).
+A spec is named by its file: `tide-weather-fill-median.yaml` is `tide-weather-fill-median`, and a panel spec by its folder. No spec file says its name (a `training_id` in a training spec or an `id` in a `panel.yaml` is refused), and a name is unique within its kind (ponzi-core CR-081). A spec is edited in place under its name, and a new name is for another spec, the old one with its change added (`majortom-global-dense`). The name is a label, not part of the spec's hash, its version ([Specs: a name and a hash](versions.md#specs-a-name-and-a-hash)).
 
-A standard's id is its sensor and its scope, both listed in `ponzi_spec.naming` (`SENSORS`, `SCOPES`, `TESTCASES`). The sensor is the one exception to "no sensor in a name": a standard runs one sensor's data, and its model card names the same sensor. `check-standard`, `register-standard` and the suite's tests refuse any other form. Its version is not in the id: it is cited as `<id>@<version>`.
+A standard's id is its sensor and its scope, both listed in `ponzi_spec.naming` (`SENSORS`, `SCOPES`, `TESTCASES`). The sensor is the one exception to "no sensor in a name": a standard runs one sensor's data, and its model card names the same sensor. `check-standard`, `register-standard` and the suite's tests refuse any other form. Its version is not in the id: its key is `<id>@<hash8>` ([Standard versions](versions.md#the-id-the-version-and-the-key)).
 
 ## Spec folders
 

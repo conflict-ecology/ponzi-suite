@@ -1,4 +1,4 @@
-# A new stage
+# Adding a stage
 
 A stage is replaced or added without touching the worker or the server. Example: a second coherence backend.
 
@@ -36,4 +36,4 @@ A stage is replaced or added without touching the worker or the server. Example:
 6. **Test.** Synthetic fixtures, no network. The outputs validate against the PONZI extension schema; the content id is stable; a second run with the same inputs and params gives the same content id.
 7. **Backend-specific checks.** A coherence backend states its agreement with the primary backend on a reference burst (equal, or within a documented tolerance), and its assembled store passes `ponzi validate-store`.
 8. **Document it** on this site (a page under the stage's area and a line in the [stages table](../method/stages.md)) and in the agent checklist if it changes how agents work.
-9. **Use it.** `ponzi-models standard-workflow` (`ponzi_models.standards.workflow`) adds it to the steps it builds from a standard, and `STAGE_CODE` (`ponzi_models.standards.versions`) names its code's distributions for a standard's `requires`; a new standard version makes it the default for watched areas.
+9. **Use it.** `ponzi-models standard-workflow` (`ponzi_models.standards.workflow`) adds it to the steps it builds from a standard, and `STAGE_CODE` (`ponzi_models.standards.versions`) names its code's distributions for a standard's `requires`.

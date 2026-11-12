@@ -9,10 +9,10 @@
   const NODES = [
     { id: "asf", col: 0, y: 40, label: "Sentinel-1 scenes", sub: "ASF: SLCs, orbits", kind: "data" },
     { id: "wx", col: 0, y: 118, label: "Weather, built-up", sub: "EDH or CDS grid, GHSL", kind: "data" },
-    { id: "pan_tr", col: 0, y: 210, label: "Panel: train, val cells", sub: "panel spec majortom-global", kind: "data" },
+    { id: "pan_tr", col: 0, y: 210, label: "Panel: train, val cells", sub: "majortom-global", kind: "data" },
     { id: "pan_te", col: 0, y: 296, label: "Panel: test cells", sub: "the calibration null", kind: "data" },
-    { id: "aoi_pre", col: 0, y: 382, label: "Area pre-event data", sub: "e.g. Gaza before Oct 2023", kind: "data" },
-    { id: "labels", col: 0, y: 482, label: "Labels, known events", sub: "BRIGHT, UNOSAT", kind: "data" },
+    { id: "aoi_pre", col: 0, y: 382, label: "Area pre-event data", sub: "Gaza, before Oct 2023", kind: "data" },
+    { id: "labels", col: 0, y: 492, label: "Labels, known events", sub: "BRIGHT, UNOSAT", kind: "data" },
     { id: "train", col: 1, y: 250, label: "Training", sub: "prepare, train, export", kind: "piece" },
     { id: "model", col: 2, y: 168, label: "Model + scoring spec", sub: "registry, immutable", kind: "piece" },
     { id: "cal", col: 2, y: 296, label: "Calibration", sub: "under the model", kind: "piece" },
@@ -22,20 +22,23 @@
     { id: "runs", col: 3, y: 210, label: "Forecast runs", sub: "scores, Et, staged", kind: "piece" },
     { id: "pv", col: 3, y: 296, label: "p-values", sub: "codes per anchor", kind: "piece" },
     { id: "ev", col: 3, y: 410, label: "Events", sub: "detect, tile", kind: "piece" },
-    { id: "std", col: 4, y: 168, label: "Standard", sub: "id@version, immutable", kind: "piece" },
+    { id: "std", col: 4, y: 168, label: "Standard", sub: "id@hash8, its content", kind: "piece" },
     { id: "prod", col: 4, y: 410, label: "Outputs", sub: "per Major TOM cell", kind: "piece" },
     { id: "checks", col: 4, y: 500, label: "Benchmark checks", sub: "not yet a command", kind: "piece" },
   ];
+  // Every edge is straight or orthogonal: straight when its ends share a row, else an elbow in the gap between the
+  // columns. `out` and `in` move its ends up or down from the middle of a box's side, so no two edges share a point;
+  // `at` places a label [x, y, anchor] where the longest segment has no room.
   const EDGES = [
     { id: "asf-coh", from: "asf", to: "coh", label: "scenes, pairs" },
     { id: "coh-onb", from: "coh", to: "onb", label: "store", route: "v" },
     { id: "wx-onb", from: "wx", to: "onb", label: "covariates" },
-    { id: "pantr-train", from: "pan_tr", to: "train", label: "train, val" },
-    { id: "aoi-train", from: "aoi_pre", to: "train", label: "fine-tune" },
-    { id: "train-model", from: "train", to: "model", label: "register" },
+    { id: "pantr-train", from: "pan_tr", to: "train", label: "", in: -8 },
+    { id: "aoi-train", from: "aoi_pre", to: "train", label: "", in: 8 },
+    { id: "train-model", from: "train", to: "model", label: "" },
     { id: "model-cal", from: "model", to: "cal", label: "null runs", route: "v" },
     { id: "pante-cal", from: "pan_te", to: "cal", label: "test cells" },
-    { id: "model-runs", from: "model", to: "runs", label: "model" },
+    { id: "model-runs", from: "model", to: "runs", label: "", in: -6 },
     { id: "onb-runs", from: "onb", to: "runs", label: "sidecar", route: "v" },
     { id: "coh-runs", from: "coh", to: "runs", label: "C1", route: "right" },
     { id: "runs-pv", from: "runs", to: "pv", label: "scores", route: "v" },
@@ -44,8 +47,9 @@
     { id: "runs-ev", from: "runs", to: "ev", label: "Et", route: "right" },
     { id: "detection-ev", from: "detection", to: "ev", label: "rules" },
     { id: "ev-prod", from: "ev", to: "prod", label: "" },
-    { id: "ev-checks", from: "ev", to: "checks", label: "on test areas", dashed: true },
-    { id: "labels-checks", from: "labels", to: "checks", label: "known events", route: "under", dashed: true },
+    { id: "ev-checks", from: "ev", to: "checks", label: "on test areas", out: 16, in: -16, dashed: true,
+      at: [866, 476, "end"] },
+    { id: "labels-checks", from: "labels", to: "checks", label: "known events", dashed: true },
     { id: "checks-std", from: "checks", to: "std", label: "promote", route: "outer", dashed: true },
   ];
   // the states: data (read), comp (computed again), new (a new version made), reused, gap (should be computed
@@ -55,7 +59,7 @@
       example: "Gaza: 40 Major TOM tiles over the Strip, tagged gaza-2023, 7 Oct 2023 to 31 Jan 2024.",
       nodes: { asf: "data", wx: "data", coh: "comp", onb: "comp", runs: "comp", pv: "comp", ev: "comp", prod: "new",
                model: "reused", cal: "reused", detection: "reused", std: "reused" },
-      steps: ["In ponzi-visual, click or paint Major TOM tiles (up to 64), add tags and the days. The server watches every burst of both passes that meets the tiles.",
+      steps: ["In ponzi-visual, click or paint Major TOM tiles (past 64 the server warns), add tags and the days. The server watches every burst of both passes that meets the tiles.",
               "On creation, then at the area's cadence, the server makes one job per burst: the standard's workflow with the area's days.",
               "A worker finds the acquisitions (ASF), downloads the scenes and makes the burst's coherence store with ISCE3.",
               "Onboard the store: weather and built-up covariates into its sidecar.",
@@ -75,13 +79,13 @@
       nodes: { aoi_pre: "data", pan_te: "data", labels: "data", train: "new", model: "new", cal: "new", std: "new",
                coh: "reused", onb: "reused", detection: "reused", runs: "comp", pv: "comp", ev: "comp", prod: "new",
                checks: "todo" },
-      steps: ["The test case's training spec (testcases/<case>/training.yaml) builds on the base training spec, starting from its weights.",
+      steps: ["The area's training spec (specs/training_specs/, such as tide-weather-gaza-finetune) builds on the base training spec, starting from its weights (init_from).",
               "Train and export it; register the child model with its scoring spec.",
               "Calibrate it on the panel's test cells (null-runs, null-rows, calibrate), as the general model was.",
               "Check it against the area's labels: not yet a command (ponzi.evaluation has the metrics).",
               "Publish a standard of its own, s1-<case> (new-standard, register-standard, standard-workflow). The code does not record that it branches from the general one.",
               "Point the area at it: its runs, p-values and events are made again."] },
-    { id: "general", name: "Better general model", freq: "a few times a year", std: "new standard, major",
+    { id: "general", name: "Better general model", freq: "a few times a year", std: "new standard version",
       example: "A new panel spec such as majortom-global-dense, or a new training spec such as tide-weather-fill-previous-augmented.",
       nodes: { pan_tr: "new", pan_te: "new", labels: "data", train: "new", model: "new", cal: "new", std: "new",
                coh: "reused", onb: "reused", detection: "reused", runs: "comp", pv: "comp", ev: "comp", prod: "new",
@@ -91,32 +95,32 @@
               "Register the model: its id carries the two spec versions, tide-weather@<hash8>--majortom-global-dense@<hash8>.",
               "Calibrate it on the new panel's test cells.",
               "Benchmark it against the current standard: not yet a command.",
-              "Publish a new major standard version (bump-standard, register-standard); the previous one stays as it is.",
+              "Name the new model in the standard's file and register it: a new version, its content hash, reported as a run change (register-standard); the previous one stays as it is.",
               "Areas run it once their standard is changed to it; older outputs keep theirs."] },
-    { id: "cal", name: "Better calibration", freq: "occasionally", std: "new standard, minor",
-      example: "More test cells, or a staged (format 3) calibration with calibrate-staged.",
+    { id: "cal", name: "Better calibration", freq: "occasionally", std: "new standard version",
+      example: "More test cells, or a staged calibration with calibrate-staged.",
       nodes: { pan_te: "new", labels: "data", model: "reused", cal: "new", std: "new", runs: "reused", pv: "comp",
                ev: "comp", prod: "new", detection: "reused", checks: "todo" },
       steps: ["Extend the test cells. Nothing checks yet that they stay out of training.",
               "Run the registered model on them (null-runs; --staged for a staged calibration).",
               "Build and file it under the same model: null-rows, calibrate (or calibrate-staged), register-calibration.",
-              "A new standard version names it (bump-standard).",
+              "Name it in the standard's file and register it: a new version, reported as a products change.",
               "The runs are reused from the cache; only p-values and events are computed again."] },
-    { id: "detection", name: "New detection spec", freq: "while rules settle", std: "new standard, minor",
+    { id: "detection", name: "New detection spec", freq: "while rules settle", std: "new standard version",
       example: "Threshold code 55 instead of 50, or episodes on.",
       nodes: { detection: "new", std: "new", labels: "data", model: "reused", cal: "reused", runs: "reused",
                pv: "reused", ev: "comp", prod: "new", checks: "todo" },
       steps: ["Write a detection spec in specs/detection_specs/ (such as single-path-gaza-release.yaml), or edit one in place: its hash is its version.",
-              "A new standard version names it (bump-standard gives a minor).",
+              "The standard names it (or names it already, and its hash moved): a new version, reported as a products change.",
               "detect and tile run again; runs and p-values are reused from the cache."] },
-    { id: "lib", name: "Library major change", freq: "rarely", std: "should be major",
+    { id: "lib", name: "Library major change", freq: "rarely", std: "new standard version",
       example: "A results-changing fix, such as the Et early-anchor fix.",
       nodes: { lib: "new", cal: "new", std: "new", model: "reused", coh: "reused", onb: "reused", detection: "reused",
                runs: "comp", pv: "comp", ev: "comp", prod: "comp" },
       steps: ["Release the library with a new major (0.y while below 1.0).",
               "Rebuild the calibration under it: a calibration refuses runs of another major (CR-020).",
               "The major is part of the content id of every stage whose code it is (CR-054), so the runs and everything after them are made again."] },
-    { id: "engine", name: "Coherence engine change", freq: "per engine release", std: "same, or major",
+    { id: "engine", name: "Coherence engine change", freq: "per engine release", std: "same standard, or a new version",
       example: "A new ISCE3 or ponzi-pipeline release, or a new coherence spec.",
       nodes: { lib: "new", asf: "data", coh: "gap", onb: "gap", runs: "gap", pv: "gap", ev: "gap", prod: "gap",
                model: "reused", cal: "reused", detection: "reused" },
@@ -127,7 +131,7 @@
   const LEGEND = [["new", "new version made"], ["comp", "computed again"], ["reused", "reused as is"],
                   ["data", "data read"], ["gap", "should rerun, reused today"], ["todo", "not yet in the code"],
                   ["idle", "not involved"]];
-  const LIBRARY = "Library: ponzi 0.0.1, ponzi-pipeline 0.0.1, ponzi-models 0.0.1. Their majors are in the content ids (CR-054).";
+  const LIBRARY = "Library: ponzi, ponzi-pipeline, ponzi-models. Their majors are in the content ids (CR-054).";
 
   const NS = "http://www.w3.org/2000/svg";
   const NW = 172, NH = 48, COLX = [16, 236, 456, 676, 896], W = COLX[4] + NW + 90, H = 600;
@@ -167,12 +171,14 @@
     function pts(e) {
       const a = byId[e.from], b = byId[e.to];
       const ax = X(a), ay = Y(a), bx = X(b), by = Y(b);
+      const oy = ay + NH / 2 + (e.out || 0), iy = by + NH / 2 + (e.in || 0);
       if (e.route === "v") return [[ax + NW / 2, ay + NH], [bx + NW / 2, by]];
       if (e.route === "right") return [[ax + NW, ay + NH / 2 + 8], [ax + NW + 16, ay + NH / 2 + 8],
-                                       [bx + NW + 16, by + NH / 2 - 8], [bx + NW, by + NH / 2 - 8]];
-      if (e.route === "under") return [[ax + NW, ay + NH / 2 + 10], [bx - 20, ay + NH / 2 + 10], [bx - 20, by + NH - 8], [bx, by + NH - 8]];
-      if (e.route === "outer") return [[ax + NW, ay + NH / 2], [ax + NW + 18, ay + NH / 2], [bx + NW + 18, by + NH / 2], [bx + NW, by + NH / 2]];
-      return [[ax + NW, ay + NH / 2], [bx, by + NH / 2]];
+                                       [bx + NW + 16, by + NH / 2 - 16], [bx + NW, by + NH / 2 - 16]];
+      if (e.route === "outer") return [[ax + NW, oy], [ax + NW + 18, oy], [bx + NW + 18, iy], [bx + NW, iy]];
+      if (oy === iy) return [[ax + NW, oy], [bx, iy]];                      // the same row: straight
+      const cx = (ax + NW + bx) / 2;                                        // an elbow in the gap before b
+      return [[ax + NW, oy], [cx, oy], [cx, iy], [bx, iy]];
     }
     const EDG = {};
     for (const e of EDGES) {
@@ -185,7 +191,8 @@
         const d = Math.hypot(p[i + 1][0] - p[i][0], p[i + 1][1] - p[i][1]);
         if (d > best) { best = d; mx = (p[i][0] + p[i + 1][0]) / 2; my = (p[i][1] + p[i + 1][1]) / 2; vert = p[i][0] === p[i + 1][0]; }
       }
-      const t = txt(e.label, { x: vert ? mx + 6 : mx, y: vert ? my + 4 : my - 5, "text-anchor": vert ? "start" : "middle" }, g);
+      const t = e.at ? txt(e.label, { x: e.at[0], y: e.at[1], "text-anchor": e.at[2] }, g)
+        : txt(e.label, { x: vert ? mx + 6 : mx, y: vert ? my + 4 : my - 5, "text-anchor": vert ? "start" : "middle" }, g);
       EDG[e.id] = { g, path, t, e };
     }
     const NOD = {};

@@ -5,18 +5,30 @@ site_url: https://conflict-ecology.github.io/ponzi-suite/
 repo_name: conflict-ecology/ponzi-suite
 repo_url: https://github.com/conflict-ecology/ponzi-suite
 strict: true
+# links and #anchors between pages are checked: a broken one fails the strict build
+validation:
+  links:
+    anchors: warn
+    unrecognized_links: warn
 
 theme:
   name: material
   features:
-    - navigation.indexes
     - content.code.copy
+  # ponzi-visual's Conflict ecology skin: its fonts here, its colours in stylesheets/theme.css
+  font:
+    text: Archivo
+    code: IBM Plex Mono
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: custom
+      accent: custom
       toggle: {icon: material/brightness-7, name: Dark mode}
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: custom
+      accent: custom
       toggle: {icon: material/brightness-4, name: Light mode}
 
 plugins:
@@ -58,6 +70,7 @@ markdown_extensions:
   - pymdownx.tasklist: {custom_checkbox: true}
 
 extra_css:
+  - stylesheets/theme.css
   - stylesheets/diagrams.css
 
 extra_javascript:
@@ -65,69 +78,81 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - The method:
-      - method/index.md
-      - How PONZI works: method/workflows.md
-      - Coherence: method/coherence.md
-      - Panels: method/panels.md
-      - Grids: method/grids.md
-      - Stages: method/stages.md
-      - Data sources and catalogs: method/data-sources.md
   - Getting started:
-      - getting-started/index.md
+      - Overview: getting-started/index.md
       - System overview: getting-started/overview.md
       - Install: getting-started/install.md
-      - Quickstart: getting-started/quickstart.md
-      - Authentication: getting-started/authentication.md
-      - Paths and environment variables: getting-started/paths.md
-  - Interacting with PONZI:
-      - using/index.md
-      - Watched areas: using/watched-areas.md
-      - The map: using/map.md
-      - The clients: using/clients.md
-      - "Outputs: the STAC profile": using/stac-profile.md
-      - Manifests: using/manifests.md
-      - Content ids: using/content-ids.md
-  - The service:
-      - service/index.md
-      - The server: service/server.md
-      - The worker: service/worker.md
-      - Running on the cluster: service/hpc.md
-      - Configuration: service/configuration.md
-      - REST API: service/rest-api.md
+      - "Quickstart: one machine": getting-started/quickstart.md
+      - Logins and keys: getting-started/authentication.md
+      - Folders and environment variables: getting-started/paths.md
+  # the ideas, whichever package implements them
+  - Concepts:
+      - Overview: method/index.md
+      - How PONZI works: method/workflows.md
+      - Stages: method/stages.md
+      - Content ids and reuse: using/content-ids.md
+      - Provenance (manifests): using/manifests.md
+      - Watched areas (under construction): using/watched-areas.md
+      - Data sources and catalogs: method/data-sources.md
+      - Specs and the PONZI home: service/configuration.md
+  # by repository, then distribution: each opens on what it holds, then its pages, then its API reference;
+  # page paths are unchanged, so published links hold
+  - ponzi-core:
+      - Overview: core/index.md
+      - ponzi-spec:
+          - Overview: core/ponzi-spec.md
+          - STAC catalog profile: using/stac-profile.md
+          - API reference: reference/ponzi-spec.md
+      - ponzi:
+          - Overview: core/ponzi.md
+          - "Grids: processing and outputs": method/grids.md
+          - Store formats (contracts): reference/contracts.md
+          - API reference: reference/api/ponzi.md
+      - ponzi-pipeline:
+          - Overview: core/ponzi-pipeline.md
+          - Making coherence stores: method/coherence.md
+          - API reference: reference/api/ponzi-pipeline.md
+      - ponzi-models:
+          - Overview: models/index.md
+          - Training panels: method/panels.md
+          - Training and calibrating a model: models/new-model.md
+          - Building a standard: models/standards.md
+          - Standard versions: models/versions.md
+          - Naming rules: models/naming.md
+          - API reference: reference/api/ponzi-models.md
+  - ponzi-service:
+      - Overview: service/index.md
+      - ponzi-server (under construction):
+          - Running the server: service/server.md
+          - REST API: service/rest-api.md
+          - API reference: reference/api/ponzi-server.md
+      - ponzi-worker:
+          - Workflows and the cache: service/worker.md
+          - Running on SLURM: service/hpc.md
+          - API reference: reference/api/ponzi-worker.md
+      - ponzi-client (under construction):
+          - "Clients: Python, CLI, TypeScript": using/clients.md
+          - API reference: reference/api/ponzi-client.md
       - Troubleshooting: service/troubleshooting.md
-  - Models and standards:
-      - models/index.md
-      - Making a standard: models/standards.md
-      - Standard versions and naming: models/versions.md
-      - Naming: models/naming.md
-      - A new model: models/new-model.md
+  - ponzi-visual (under construction):
+      - Using the map: using/map.md
+      - API reference: reference/api/ponzi-visual.md
   - Reference:
-      - reference/index.md
-      - ponzi-spec: reference/ponzi-spec.md
-      - API:
-          - ponzi: reference/api/ponzi.md
-          - ponzi-pipeline: reference/api/ponzi-pipeline.md
-          - ponzi-models: reference/api/ponzi-models.md
-          - ponzi-server: reference/api/ponzi-server.md
-          - ponzi-worker: reference/api/ponzi-worker.md
-          - ponzi-client: reference/api/ponzi-client.md
-          - ponzi-visual: reference/api/ponzi-visual.md
-      - Store contracts: reference/contracts.md
+      - Overview: reference/index.md
       - Versions: reference/versions.md
-      - Terminology: reference/terminology.md
-      - References: reference/references.md
+      - Glossary: reference/terminology.md
+      - Citations: reference/references.md
   - Contributing:
-      - contributing/index.md
+      - Overview: contributing/index.md
       - Roadmap: contributing/roadmap.md
       - Change process: contributing/process.md
-      - A new stage: contributing/new-stage.md
+      - Adding a stage: contributing/new-stage.md
       - For agents:
-          - contributing/agents/index.md
+          - Overview: contributing/agents/index.md
           - Using PONZI: contributing/agents/usage.md
-          - Contributing: contributing/agents/contributing.md
+          - Changing the code: contributing/agents/contributing.md
   - Discoveries:
-      - discoveries/index.md
+      - Overview: discoveries/index.md
       - Coherence computation: discoveries/coherence.md
       - Sensors and acquisitions: discoveries/acquisition.md
       - The time series: discoveries/time-series.md
@@ -136,6 +161,6 @@ nav:
       - Campaigns: discoveries/campaigns.md
       - Detection and scoring: discoveries/detection.md
   - History:
-      - history/index.md
+      - Overview: history/index.md
       - The overhaul plan: history/overhaul-plan.md
       - The system before the overhaul: history/current-system.md

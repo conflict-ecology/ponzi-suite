@@ -21,7 +21,7 @@ Besides those of C7:
 
 | Attr | Meaning |
 |---|---|
-| `summaries` | the summaries in the store, `["et"]` or `["et", "e"]` |
+| `summaries` | the summaries in the store, in the order the request named them: `et`, or `et` and `e` |
 | `summary_t_lo`, `summary_t_hi` | the written time indices |
 | `et_definition` | the definition below, as a sentence |
 | `et_j`, `et_min_cells` | 4 and 5 |
@@ -50,4 +50,4 @@ One float16 grid per written time index with `et` (`2 * Y * X` bytes raw), two w
 
 ## Functions
 
-`ponzi.contracts.summary`: `SUMMARY_ARRAYS`, `create_summary_store`, `write_summary_slice`, `validate_summary_store` (the checks of C7), `open_summary_store`. The statistic: `ponzi.core.summary`: `EtSummary`, `e_stat_window`, `span_masks`, `check_baselines`.
+`ponzi.contracts.summary`: `SUMMARY_ARRAYS`, `create_summary_store`, `write_summary_slice`, `validate_summary_store` (the checks of C7; a store without the `summaries` attr raises `ValueError`), `open_summary_store`. The statistic: `ponzi.core.summary`: `EtSummary`, `e_stat_window`, `span_masks`, `check_baselines`.

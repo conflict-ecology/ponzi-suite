@@ -5,7 +5,7 @@ hide:
 
 # How PONZI works
 
-The method, where it runs, how its registered pieces are made, and what a change to one of them makes new. Every diagram follows the code as it stands; the [terminology](../reference/terminology.md) defines the words.
+The method, where it runs, how its registered pieces are made, and what a change to one of them makes new. Every diagram follows the code as it stands; the [Glossary](../reference/terminology.md) defines the words.
 
 ## The method
 
@@ -56,12 +56,11 @@ The method, where it runs, how its registered pieces are made, and what a change
 <text class="pz-small" x="426" y="74">block t to t+4:</text>
 <text class="pz-small" x="426" y="89">25 pairs, 5 baselines</text>
 <text class="pz-small" x="426" y="104">by 5 acquisitions</text>
-<text class="pz-small" x="426" y="119"></text>
 <text class="pz-small" x="426" y="134">filled: the pyramid,</text>
 <text class="pz-small" x="426" y="149">the 15 pairs that span</text>
 <text class="pz-small" x="426" y="164">the gap before t</text>
 <text class="pz-small" x="426" y="179">(dashed line)</text>
-<line class="pz-arrow" x1="306.0" y1="218" x2="88.0" y2="258"/>
+<path class="pz-arrow" d="M304,216 L304,236 L88,236 L88,259"/>
 <rect class="pz-box" x="20" y="262" width="136" height="142" rx="6"/>
 <text class="pz-title" x="30" y="284">1 Forecast</text>
 <text class="pz-small" x="30" y="306">the forecaster (default</text>
@@ -107,26 +106,24 @@ From the 30 acquisitions before an anchor `t` and the covariates (weather, built
 ## Where it runs
 
 ```mermaid
-flowchart LR
-  suite["ponzi-suite<br/>specs, standards,<br/>test cases"]
-  visual["ponzi-visual<br/>map: tiles, areas,<br/>outputs over time"]
-  server[("ponzi-server<br/>areas, jobs, leases,<br/>final outputs")]
+flowchart TB
+  visual["ponzi-visual<br/>map: tiles, areas, outputs"]
+  server[("ponzi-server<br/>areas, jobs, final outputs")]
   client["ponzi-client serve<br/>the long-running loop"]
-  worker["ponzi-worker job<br/>short calls: runs the stages,<br/>caches by content id"]
-  home[("PONZI home<br/>$PONZI_HOME")]
+  worker["ponzi-worker job<br/>runs the stages, caches by content id"]
   data[("ASF, Copernicus DEM,<br/>weather, GHSL")]
-  visual -- "areas: tiles, tags, days" --> server
-  server -- "outputs, boundaries" --> visual
-  server -- "jobs (lease)" --> client
-  client -- "one call per step" --> worker
-  client -- "final assets: upload or shared path" --> server
+  suite["ponzi-suite<br/>specs, standards"]
+  home[("PONZI home<br/>$PONZI_HOME")]
+  visual <-- "areas; outputs, boundaries" --> server
+  server <-- "leases jobs; final outputs back" --> client
+  client -- "one short call per step" --> worker
   data --> worker
-  worker --- home
+  suite -. "specs by name" .-> worker
   server --- home
-  suite -. "specs by name or path" .-> worker
+  worker --- home
 ```
 
-The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([The service](../service/server.md), [The worker](../service/worker.md)).
+The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([Running the server](../service/server.md), [Workflows and the cache](../service/worker.md)).
 
 ## One burst under a standard
 
@@ -134,55 +131,47 @@ What a job runs: the workflow of the area's [standard](../models/standards.md), 
 
 ```mermaid
 flowchart TB
-  subgraph make["the coherence store of the burst"]
-    direction LR
-    asf[("ASF<br/>SLC scenes, orbits")] --> discover["discover<br/>acquisitions, pairs"]
-    discover --> coherence["coherence<br/>ISCE3, one raster<br/>per pair"]
-    dem["dem"] --> coherence
-    coherence --> assemble["assemble<br/>coherence store C1"]
-  end
-  subgraph score["scoring and detection"]
-    direction LR
-    onboard["onboard<br/>sidecar C2"] --> run["run<br/>scores C7, Et C24,<br/>staged C26"]
-    model[("registry<br/>model + scoring spec")] --> run
-    run --> pvalues["pvalues<br/>codes C22"]
-    cal[("registry<br/>calibration")] -- "ingest-calibration" --> pvalues
-    pvalues --> detect["detect<br/>events C25"]
-    pvalues --> tile["tile<br/>events per<br/>Major TOM cell"]
-    detection["standard's detection spec"] --> detect
-    detection --> tile
-  end
-  assemble --> onboard
-  assemble --> run
+  asf[("ASF<br/>SLC scenes, orbits")] --> discover["discover<br/>acquisitions, pairs"]
+  discover --> coherence["coherence<br/>downloads the scenes,<br/>ISCE3, one raster per pair"]
+  dem["dem<br/>Copernicus DEM"] --> coherence
+  coherence --> assemble["assemble<br/>coherence store C1"]
+  assemble --> onboard["onboard<br/>sidecar C2"]
+  assemble --> run["run<br/>scores C7, Et C24, staged C26"]
+  onboard --> run
+  model[("registry<br/>model + scoring spec")] --> run
+  run --> pvalues["pvalues<br/>codes C22"]
+  cal[("registry<br/>calibration")] -- "ingest-calibration" --> pvalues
+  pvalues --> detect["detect, by the detection spec<br/>events C25"]
+  pvalues --> tile["tile, by the detection spec<br/>events per Major TOM cell"]
 ```
 
 `detect` and `tile` are the final steps whose Items the server keeps. A standard made from existing stores starts at `ingest-coherence` instead of the first four stages.
 
 ## How the registered pieces are made
 
-The model, its calibrations and the standard are made with `ponzi-models`, from the files in ponzi-suite, into the PONZI home.
+The model, its calibrations and the standard are made with `ponzi-models`, from the files in ponzi-suite, into the PONZI home. `panel-build` writes the panel's stores and masks to `$PONZI_HOME/panels/`; `prepare` makes the train and validation windows (layer `sample_train`); `export` writes the artifact (TiDE: TorchScript and `meta.json`); `register-model` files it with one scoring spec, whose hash is fixed from then on. The null runs are production runs on the panel's test split (layer `sample_test`); `register-calibration` files each calibration under its model, with the scoring spec hash and the library version it was made with. A standard names its model, calibrations and specs; its key is `<id>@<hash8>` ([Standard versions](../models/versions.md)).
 
 **Training**
 
 ```mermaid
 flowchart LR
-  def["panel spec<br/>specs/panel_specs/majortom-global<br/>(panel-check)"] --> build["panel-build<br/>stores and masks<br/>in home/panels"]
-  build --> prep["prepare<br/>train and val windows,<br/>layer sample_train"]
-  spec["training spec<br/>specs/training_specs/&lt;family&gt;/...<br/>(default: tide)"] --> prep
-  prep --> train["train<br/>keeps the best<br/>val epoch"]
-  train --> export["export<br/>the artifact<br/>(TiDE: TorchScript + meta.json)"]
-  export --> reg["register-model<br/>model id + ONE scoring spec:<br/>its hash fixed here"]
+  def["panel spec<br/>majortom-global"] --> build["panel-build<br/>stores, masks"]
+  build --> prep["prepare<br/>windows"]
+  spec["training spec<br/>default: tide"] --> prep
+  prep --> train["train<br/>best val epoch"]
+  train --> export["export<br/>the artifact"]
+  export --> reg["register-model<br/>fixes the scoring spec"]
 ```
 
 **Calibration**
 
 ```mermaid
 flowchart LR
-  reg[("registered model")] --> runs["null-runs<br/>production runs on the<br/>test split, layer sample_test"]
-  runs --> rows["null-rows<br/>the runs' own anomaly<br/>scores where finite"]
-  rows --> build["calibrate<br/>plain and ceiling"]
-  build --> regcal["register-calibration<br/>under the model; records the<br/>scoring spec hash and library version"]
-  runs -. "--staged" .-> staged["calibrate-staged<br/>one mapping per stage"]
+  reg[("registered<br/>model")] --> runs["null-runs<br/>test split"]
+  runs --> rows["null-rows<br/>anomaly scores"]
+  rows --> build["calibrate<br/>plain, ceiling"]
+  build --> regcal["register-calibration"]
+  runs -. "--staged" .-> staged["calibrate-staged<br/>one per stage"]
   staged -.-> regcal
 ```
 
@@ -190,12 +179,12 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  newstd["new-standard<br/>or bump-standard"] --> std
-  std["standard yaml<br/>model, calibrations, and the<br/>detection, coherence, onboarding<br/>and panel specs by name"] --> check["check-standard<br/>against the registry"]
-  check --> regstd["register-standard<br/>registry standards/id@version"]
-  regstd --> wf["standard-workflow<br/>the server's standard file"]
+  newstd["new-standard,<br/>or an edit"] --> std["standard<br/>&lt;id&gt;.yaml"]
+  std --> check["check-standard"]
+  check --> regstd["register-standard<br/>&lt;id&gt;@&lt;hash8&gt;"]
+  regstd --> wf["standard-workflow"]
   wf --> served[("home/standards<br/>read by the server")]
-  bench["benchmark checks<br/>panel null, BRIGHT,<br/>Gaza with UNOSAT, Tehran"] -. "not yet a command" .-> std
+  bench["benchmark checks"] -. "not yet a command" .-> std
 ```
 
 The fixed checks a candidate standard is compared on are not yet a command: `ponzi.evaluation` has the metrics, and `ponzi-models rehearse` runs the whole lifecycle on synthetic data.
@@ -206,7 +195,7 @@ Each piece is fixed at a known point, and a change to it gives new content ids t
 
 <div class="pz-flows" markdown="0"><p>Pick a kind of work to see its path through the system. (The map needs JavaScript; the matrix below says the same.)</p></div>
 
-Pick a kind of work to see where its data comes in, which registered pieces it makes new, which it computes again and which it reuses. Red dashed pieces should be computed again but are reused as the code stands (an engine change below a major); dotted ones are not yet in the code.
+Pick a kind of work to see where its data comes in, which registered pieces it makes new, which it computes again and which it reuses. Purple dashed pieces should be computed again but are reused as the code stands (an engine change below a major); dotted ones are not yet in the code.
 
 | Piece | Fixed by | A change means |
 | --- | --- | --- |
@@ -217,7 +206,7 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | Scoring spec | its hash, fixed at `register-model` | new runs; a calibration is made for one hash and refuses others |
 | Calibration | its id under the model, the scoring spec hash | new p-values and events; runs reused |
 | Detection spec | its name and hash, named by the standard | new events and cells; runs and p-values reused |
-| Standard | `id@version`, immutable once registered | any change is a new version; areas name the version they run |
+| Standard | `id@hash8`, its content hash (CR-089); immutable once registered | any change but its description is a new version; areas name the version they run |
 | Area | its tiles (and so its bursts, of both passes) and its days | its jobs; no new standard |
 
 **The change matrix.** What each kind of work makes new, recomputes or reuses, as the worker behaves today.
@@ -227,10 +216,10 @@ Pick a kind of work to see where its data comes in, which registered pieces it m
 | A. New area | the area | the stages of bursts not yet computed | the registry; any burst already computed | as intended |
 | B. Monitoring update | the pairs Item (identified by the acquisitions found) | the new pairs' coherence; then the store, sidecar, a new staged run over the window, p-values, events | the earlier pairs; a day with nothing new reuses everything | a monitoring update is a new run, never an appended one |
 | C. Fine-tune for an area | a child model (`init_from`), its calibration, a standard of its own | runs, p-values, events | coherence stores, sidecars | the two standards are not linked in the code |
-| D. New panel spec or training spec | model, calibration, a new standard major | runs onward | coherence stores of bursts in both | as intended |
-| E. Better calibration | calibration, a new standard version | p-values, events | runs | nothing checks that its cells stayed out of training |
-| F. New detection spec | a new standard minor | events, cells | runs, p-values | as intended |
+| D. New panel spec or training spec | model, calibration, a new standard version (a `run` change) | runs onward | coherence stores of bursts in both | as intended |
+| E. Better calibration | calibration, a new standard version (a `products` change) | p-values, events | runs | nothing checks that its cells stayed out of training |
+| F. New detection spec | a new standard version (a `products` change) | events, cells | runs, p-values | as intended |
 | G. Library major change | the release, a rebuilt calibration | the stages whose `code` names the library: for `ponzi`, the store assembly, runs, p-values, events and cells; for `ponzi-pipeline`, coherence onward | the stages of other code | as intended (CR-054) |
 | H. Coherence engine change | new stores when the coherence spec changes, or with a new `ponzi-pipeline` major | stores onward | | **not automatic** for a minor or patch release of `ponzi-pipeline` or a new ISCE3 with the same coherence spec: stores are reused |
 
-Standard versions: a minor version reuses the runs (a new calibration or detection spec), a major one makes new runs (a new model or panel spec). `check-standard` refuses a version whose change needs a bigger bump, and a worker fails a job whose standard's `requires` its installed versions do not meet (CR-055; [Standard versions and naming](../models/versions.md)).
+What a standard's new version means for runs, and how `check-standard` and `register-standard` report it: [Standard versions](../models/versions.md#what-a-change-means).

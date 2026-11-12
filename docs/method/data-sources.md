@@ -1,6 +1,6 @@
 # Data sources and catalogs
 
-Where each input of PONZI comes from, who fetches it and where it lands. The server fetches its catalogs once, on its first start; the worker fetches the inputs of a burst as its jobs need them. Every downloaded file is fetched once and reused. The citations of the data and software are in [References](../reference/references.md), the logins in [Authentication](../getting-started/authentication.md), and the whole home layout in [Paths and environment variables](../getting-started/paths.md).
+Where each input of PONZI comes from, who fetches it and where it lands. The server fetches its catalogs once, on its first start; the worker fetches the inputs of a burst as its jobs need them. Every downloaded file is fetched once and reused. The citations of the data and software are in [Citations](../reference/references.md), the logins in [Logins and keys](../getting-started/authentication.md), and the whole home layout in [Folders and environment variables](../getting-started/paths.md).
 
 | Input | Fetched by | When | Lands in | Login |
 | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ Where each input of PONZI comes from, who fetches it and where it lands. The ser
 | [Weather](#era5-land-weather) (ERA5-Land) | worker, `onboard` | per burst and month | `$PONZI_HOME/downloads/era5/` (CDS); Earth Data Hub is read in place | Earth Data Hub or CDS |
 | [Built-up and land](#ghsl-built-up-and-land) (GHSL) | worker, `onboard` | per tile | `$PONZI_HOME/downloads/ghsl/` | none |
 
-`$PONZI_HOME` is the home of every part: the server's, the worker's, the SLURM tasks' (CR-088; [The worker](../service/worker.md)).
+`$PONZI_HOME` is the home of every part: the server's, the worker's, the SLURM tasks' (CR-088; [Workflows and the cache](../service/worker.md)).
 
 ## Fetched by the server on its first start
 
@@ -30,7 +30,7 @@ Every Sentinel-1 IW burst with its footprint in lon/lat, about 1.1 million burst
 - **Source:** `burst-id-geometries-simple-0.18.0.geojson.zip` of the burst_db 0.18.0 release (59.7 MB), pinned by URL and sha256 in `ponzi_spec.catalog.GEOMETRIES` (CR-038, CR-045).
 - **Built** by `ponzi_spec.catalog.ensure_catalog` with the standard library only: the GeoJSON is streamed and written to `bursts.sqlite3` (its `format` the hash of `ponzi_spec.catalog.CONTRACT`, CR-086), with an R*Tree over the boxes. A burst across the antimeridian has two index entries; a burst repeated with the same footprint is kept once (burst_db 0.18.0 repeats about 141,000). The layout is the contract `ponzi_server.catalog` reads with `sqlite3` only.
 - **Lands in** `$PONZI_HOME/catalog/`: the zip as downloaded, and `bursts.sqlite3`.
-- **Other ways:** `ponzi-pipeline burst-catalog` (or `pixi run catalog VERSION` in ponzi-visual) builds a catalog from another release, which the settings then name as `bursts`. A small JSON list of bursts also works (a demo, a test).
+- **Other ways:** `ponzi-pipeline burst-catalog --source FILE` builds a catalog from another release into the home's `catalog/bursts.sqlite3` (CR-088; `pixi run catalog VERSION` in ponzi-visual writes one to its `.e2e/`). A small JSON list `bursts.json` in its place also works (a demo, a test).
 
 ### The administrative boundaries
 
@@ -44,13 +44,13 @@ The administrative units of the World Bank Official Boundaries, drawn on the map
     | 1 | `Admin 1` | their first subdivisions |
     | 2 | `Admin 2` | their second subdivisions |
 
-- **The disputed areas** (CR-069): the plain Admin 0 file leaves out the NDLSA areas (Jammu and Kashmir, Aksai Chin, Western Sahara, Abyei, the Golan Heights, the Falklands and others); the "all layers" file holds them, so level 0 covers the land. They are kept with `disputed` true. They have no code in the file: theirs is `NDLSA-` and the name in capitals with dashes, with the sovereign's ISO code after it when two share a name (`NDLSA-JAMMU-AND-KASHMIR-IND`, `NDLSA-JAMMU-AND-KASHMIR-PAK`). Each belongs to no country.
+- **The disputed areas** (CR-069): the plain Admin 0 file leaves out the NDLSA areas (Jammu and Kashmir, Aksai Chin, Western Sahara, Abyei, the Golan Heights, the Falklands and others); the "all layers" file holds them, so level 0 covers the land. They are kept with `disputed` true. They have no code in the file: theirs is `NDLSA-` and the name in capitals with dashes, with the sovereign's ISO code after it when two share a name (`NDLSA-JAMMU-AND-KASHMIR-IND`, `NDLSA-JAMMU-AND-KASHMIR-PAK`). Each belongs to no country. Antarctica is in neither file and has no tiles.
 - **Built** by `ponzi_server.boundaries.ensure_boundaries` (with `pyarrow` and `shapely`) into `boundaries.sqlite3` (its `format` the hash of `ponzi_server.boundaries.CONTRACT`, CR-086): each outline made valid and simplified to `SHAPE`, 0.001 degrees (about 100 m), with an R*Tree over the boxes. The map's outlines are simplified further to its scale when asked.
 - **Lands in** `$PONZI_HOME/catalog/`: the Parquet files in `boundaries/`, and `boundaries.sqlite3`.
 
 ## The Major TOM grid
 
-The 10 km grid of the panels' cells, the delivered outputs and the tiles of a watched area ([Grids](grids.md)). Nothing is downloaded: the cells, their ids (`433U_621R`, row then column, named by the bottom-left corner) and their bounds are computed, by `ponzi.grid.MajorTomGrid` and, without numpy for the server, by `ponzi_spec.majortom` (CR-066). Rows cover latitudes -85 to 85.
+The 10 km grid of the panels' cells, the delivered outputs and the tiles of a watched area ([Grids: processing and outputs](grids.md)). Nothing is downloaded: the cells, their ids (`433U_621R`, row then column, named by the bottom-left corner) and their bounds are computed, by `ponzi.grid.MajorTomGrid` and, without numpy for the server, by `ponzi_spec.majortom` (CR-066). Rows cover latitudes -85 to 85.
 
 ## Burst availability
 
@@ -62,7 +62,7 @@ When each burst was acquired, and when it will be next (CR-060), for `GET /v1/bu
 
 ## Fetched by the worker, per job
 
-The steps of a standard's workflow name their shared inputs by variables (`burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`). Those a job does not set come from the worker's home. They are request parameters, never part of a content id, so where a home is changes no output ([Making a standard](../models/standards.md#from-bundle-to-server)).
+The steps of a standard's workflow name their shared inputs by variables (`burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`). Those a job does not set come from the worker's home. They are request parameters, never part of a content id, so where a home is changes no output ([Building a standard](../models/standards.md#from-bundle-to-server)).
 
 ### The burst map
 
@@ -73,7 +73,7 @@ Every burst's box in its UTM zone, from which each burst's fixed grid is made (`
 - **The acquisitions:** the `discover` stage searches ASF's `SLC-BURST` dataset for each burst over the job's span (`ponzi_pipeline.discover`, through `asf_search`) and reads each hit's parent SLC off its download URL. No login.
 - **The SLCs:** the `coherence` stage downloads the parent SLC of each acquisition of its pair from ASF, as a zip, into `$PONZI_HOME/downloads/slc/` (`ponzi_pipeline.acquire`, CR-032).
 - **The orbit files:** from ASF's S1QC listing, precise (POEORB) before restituted (RESORB), into `$PONZI_HOME/downloads/orbits/`.
-- **Login:** Earthdata, for the SLCs and orbits: `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else the netrc file, never a config (CR-044). The account needs the ASF data access application approved ([Authentication](../getting-started/authentication.md)).
+- **Login:** Earthdata, for the SLCs and orbits: `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else the netrc file, never a config (CR-044). The account needs the ASF data access application approved ([Logins and keys](../getting-started/authentication.md)).
 
 A file already in the folder is used as it is. A download writes a `.part` file and renames it, under a lock folder, so array tasks that need the same SLC wait for one download.
 

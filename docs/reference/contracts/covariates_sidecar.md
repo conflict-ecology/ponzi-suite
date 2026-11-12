@@ -4,7 +4,7 @@
 
 ## Producer and consumers
 
-Producer: `ponzi_pipeline.onboard.onboard.onboard_store` (`ponzi-pipeline onboard --store PATH --out DIR [--burst ID] [--onboarding-spec SPEC] [--steps LIST] [--rebuild] [--frames FILE] [--ghsl-cache DIR] [--era5-cache DIR]`, or the worker stage `onboard`), which writes `<out_dir>/<burst>_covariates.zarr` and the stamp `<out_dir>/onboard_meta.json`; the worker keeps the two as one cache entry (assets `covariates` and `onboard_meta`). Its parameters are the onboarding spec (C17).
+Producer: `ponzi_pipeline.onboard.onboard.onboard_store` (`ponzi-pipeline onboard --store PATH [--out DIR] [--burst ID] [--onboarding-spec SPEC] [--steps LIST] [--rebuild] [--frames FILE] [--ghsl-cache DIR] [--era5-cache DIR]`, or the worker stage `onboard`; `--out` defaults to the store's folder, and the two caches to the PONZI home's `downloads/ghsl` and `downloads/era5`), which writes `<out_dir>/<burst>_covariates.zarr` and the stamp `<out_dir>/onboard_meta.json`; the worker keeps the two as one cache entry (assets `covariates` and `onboard_meta`). Its parameters are the onboarding spec (C17).
 
 Consumers: `ponzi.core.runner` (`open_input(coh, sidecar)`, `RunRequest.sidecar`, `ponzi run --sidecar`, the worker stage `run`), the onboarding's `sample` step (`extract_burst_sample`: the series and layers travel into the C3 sample), `ponzi_models` (the masked input of a panel, through `open_input`).
 

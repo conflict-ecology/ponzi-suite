@@ -2,7 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("lets do training spec and scoring spec. Their respective folders in the .ponzi home dir should be plural versions of their names. ie training_specs scoring_specs", then the same pattern for the panel, detection, coherence and onboarding files, and the folders in both the suite and the home; "no need for backward compatability", then "full recompute. full rebuild.", then, on how versions are kept, "add 1 and 2 in CR070": a bump command and versions assigned at registration; then "remove the panel spec version. same with detection, coherence, onboarding specs. those should be hashes with the specs git tracked"; then "add new standard to CR070 sensor-scope as well. for those wheres, make sure the naming convention matches")
 - **Status:** signed off (2026-11-05), implemented (2026-11-06)
-- **Superseded in part:** specs moved under `specs/` (CR-078), a spec's hash is its version (CR-083), stages have no version (CR-085), the old-name refusals went (CR-082), and a standard has no workflow (CR-084).
+- **Superseded in part:** specs moved under `specs/` (CR-078), a spec's hash is its version (CR-083), stages have no version (CR-085), the old-name refusals went (CR-082), and a standard has no workflow (CR-084). The standard's `MAJOR.MINOR.PATCH`, its `id:` and `version:` fields, the `<id>-<version>.yaml` files and `bump-standard` are gone: one file `<id>.yaml`, its version its content hash (CR-089).
 
 ## Why
 Two of the files a model is made from have names that do not say what they are:

@@ -1,4 +1,4 @@
-# Running on the cluster (SLURM)
+# Running on SLURM
 
 The worker renders SLURM job scripts from a **cluster profile**: versioned data, made on the cluster by ponzi-core's `ponzi_spec.cluster` from the cluster's site file. No cluster's profile is shipped (CR-065). A profile holds the partitions, the Python of each environment of a ponzi-service release, the scratch redirects, and the resources of each stage.
 
@@ -51,7 +51,7 @@ One loop carries out one job at a time. More loops, each with its own `--worker-
 
 ## Logs
 
-Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM task's output in `logs/slurm/<batch>/<stage>_<job>_<task>.out`, the folder made when the batch is rendered, and the client loop's in `logs/client/`. `batch.json` in `$PONZI_HOME/cache/slurm/<batch>/` names its log folder, and `ponzi-worker batch` reads the failed tasks from `sacct`. On a cluster, `$PONZI_HOME` is set to the shared file system, so the logs sit on it with the cache.
+Every log PONZI writes to files is in `$PONZI_HOME/logs/` (CR-064): each SLURM task's output in `logs/slurm/<batch>/<stage>_<job>_<task>.out`, the folder made when the batch is rendered, and the client loop's in `logs/client/`. `batch.json` in `$PONZI_HOME/cache/slurm/<batch>/` names its log folder, and `ponzi-worker batch` reads the failed tasks from `sacct`.
 
 ## How a batch is made
 
@@ -67,15 +67,7 @@ A profile is made, not written by hand, from two inputs:
 - **A snapshot of the cluster**: read-only SLURM queries of the partitions, the nodes with their cpus, memory, GPUs and state, your accounts, the limits, and your recent jobs.
 - **A site file**, written once for the cluster at `$PONZI_HOME/cluster/sites/<site>.yaml` (or any file given to `--site`). It holds what a snapshot cannot say: the roots other than the home (`lab`, where the releases are installed), the release, which partition plays each role (`cpu`, `scratch`, `gpu`, `bulk`), nodes to avoid, and each stage's request.
 
-Every job checks for the profile first. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml`; with none, they take the snapshot on the login node, make the profile from it and the site file, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `--site` names the site; with one site file in `$PONZI_HOME/cluster/sites/`, it is that one, and with none the job fails saying where to write it. `ponzi-worker profile` takes a new snapshot and makes it again, after a node goes down or new stages have run. The home is `$PONZI_HOME`, typically on the shared scratch, else `~/.ponzi` in your cluster home folder. A site file names no `data` root (refused): `{data}` in its templates, such as a redirect `TMPDIR: "{data}/tmp/slurm"`, is the home (CR-088):
-
-```
-$PONZI_HOME/cluster/
-  sites/<site>.yaml                      the site file, written for the cluster
-  profiles/<site>.yaml                   the current profile
-  profiles/<site>-<version>.yaml         every version made
-  snapshots/<site>/<YYYY-MM-DDTHHMMSS>/  the last 10 snapshots
-```
+Every job checks for the profile first. `ponzi-worker job` and `run` with `--executor slurm` and no `--profile` read `$PONZI_HOME/cluster/profiles/<site>.yaml`; with none, they take the snapshot on the login node, make the profile from it and the site file, and save both in the home's `cluster/` folder (`ponzi_spec.home.Layout.cluster`). `--site` names the site; with one site file in `$PONZI_HOME/cluster/sites/`, it is that one, and with none the job fails saying where to write it. `ponzi-worker profile` takes a new snapshot and makes it again, after a node goes down or new stages have run. A site file names no `data` root (refused): `{data}` in its templates, such as a redirect `TMPDIR: "{data}/tmp/slurm"`, is the home (CR-088). The `cluster/` folder keeps the current profile, every version made and the last 10 snapshots ([Folders and environment variables](../getting-started/paths.md#the-ponzi-home)).
 
 Remaking the profile of an unchanged cluster keeps its version, so a batch already rendered keeps its id and is not submitted twice. A changed cluster, such as a node going down, gives a new version named by the day (`2026.11.05`, then `2026.11.05.2`). `--profile FILE` uses a given profile instead.
 

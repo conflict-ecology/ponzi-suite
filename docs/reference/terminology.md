@@ -1,6 +1,6 @@
-# Terminology
+# Glossary
 
-The words PONZI uses, grouped with the words they are easily confused with. Each group says how its terms differ. Names follow the [naming convention](../models/naming.md); formats are in the [store contracts](contracts.md).
+The words PONZI uses, grouped with the words they are easily confused with. Each group says how its terms differ. Names follow the [naming convention](../models/naming.md); formats are in the [Store formats (contracts)](contracts.md).
 
 ## Words with two meanings
 
@@ -21,7 +21,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **track** (relative orbit) | the repeating ground path of the satellite, 1 to 175 | a path (a track *and* a direction) |
 | **orbit pass** | ascending or descending; one track crosses a place in one pass | |
 | **cell** | a square of the Major TOM grid (10 km), the unit of panels and of the delivered outputs | a burst; a pixel |
-| **grid**, **lattice** | the fixed raster a burst is processed on (UTM, 40 m), or the raster a path or cell is resampled to | ([Grids](../method/grids.md)) |
+| **grid**, **lattice** | the fixed raster a burst is processed on (UTM, 40 m), or the raster a path or cell is resampled to | ([Grids: processing and outputs](../method/grids.md)) |
 | **tile** | a cell of the Major TOM grid over land, as a watched area is made from it | |
 | **boundary** | an administrative unit of the World Bank Official Boundaries, level 0 (a country, or a disputed area of non-determined legal status), 1 or 2; drawn on the map and the land a tile must meet, never what an area is made from | an area |
 | **area** (watched area) | what the server keeps running: 1 or more tiles, every burst of both passes meeting them, a standard (the server's `default_standard` when none is given), a cadence, tags and optionally a first and last day | an AOI |
@@ -101,7 +101,7 @@ Only a model can be used: calibrations are made for it, and scoring specs and st
 
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
-| **panel spec** | the git-tracked folder of cells, bursts and build settings, `specs/panel_specs/<id>/` (`majortom-global`); its version is its hash ([Panels](../method/panels.md)) | a built panel |
+| **panel spec** | the git-tracked folder of cells, bursts and build settings, `specs/panel_specs/<id>/` (`majortom-global`); its version is its hash ([Training panels](../method/panels.md)) | a built panel |
 | **built panel** | the panel's stores, masks and draw, made into `$PONZI_HOME/panels/<id>@<hash8>` | |
 | **split** | train, val or test; test is the calibration null | |
 | **calibration** | the mapping from scores to codes, filed under one model for one scoring spec | a detection spec |
@@ -112,11 +112,11 @@ Only a model can be used: calibrations are made for it, and scoring specs and st
 
 | Term | What it fixes | Not to be confused with |
 | --- | --- | --- |
-| **spec** | a file a person writes, validated by PONZI, that says how something is made: a training, scoring, panel, detection, coherence or onboarding spec, known by its name and hash ([Naming](../models/naming.md#spec-folders)) | a standard; a config of the deployment |
+| **spec** | a file a person writes, validated by PONZI, that says how something is made: a training, scoring, panel, detection, coherence or onboarding spec, known by its name and hash ([Naming rules](../models/naming.md#spec-folders)) | a standard; the server's settings |
 | **detection spec** | the detection rules: threshold code, dating, gaps, episodes, `specs/detection_specs/` | a calibration |
 | **coherence spec**, **onboarding spec** | how a burst's coherence store is made (backend, looks, window, grid, DEM), and its sidecar and pixel sample, `specs/coherence_specs/`, `specs/onboarding_specs/` | |
 | **workflow** | the stages and their order for one burst, with variables | a job (one workflow for one burst and span) |
-| **standard** | everything an area runs, under one id `<sensor>-<scope>` and version (`s1-general@2.0.0`): the panel, coherence, onboarding and detection specs by name, the model, its scoring spec hash, its calibrations ([Standards](../models/standards.md)) | a release of the library |
+| **standard** | everything an area runs, under one id `<sensor>-<scope>`, its file's name, and a version, its content hash (`s1-general@3f9a12c4`): the panel, coherence, onboarding and detection specs by name, the model, its scoring spec hash, its calibrations ([Standards](../models/standards.md)) | a release of the library |
 | **test case** | a place used for testing, `testcases/<case>/`: its area, detection spec and training spec | a standard |
 
 ## The service
@@ -129,20 +129,20 @@ Only a model can be used: calibrations are made for it, and scoring specs and st
 | **request** | a one-off run of bursts under a standard | an area (which keeps making jobs) |
 | **job** | one unit the server hands out: a workflow for one burst and span | a run |
 | **lease** | the client loop's hold on a job, renewed by heartbeats | |
-| **home** | the folder everything computed lives in, `~/.ponzi` or `$PONZI_HOME` | a repository |
+| **home** | the one folder an installation keeps everything in, `$PONZI_HOME`, else `~/.ponzi` (CR-088) | a repository |
 | **cache** | the worker's store of outputs by content id, `$PONZI_HOME/cache` | |
-| **Item**, **collection**, **asset** | a STAC record of one output, its kind (`ponzi-run`), and one of its files ([STAC profile](../using/stac-profile.md)) | |
-| **manifest** | the readable provenance of an output: every step and input that made it ([Manifests](../using/manifests.md)) | |
+| **Item**, **collection**, **asset** | a STAC record of one output, its kind (`ponzi-run`), and one of its files ([STAC catalog profile](../using/stac-profile.md)) | |
+| **manifest** | the readable provenance of an output: every step and input that made it ([Provenance (manifests)](../using/manifests.md)) | |
 
 ## Identity and versions
 
 | Term | What it identifies | Changes when |
 | --- | --- | --- |
-| **content id** | one output, from its stage, the majors of its code, its inputs' ids and its parameters ([Content ids](../using/content-ids.md)) | any of those change |
+| **content id** | one output, from its stage, the majors of its code, its inputs' ids and its parameters ([Content ids and reuse](../using/content-ids.md)) | any of those change |
 | **code majors** | the major of each distribution that computes a stage, in its content ids and its Items' `ponzi:stage` (CR-054, CR-085); stages have no version of their own | a release's version |
 | **spec hash** | a spec, composed and with the code's defaults filled in (`spec_hash`) | any resolved setting changes |
 | **contract version** | a store's or a record file's layout: the hash of its declaration (`contract_hash`, CR-085), pinned by a test ([Versions](versions.md)) | its declaration changes |
 | **digest**, **sha256** | the bytes of a file or store | the bytes change |
 | **library version** | a release of `ponzi` (git tag, `0.0.1`); a calibration refuses another major | a release |
-| **standard version** | a standard, semver; set by a person, as are the release tags, `API_VERSION` and the STAC extension's ([Versions](versions.md), [Standard versions](../models/versions.md)) | anything in it changes |
+| **standard version** | a standard: the content hash of its file, cited `<id>@<hash8>` (CR-089); nobody writes it ([Versions](versions.md), [Standard versions](../models/versions.md)) | anything in it but its description, or a spec it names, changes |
 | **name** | a readable label (`tide-weather`), never an identity on its own; a spec's version is its hash, cited `name@<hash8>`, and the registry archives every version used | |

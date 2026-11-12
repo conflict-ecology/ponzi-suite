@@ -1,6 +1,6 @@
-# Making a standard
+# Building a standard
 
-A standard is a versioned bundle: a model, its scoring spec hash, its calibrations, and the panel, detection, onboarding and coherence specs it names. Watched areas and run requests name it as `<id>@<version>`. How versions are numbered, written (`new-standard`, `bump-standard`, `register-standard`), checked and tracked by the server is in [Standard versions and naming](versions.md).
+A standard is a bundle: a model, its scoring spec hash, its calibrations, and the panel, detection, onboarding and coherence specs it names, in one file `standards/<id>.yaml`. Its version is its content hash, and watched areas and run requests name it as `<id>@<hash8>`, or by its id when the server holds one version (CR-089). How it is versioned, written (`new-standard`, `register-standard`) and tracked by the server is in [Standard versions](versions.md).
 
 ## On the CPU, on local disk (the rehearsal)
 
@@ -23,15 +23,15 @@ The rehearsal runs the functions of the real lifecycle on the synthetic world (`
 
 The checks of a standard (ponzi-core CR-055):
 
-- **The id:** `<sensor>-<scope>`, its sensor the model card's ([Naming](naming.md)).
+- **The id:** `<sensor>-<scope>`, its sensor the model card's ([Naming rules](naming.md)).
 - **The specs:** each it names, as `name` or `name@<hash>` (`new-standard` writes the latter), is found: the home, then the suite, then the registry's archive for a version (ponzi-core CR-083).
 - **The registry:** the model, its artifact by reference when it has one, its scoring spec, and the calibrations, each made for that scoring spec on the standard's panel spec. A trained model was trained on that panel spec (the same hash).
 - **The panel:** with the built panel in the home, no training or validation cell of the model is a test cell of the panel, the calibrations' null.
 - **`requires`:** the installed distributions meet it. A worker also refuses a job of a standard whose `requires` its own versions do not meet.
-- **The version before it:** the latest registered version, else the previous one beside the file; the change must fit the number raised ([When to raise which number](versions.md#when-to-raise-which-number)).
-- **Drafts:** a draft (`status: draft`) is checked for its form and its specs only, and `standard-workflow` refuses it. The general standard, ponzi-suite `standards/s1-general-2.0.0.yaml`, is a draft.
+- **The version before it:** the latest registered version, else `--previous FILE`; what the change means (`run`, `products` or `other`) is reported, never refused ([What a change means](versions.md#what-a-change-means)).
+- **Drafts:** a draft (`status: draft`) is checked for its form and its specs only, and `standard-workflow` refuses it. The general standard, ponzi-suite `standards/s1-general.yaml`, is a draft.
 
-Its registry (`<out>/registry`) and its standard `s1-rehearsal@1.0.0` (`<out>/standards/`, registered with `--allow-uncommitted`, since its specs are written into `<out>` and are in no ponzi-suite commit) behave like real ones, and the worker runs them. `<out>` is the rehearsal's home for its specs: a command run with `PONZI_HOME=<out>` finds them (CR-088).
+Its registry (`<out>/registry`) and its standard `s1-rehearsal` (`<out>/standards/s1-rehearsal.yaml`, registered with `--allow-uncommitted`, since its specs are written into `<out>` and are in no ponzi-suite commit) behave like real ones, and the worker runs them. `<out>` is the rehearsal's home for its specs: a command run with `PONZI_HOME=<out>` finds them (CR-088).
 
 ## From bundle to server
 
@@ -41,7 +41,7 @@ pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY \
     --set start_date=2025-01-01
 ```
 
-This writes the standard as the server runs it, by default to `$PONZI_HOME/standards/<id>-<version>.yaml` where the server of that home reads it (`--out` names any file; for another home, set `PONZI_HOME`; CR-080, CR-088), with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir` and `era5_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `$PONZI_HOME/downloads/`). The steps are:
+The standard must be registered first: its workflow is recorded beside it in the registry, once per source, and every later build must match ([One key, one workflow](versions.md#one-key-one-workflow)). This writes the standard as the server runs it, by default to `$PONZI_HOME/standards/<id>@<hash8>.yaml` where the server of that home reads it (`--out` names any file; for another home, set `PONZI_HOME`; CR-080, CR-088), with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir` and `era5_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `$PONZI_HOME/downloads/`). The steps are:
 
 1. The coherence chain, either way:
     - `--source pipeline`: `discover`, `dem`, `coherence` (one job per pair), `assemble`;
@@ -53,6 +53,6 @@ This writes the standard as the server runs it, by default to `$PONZI_HOME/stand
 6. `detect`, with the detection spec's fields.
 7. `tile`, the same.
 
-Copy the file into the server's `standards` folder (`$PONZI_HOME/standards` by default) and restart the server. `ponzi-client standards` then lists it.
+Unless it was written there, copy the file into the server's `$PONZI_HOME/standards/` and restart the server; `ponzi-client standards` then lists it ([how the server reads it](versions.md#two-files-for-one-version)).
 
 The open work for the first real standard is on the [roadmap](../contributing/roadmap.md#phase-8b-the-first-standard).

@@ -11,7 +11,7 @@ Producer: whoever calls `write_labels`; no command or worker stage writes one. C
 | Name | Dims | dtype | Fill | Meaning |
 |---|---|---|---|---|
 | `label` | `(y, x)` or `(time, y, x)` | int16 | 0 | 0 = excluded; `k > 0` caller-defined class. The 3-d form gives the class per acquisition; the bag class is the highest nonzero code over the evaluated anchors |
-| `bag` | `(time, y, x)` | int32 | 0 | Optional. `k > 0` = the id of the bag the acquisition belongs to; 0 = in no bag. An id is unique in the store, belongs to one pixel, and `label` is constant inside it. `LabelSet.window` is the derived `bag > 0`. A store with a `window` array and no `bag` is converted on read, one id per contiguous run of a pixel |
+| `bag` | `(time, y, x)` | int32 | 0 | Optional. `k > 0` = the id of the bag the acquisition belongs to; 0 = in no bag. An id is unique in the store, belongs to one pixel, and `label` is constant inside it. `LabelSet.window` is the derived `bag > 0`. |
 | `onset` | `(y, x)` | int32 | -1 | Optional. Index of the first acquisition after the true change |
 | `weight` | `(y, x)` | float32 | NaN | Optional |
 | `stratum` | `(y, x)` | int16 | 0 | Optional reporting dimension |

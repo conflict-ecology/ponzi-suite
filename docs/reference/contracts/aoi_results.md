@@ -15,7 +15,7 @@ Columns, in order (`DESIGN_COLUMNS`):
 | `claim` | the caller's label |
 | `strategy` | `event` (a per event row), `pooled_equal`, `pooled_pixel`, `median`, `paired`, `wins`, `worst` |
 | `statistic` | `value` for event and pooled rows, `median`, `ratio_median`, `diff_median`, `wins`, `losses`, `n_paired`, `sign_test_p`, `worst` |
-| `variant`, `baseline` | the design variant the row describes, and the variant it is paired against (empty unless paired) |
+| `variant`, `baseline` | the design variant the row describes, and the baseline variant given to `across_events`, on the rows it makes (always for `paired` and `wins`); empty on event and pooled rows |
 | `event` | the event name of a per event row, the worst event of a `worst` row, else empty |
 | `cls`, `null_kind`, `metric`, `threshold_name`, `threshold_value`, `stratum`, `value`, `n`, `k`, `lo`, `hi` | the metric row of `ponzi.evaluation.metrics` (C20; `threshold_value` of a median row is the median of the events' values) |
 | `events` | the contributing events, semicolon joined |

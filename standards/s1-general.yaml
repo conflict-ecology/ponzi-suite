@@ -2,8 +2,7 @@
 # A draft: the panel spec majortom-global is written but its coherence stores are still to be made, so no model,
 # scoring spec hash or calibration is registered yet. Publishing it means filling `model.ref`, `scoring_spec_hash`
 # and `calibrations` from the registry, setting `status: published`, and `ponzi-models register-standard`.
-id: s1-general
-version: 2.0.0
+# Its id is this file's name and its version its content hash, s1-general@<hash8> (ponzi-core CR-089).
 status: draft
 sensor: S1
 description: >-

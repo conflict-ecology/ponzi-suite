@@ -1,8 +1,11 @@
-# The service
+# ponzi-service
 
-- [The server](server.md): requests, jobs and leases, the scheduler, keys, the catalogs.
-- [The worker](worker.md): how workflows are planned, cached and run.
-- [Running on the cluster](hpc.md): the client loop, the SLURM executor and the cluster profile.
-- [Configuration](configuration.md): one home, `$PONZI_HOME`; the specs and how they compose.
-- [REST API](rest-api.md): the `/v1` endpoints.
-- [Troubleshooting](troubleshooting.md): common errors and what to do about them.
+The service around ponzi-core: the server that keeps areas, jobs and outputs, the worker that runs the stages, and the client that joins them.
+
+| Distribution | Pages | Status |
+| --- | --- | --- |
+| ponzi-server | [Running the server](server.md), [REST API](rest-api.md), [API](../reference/api/ponzi-server.md) | under construction |
+| ponzi-worker | [Workflows and the cache](worker.md), [Running on SLURM](hpc.md), [API](../reference/api/ponzi-worker.md) | |
+| ponzi-client | [Clients: Python, CLI, TypeScript](../using/clients.md), [API](../reference/api/ponzi-client.md) | under construction |
+
+[Troubleshooting](troubleshooting.md) covers all three.

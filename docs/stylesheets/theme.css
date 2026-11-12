@@ -1,0 +1,90 @@
+/* The site in ponzi-visual's "Conflict ecology" skin (ponzi-visual src/styles.css): white surfaces, black ink, one red
+   accent, square corners, Archivo (Bahnschrift where installed) with IBM Plex Mono, and bold uppercase titles marked by a
+   red bar. Dark mode takes the skin's dark values. Set on the element that carries data-md-color-scheme, as
+   diagrams.css explains. */
+[data-md-color-scheme="default"] {
+  --ce-bg: #f0efef; --ce-surface: #ffffff; --ce-ink: #000000; --ce-muted: #5f6672; --ce-rule: #dcdada;
+  --ce-accent: #d73f3f; --ce-link: #b8302f; --ce-signal: #d73f3f; --ce-stripe: #f8f7f7; --ce-mark: #fde7e7;
+
+  --md-primary-fg-color: var(--ce-surface);
+  --md-primary-fg-color--light: var(--ce-bg);
+  --md-primary-fg-color--dark: var(--ce-bg);
+  --md-primary-bg-color: var(--ce-ink);
+  --md-primary-bg-color--light: var(--ce-muted);
+  --md-accent-fg-color: var(--ce-accent);
+  --md-accent-fg-color--transparent: rgba(215, 63, 63, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --ce-bg: #262626; --ce-surface: #121212; --ce-ink: #f4f4f4; --ce-muted: #a4a8b0; --ce-rule: #323232;
+  --ce-accent: #ff6b6b; --ce-link: #ff8585; --ce-signal: #e5484d; --ce-stripe: #181818; --ce-mark: #5a2323;
+  --md-hue: 0;
+
+  --md-primary-fg-color: #1c1c1c;
+  --md-primary-fg-color--light: #262626;
+  --md-primary-fg-color--dark: #121212;
+  --md-primary-bg-color: var(--ce-ink);
+  --md-primary-bg-color--light: var(--ce-muted);
+  --md-accent-fg-color: var(--ce-accent);
+  --md-accent-fg-color--transparent: rgba(255, 107, 107, 0.12);
+  --md-footer-bg-color: #1c1c1c;
+  --md-footer-bg-color--dark: #121212;
+}
+
+[data-md-color-scheme] {
+  --md-default-bg-color: var(--ce-surface);
+  --md-default-fg-color: var(--ce-ink);
+  --md-default-fg-color--light: var(--ce-muted);
+  --md-default-fg-color--lighter: var(--ce-rule);
+  --md-default-fg-color--lightest: var(--ce-bg);
+  --md-typeset-color: var(--ce-ink);
+  --md-typeset-a-color: var(--ce-link);
+  --md-code-bg-color: var(--ce-bg);
+  --md-code-fg-color: var(--ce-ink);
+  --md-typeset-table-color: var(--ce-rule);
+  --md-text-font: "Bahnschrift", "Archivo";
+}
+
+/* The header: the surface, with the red rule under it; the site name bold and uppercase, as the app's title. */
+.md-header { border-bottom: 3px solid var(--ce-signal); box-shadow: none; }
+.md-header[data-md-state="shadow"], .md-header--shadow { box-shadow: none; }
+.md-header__topic:first-child { font-weight: 800; text-transform: uppercase; letter-spacing: .01em; }
+.md-tabs { background-color: var(--md-primary-fg-color); color: var(--ce-ink); }
+.md-search__form { background-color: var(--ce-bg); border-radius: 0; }
+.md-search__input { color: var(--ce-ink); }
+.md-search__input::placeholder, .md-search__icon { color: var(--ce-muted); }
+
+/* Titles: the page title bold and uppercase behind a red bar, the sections bold. */
+.md-typeset h1 { font-weight: 800; text-transform: uppercase; letter-spacing: .01em; color: var(--ce-ink);
+  border-left: 8px solid var(--ce-signal); padding-left: 12px; }
+.md-typeset h2 { font-weight: 700; color: var(--ce-ink); border-bottom: 1px solid var(--ce-rule); padding-bottom: .2em; }
+.md-typeset h3, .md-typeset h4 { font-weight: 700; color: var(--ce-ink); }
+
+/* Text: a little larger, with more space between lines. */
+.md-typeset { font-size: 0.82rem; line-height: 1.7; }
+.md-typeset p, .md-typeset li { max-width: 52rem; }
+
+/* Links: the accent, underlined on hover and focus, so they read as links without colour. */
+.md-typeset a { text-underline-offset: 0.18em; }
+.md-typeset a:hover, .md-typeset a:focus { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--ce-accent); outline-offset: 2px; }
+
+/* The navigation: the current page in the accent, bold, as the app's drawer marks it. */
+.md-nav__link--active, .md-nav__item .md-nav__link--active { color: var(--ce-accent); font-weight: 700; }
+
+/* Tables: a grey header row and striped rows, so wide tables are easy to follow along a line. */
+.md-typeset table:not([class]) { font-size: 0.74rem; border-radius: 0; border-color: var(--ce-rule); }
+.md-typeset table:not([class]) th { background-color: var(--ce-bg); color: var(--ce-ink); }
+.md-typeset table:not([class]) tbody tr:nth-child(even) { background-color: var(--ce-stripe); }
+.md-typeset table:not([class]) tbody tr:hover { background-color: var(--md-accent-fg-color--transparent); }
+
+/* Square corners everywhere, as the skin has them. */
+.md-typeset code, .md-typeset pre > code, .md-typeset .admonition, .md-typeset details, .md-typeset .tabbed-set,
+.md-search__form, .md-search__output, .md-clipboard, .md-button, .md-source__icon { border-radius: 0; }
+.md-typeset :not(pre) > code { border: 1px solid var(--ce-rule); padding: 0.05em 0.3em; }
+
+/* The search highlight, readable in dark mode too. */
+.md-typeset mark { background-color: var(--ce-mark); color: inherit; }
+
+/* A name in a table's first column stays whole: `ponzi.calibration`, never `ponzi.calibrat` and `ion`. */
+.md-typeset table:not([class]) td:first-child code { white-space: nowrap; }

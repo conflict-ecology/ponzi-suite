@@ -29,7 +29,7 @@ A run with `staged.zarr` (C26) coded with a staged calibration (below) also hold
 - One calibration per store; the calibration's `scoring_spec_hash` equals the run's `scoring_spec.hash` (`CalibrationMismatch` otherwise).
 - The calibration's library version (`provenance.ponzi_version`) has the major of the run's (`run_meta.ponzi_version`; SemVer: the first number from 1 on, `0.y` below; `LibraryMismatch` otherwise), unless written with `--allow-library-mismatch`; a side without a known version is warned about, not refused.
 - A staged calibration made under another `staged_rule`, or with other stages, than the run's is refused (`CalibrationMismatch`).
-- A store without `complete` is refused by `open_pvalue_store` (`IncompletePValueStore`); a complete store is written again only with `overwrite`, an interrupted one always.
+- A store without `complete` is refused by `open_pvalue_store` (`IncompletePValueStore`, a `ContractError`); a complete store is written again only with `overwrite`, an interrupted one always.
 
 ## The calibration file
 

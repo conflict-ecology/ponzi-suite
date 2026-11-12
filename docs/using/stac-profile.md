@@ -1,4 +1,4 @@
-# STAC profile
+# STAC catalog profile
 
 PONZI catalogs its data with [STAC](https://stacspec.org) 1.1.0. Stores keep their formats (Zarr for the stores of the [contracts](../reference/contracts.md), Cloud Optimized GeoTIFF for pair coherence and display rasters); STAC is the catalog and the lineage around them.
 
@@ -56,4 +56,4 @@ An Item links to what it was made from:
 
 Every lineage link carries the target's `ponzi:content_id`, so the graph can be walked without fetching the targets. Every Item also links its Collection (`rel: collection`, `./collection.json`); a static catalog keeps each Collection's Items in one folder.
 
-Build Items with `ponzi_spec.make_item`; see the [reference](../reference/ponzi-spec.md).
+Build Items with `ponzi_spec.make_item`; see the [ponzi-spec API reference](../reference/ponzi-spec.md#stac).

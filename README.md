@@ -13,7 +13,7 @@ Pages are under `docs/`. Content that comes from code is generated at build time
 
 Linux on x86-64 only, for now: both commands check the machine first and stop on any other system.
 
-For developing and testing PONZI on one machine, not for deploying it, two pixi tasks of this repository set up and start the whole system ([Install](docs/getting-started/install.md#for-development), [Quickstart](docs/getting-started/quickstart.md#development-on-your-own-home)):
+For developing and testing PONZI on one machine, not for deploying it, two pixi tasks of this repository set up and start the whole system ([Install](docs/getting-started/install.md#for-development), [Quickstart](docs/getting-started/quickstart.md#development-setup)):
 
 ```
 pixi run dev-install         # clone the missing ponzi-core, ponzi-service, ponzi-visual beside the suite, install them
@@ -39,7 +39,7 @@ The suite also holds the files PONZI runs from, versioned here because ponzi-cor
 | `specs/onboarding_specs/` | onboarding specs, how a store's sidecar and pixel sample are made: `all-steps` | a standard's `onboarding`; `ponzi-pipeline onboard --onboarding-spec all-steps` |
 | `specs/detection_specs/` | detection specs, how the events and cells are made from p-values: `single-path` | a standard's `detection`; `ponzi detect ... --detection-spec single-path` |
 | `testcases/<case>/` | test locations: an area (`area.yaml`); their specs are under `specs/`, named after them. The first is `gaza`. | `ponzi detect ... --detection-spec single-path-gaza-release` |
-| `standards/` | standard versions, `<id>-<version>.yaml`, the id `<sensor>-<scope>`, naming the specs above. The first is the draft `s1-general-2.0.0.yaml`. | `ponzi-models check-standard ../ponzi-suite/standards/s1-general-2.0.0.yaml`; `new-standard`, `bump-standard`, `register-standard` |
+| `standards/` | standards, `<id>.yaml`, the id `<sensor>-<scope>` the file's name and the version its content hash (CR-089), naming the specs above. The first is the draft `s1-general.yaml`. | `ponzi-models check-standard ../ponzi-suite/standards/s1-general.yaml`; `new-standard`, `register-standard` |
 
 A command takes a spec as `--<kind>-spec NAME|FILE` (ponzi-core CR-070): a name is looked up in the PONZI home's folder of the same name (`$PONZI_HOME/specs/training_specs/`, `specs/scoring_specs/`, `specs/panel_specs/`, `specs/detection_specs/`, `specs/coherence_specs/`, `specs/onboarding_specs/`) first, then in this repository's; a path is always accepted. A spec's version is its content hash, cited `name@<hash8>` (ponzi-core CR-083): a spec is edited in place, and the registry archives every version used. Where a spec is used (a model card, a built panel, a calibration, a registered standard, the server's standard file) its name, hash and the commit of this repository it was read from are recorded; a published standard is registered only from committed files.
 

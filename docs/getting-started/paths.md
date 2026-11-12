@@ -1,6 +1,6 @@
-# Paths and environment variables
+# Folders and environment variables
 
-Where PONZI keeps things on a machine, and the variables that move them. Secrets are in [Authentication](authentication.md); what is set where is in [Configuration](../service/configuration.md).
+Where PONZI keeps things on a machine, and the variables that move them. Secrets are in [Logins and keys](authentication.md); what is set where is in [Specs and the PONZI home](../service/configuration.md).
 
 ## The PONZI home
 
@@ -13,7 +13,7 @@ $PONZI_HOME/                            ~/.ponzi by default
   keys/                                 key files, readable by the owner only (mode 700)
     <name>.key                          as `ponzi-server keys add --out` writes them
   standards/
-    <id>-<version>.yaml                 the standards the server runs (from `ponzi-models standard-workflow`)
+    <id>@<hash8>.yaml                   the standards the server runs (from `ponzi-models standard-workflow`); it reads every file here
   outputs/                              the final assets the server serves (in path mode the workers write them here)
   catalog/
     opera-burst-bbox-only.sqlite3       the OPERA burst map the worker reads (pinned, sha256 checked)
@@ -31,7 +31,8 @@ $PONZI_HOME/                            ~/.ponzi by default
   registry/                             models and their calibrations
     <model id>/                         the model card (model.json), the artifact, scoring_spec.yaml, training_spec.yaml
       calibrations/<calibration id>/    calibration.npz and its record
-    standards/<id>@<version>/           a registered standard: standard.yaml and record.json, written once
+    standards/<id>@<hash8>/             a registered standard: standard.yaml and record.json, written once (CR-089);
+                                        workflow-<source>.json, the workflow standard-workflow built for it (CR-091)
     specs/<kind>_specs/<name>/<hash>/   every spec version used, resolved (CR-083)
   panels/
     <id>@<hash8>/                       a built panel of one panel spec version: masks, draw, catalogue, panel.json
@@ -50,6 +51,7 @@ $PONZI_HOME/                            ~/.ponzi by default
     detection_specs/
     coherence_specs/
     onboarding_specs/
+    standards/                          standards a person writes, <id>.yaml (`new-standard`; CR-089)
   downloads/                            inputs shared by every run
     slc/                                Sentinel-1 SLCs (the parent SLC zip of each burst, `<granule>.zip`)
     orbits/                             orbit files
@@ -87,14 +89,14 @@ A home records its own files by paths relative to itself, so a home copied to an
 | --- | --- | --- |
 | `PONZI_HOME` | the PONZI home | `~/.ponzi` |
 | `PONZI_URL` | the server `ponzi-client` and the client loop talk to, without `--url` (CR-088) | |
-| `PONZI_SUITE` | the ponzi-suite checkout a spec name is looked up in, after the home's spec folders ([Naming](../models/naming.md#spec-folders)) | `ponzi-suite` beside the ponzi-core checkout |
+| `PONZI_SUITE` | the ponzi-suite checkout a spec name is looked up in, after the home's spec folders ([Naming rules](../models/naming.md#spec-folders)) | `ponzi-suite` beside the ponzi-core checkout |
 
 ### Keys and logins
 
 | Variable | Read by | For |
 | --- | --- | --- |
-| `PONZI_KEY` (or the name in `server.key_env`) | ponzi-client, the worker | the server key |
-| `PONZI_KEY_FILE` | ponzi-client, the worker | a file holding the server key, read when the variable above is unset |
+| `PONZI_KEY` (or the variable `--key-env` names) | ponzi-client and its loop | the server key |
+| `PONZI_KEY_FILE` | ponzi-client and its loop | a file holding the server key, read when the variable above is unset |
 | `EARTHDATA_USERNAME`, `EARTHDATA_PASSWORD` | `ponzi-pipeline acquire`, the worker | ASF downloads; both set win over the netrc file |
 | `NETRC` | `ponzi-pipeline` | another netrc file than `~/.netrc` |
 | `WANDB_API_KEY`, `WANDB_ENTITY`, `WANDB_MODE` | `ponzi-models train` | wandb's login, team and mode (wandb's own variables); the trainer sets `WANDB_DIR` and the other wandb folders to the fit's `wandb/` (`--preflight`: the training root's `wandb/`), so nothing is written to `~/.config` or `~/.cache` |
@@ -107,6 +109,6 @@ A home records its own files by paths relative to itself, so a home copied to an
 | `OMP_NUM_THREADS` | `ponzi`, torch, the BLAS libraries | the threads of a run; the SLURM scripts set it to `$SLURM_CPUS_PER_TASK` |
 | `PONZI_TIDE_WORKERS` | the TiDE forecaster | its data loader workers (default min(4, torch threads / 2)) |
 | `CONDA_OVERRIDE_CUDA` | pixi | install the `isce3` environment where no NVIDIA driver is found (`12.9`) |
-| `PONZI_URL` | ponzi-visual's dev server | the server it forwards to (default `http://127.0.0.1:8799`, the demo) |
+| `PONZI_URL` | ponzi-visual's dev server | the same variable as above, here the server the dev server forwards to (default `http://127.0.0.1:8799`, the demo) |
 | `PONZI_ENVS`, `PONZI_REF` | ponzi-suite's `pixi run dev-install` | the extra environments to install, the branch or tag to clone ([For development](install.md#for-development)) |
-| `PONZI_SERVER_PORT`, `PONZI_VISUAL_PORT`, `PONZI_SERVER_HOST`, `PONZI_SERVER_SETTINGS`, `PONZI_WORKER_ID` | ponzi-suite's `pixi run dev-up` | its ports, the server's address and settings, the client loop's name ([Quickstart](quickstart.md#development-on-your-own-home)) |
+| `PONZI_SERVER_PORT`, `PONZI_VISUAL_PORT`, `PONZI_SERVER_HOST`, `PONZI_SERVER_SETTINGS`, `PONZI_WORKER_ID` | ponzi-suite's `pixi run dev-up` | its ports, the server's address and settings, the client loop's name ([Quickstart](quickstart.md#development-setup)) |

@@ -1,13 +1,13 @@
-# Authentication
+# Logins and keys
 
-What each part of PONZI needs to log in to, and where to put it. A secret is never written in a PONZI file, a standard or a repository: each one is read from the environment or from the file its own tool reads (`ponzi.yaml` has no `credentials:` section).
+What each part of PONZI needs to log in to, and where to put it. A secret is never written in a PONZI file, a standard or a repository: each one is read from the environment or from the file its own tool reads.
 
 ## What needs what
 
 | Credential | Needed by | Required for | Where it goes |
 | --- | --- | --- | --- |
-| **Earthdata Login** (NASA) | the worker, `ponzi-pipeline acquire` | downloading the SLCs and orbit files from ASF | `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else the netrc file |
-| **Earth Data Hub** token (DestinE) | the worker, onboarding with weather source `edh` or `edh_cdsgrid` | ERA5-Land weather for the sidecar | the netrc file |
+| **Earthdata Login** (NASA) | the worker, `ponzi-pipeline acquire` | downloading the SLCs and orbit files from ASF | `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else `~/.netrc` |
+| **Earth Data Hub** token (DestinE) | the worker, onboarding with weather source `edh` or `edh_cdsgrid` | ERA5-Land weather for the sidecar | `~/.netrc` |
 | **Copernicus CDS** key | the worker, onboarding with weather source `cdsgrid` or `edh_cdsgrid` | ERA5-Land weather newer than the Earth Data Hub store | `~/.cdsapirc` |
 | **PONZI server key** | `ponzi-client` (and its loop, `ponzi-client serve`), ponzi-visual | every call to a running server | `PONZI_KEY` (or the variable `--key-env` names), else the file `$PONZI_KEY_FILE` |
 | **wandb** key | `ponzi-models train` with `--wandb online` (its default) | logging training runs | wandb's own: `WANDB_API_KEY` or `wandb login` |
@@ -16,7 +16,7 @@ Needs no login: ASF's burst search (`discover`, and the server's [burst availabi
 
 A machine needs only the credentials of what runs on it. The server needs none to reach out: it holds the hashes of the PONZI keys and calls nothing that needs a login. A machine that carries out jobs needs Earthdata and the weather source of its onboarding spec for the worker, and a `worker` key for its client loop (the worker itself talks to no server).
 
-## The netrc file
+## The `~/.netrc` file
 
 Earthdata and the Earth Data Hub are read from one file: `$NETRC` when that is set, else `~/.netrc`. One line per host:
 
@@ -31,7 +31,7 @@ Make it readable by you only:
 chmod 600 ~/.netrc
 ```
 
-- **Earthdata.** Register at [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov). `login` is the username, not the email address. Downloads from ASF also need the application *Alaska Satellite Facility Data Access* approved under *Applications › Authorized Apps* of the Earthdata profile; without it, the login answers 401. When `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD` are both set, they win over the netrc file.
+- **Earthdata.** Register at [urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov). `login` is the username, not the email address. Downloads from ASF also need the application *Alaska Satellite Facility Data Access* approved under *Applications › Authorized Apps* of the Earthdata profile; without it, the login answers 401. When `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD` are both set, they win over `~/.netrc`.
 - **Earth Data Hub.** Register at [earthdatahub.destine.eu](https://earthdatahub.destine.eu/getting-started) and make a personal access token; the token is the `password`, and the line needs no `login`.
 
 ## The CDS file
@@ -84,8 +84,8 @@ A failed login names its source, never the secret:
 
 | Message | Means |
 | --- | --- |
-| `no Earthdata credentials: set EARTHDATA_USERNAME and EARTHDATA_PASSWORD, or add ...` | neither the variables nor a netrc entry for `urs.earthdata.nasa.gov` were found |
+| `no Earthdata credentials: set EARTHDATA_USERNAME and EARTHDATA_PASSWORD, or add ...` | neither the variables nor an entry in `~/.netrc` for `urs.earthdata.nasa.gov` were found |
 | `ASFAuthenticationError ... 401 Unauthorized` | the entry was found and refused: the username or password is wrong, or the ASF application is not approved |
-| `<file>: ... (line N)` | the netrc file does not parse |
+| `<file>: ... (line N)` | `~/.netrc` does not parse |
 | `401 a valid key is needed` | the server key is missing, revoked or mistyped |
 | `403` | the key is valid but its scope does not allow the call |

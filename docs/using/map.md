@@ -1,15 +1,15 @@
-# The map
+# Using the map
 
 !!! warning "Under construction"
     ponzi-visual is still being built; this page and the map itself will change.
 
 ponzi-visual is PONZI's web front end. It shows the administrative boundaries the server serves, lets you choose Major TOM tiles and watch them over a span of days, and shows on the map the tiles monitored now and those with outputs that nothing monitors. It makes areas of tiles and nothing else: the server chooses the standard that runs them and how often it looks (ponzi-core CR-068). What an area is and how the server runs it is in [Watched areas](watched-areas.md).
 
-Every call goes through the server's API with your key. To run the front end, see [Install](../getting-started/install.md#ponzi-visual) and, for the whole system on one machine, [Quickstart](../getting-started/quickstart.md#development-on-your-own-home).
+Every call goes through the server's API with your key. To run the front end, see [Install](../getting-started/install.md#ponzi-visual) and, for the whole system on one machine, [Quickstart](../getting-started/quickstart.md#development-setup).
 
 ## Connecting
 
-The first page asks for an **API key**. **Connect** checks it against the server (`GET /v1/standards`) before keeping it, and shows the server's answer when it is refused. A key needs the scope `client:write` to make, pause or delete areas, `client:read` to look only ([Authentication](../getting-started/authentication.md#ponzi-server-keys)). Under `pixi run dev-up` the key to enter is `dev-browser.key`, printed when the system starts.
+The first page asks for an **API key**. **Connect** checks it against the server (`GET /v1/standards`) before keeping it, and shows the server's answer when it is refused. A key needs the scope `client:write` to make, pause or delete areas, `client:read` to look only ([Logins and keys](../getting-started/authentication.md#ponzi-server-keys)). Under `pixi run dev-up` the key to enter is `dev-browser.key`, printed when the system starts.
 
 The key is kept in the browser tab's `sessionStorage` (`ponzi.key`): it lasts while the tab is open, and a new tab or a new browser session asks again. Where storage is blocked (a private window) it lives in the page's memory only. **Disconnect**, in the drawer, forgets it.
 
@@ -49,13 +49,13 @@ Over it, three overlays show the World Bank Official Boundaries the server serve
 | **Admin 1** | ×6 | red outlines, thinner |
 | **Admin 2** | ×16 | the thinnest yellow outlines, over Admin 1, so a red edge shows on both sides of a yellow line along it |
 
-An overlay's tooltip says from which zoom it is drawn. Each boundary is labelled with its name, at a point inside its largest part; a name is left out when the boundary is too small on screen for it or when it would overlap the name of a larger one. Level 0 includes the World Bank's areas of non-determined legal status (the NDLSA areas, such as Jammu and Kashmir, Western Sahara and Abyei, listed in [Watched areas](watched-areas.md)): they are filled as land and outlined dashed. The toggles are kept in the browser (`ponzi.overlays`).
+An overlay's tooltip says from which zoom it is drawn. Each boundary is labelled with its name, at a point inside its largest part; a name is left out when the boundary is too small on screen for it or when it would overlap the name of a larger one. Level 0 includes the World Bank's areas of non-determined legal status (the NDLSA areas, such as Jammu and Kashmir, Western Sahara and Abyei, listed in [Data sources and catalogs](../method/data-sources.md#the-administrative-boundaries)): they are filled as land and outlined dashed. The toggles are kept in the browser (`ponzi.overlays`).
 
 The boundaries are a view only. They take no hover and no click, and an area is never made from them (ponzi-core CR-067). Until the server has prepared them, the map draws only its graticule and the note says why ([Troubleshooting](../service/troubleshooting.md#the-boundaries-or-the-burst-catalog-are-being-prepared)).
 
 ## Choosing tiles
 
-An area is made from Major TOM tiles, the 10 km cells of the grid the outputs are on ([Grids](../method/grids.md)). The tiles are drawn from ×32, where a tile is about 7 pixels across, and only over land: the server lists no tile over open sea. They are drawn above the overlays and are the one layer that takes the pointer. Hovering a tile shows its id.
+An area is made from Major TOM tiles, the 10 km cells of the grid the outputs are on ([Grids: processing and outputs](../method/grids.md)). The tiles are drawn from ×32, where a tile is about 7 pixels across, and only over land: the server lists no tile over open sea. They are drawn above the overlays and are the one layer that takes the pointer. Hovering a tile shows its id.
 
 - **Drag a box** with the left mouse button: every tile it meets is added. Each box adds more to the selection.
 - **Hold Shift** while dragging to remove the tiles the box meets.
@@ -134,7 +134,7 @@ An area's page (`#/areas/<id>`; **← Map** goes back) shows its name, its stand
 
 - The store is the Item's `events` asset, fetched through the server with the key and read in the browser.
 - The raster is drawn over the Item's lon/lat box. The cell's grid is in UTM, so this is close (within about a pixel for a 10 km cell) but not a reprojection.
-- **Where this cell came from** shows the steps the cell's Item was made by: stage, Item, spec hash and inputs, and its sources outside PONZI ([Manifests](manifests.md)).
+- **Where this cell came from** shows the steps the cell's Item was made by: stage, Item, spec hash and inputs, and its sources outside PONZI ([Provenance (manifests)](manifests.md)).
 
 An area whose jobs have not finished shows "No outputs yet"; **Look now**, in its panel on the map, makes its jobs again.
 

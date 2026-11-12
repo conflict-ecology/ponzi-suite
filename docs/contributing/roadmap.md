@@ -11,30 +11,14 @@ Pick an open item, read the pages it links to, and follow the [change process](p
 - **owner:** needs a decision or an approval from the owner.
 
 !!! warning "Before you take an HPC item"
-    - A rule for contributors and agents: you submit nothing to a cluster yourself without the owner's approval. The worker itself submits the work it claims, with no approval step (CR-062).
+    - A rule for contributors and agents: you submit nothing to a cluster yourself without the owner's approval, which may cover many submissions at once ([Cluster approvals](agents/usage.md#cluster-approvals)). The worker itself submits the work it claims, with no approval step (CR-062).
     - Render and show the scripts first: `ponzi-worker run --executor slurm --dry-run` gives the job count, runtime and resources without submitting.
     - Never submit from a machine outside the cluster or from a CI runner.
 
 !!! note "Before you take any item"
     Code changes are reviewed and committed by the owner (decision D10). Leave your work uncommitted in the working tree, or on a branch the owner asked for.
 
-**Getting set up:**
-
-Clone the four repositories side by side: the tests of the suite's files and the agent instructions read ponzi-suite from beside the others.
-
-```
-cd ponzi-core    && pixi install && pixi run test        # + test-spec, test-pipeline, test-models
-cd ponzi-service && pixi install && pixi run test        # worker, server, client
-cd ponzi-visual  && pixi run install && pixi run test    # front end; pixi run e2e against a real server
-```
-
-The whole system on one machine, with a standard made on the CPU and the registry on disk:
-
-```
-cd ponzi-visual && pixi run install
-pixi run server        # the demo (the rehearsal, a standard, 5 bursts run) on :8799; prints the key to enter
-pixi run dev           # another shell: http://localhost:5173
-```
+**Getting set up:** clone the four repositories side by side (the tests of the suite's files and the agent instructions read ponzi-suite from beside the others), then follow [Install](../getting-started/install.md#for-development) and the [Quickstart](../getting-started/quickstart.md). The test commands of each repository are in the [Change process](process.md#tests).
 
 ## Where things stand
 
@@ -75,10 +59,10 @@ pixi run dev           # another shell: http://localhost:5173
 The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi-models rehearse`, then `ponzi-models standard-workflow`. What is left is the same lifecycle at scale, on ISCE3 stores.
 
 - [x] `ponzi_models.synthetic` and `ponzi_models.rehearsal` cover panel, prepare, train (CPU), export, register, null runs, null rows, calibrate, register the calibration, and the checked standard bundle.
-    - `pixi run -e ml ponzi-models rehearse --out DIR` fits a tiny TiDE model in about 10 s; `--model rolling` needs no torch.
+    - `pixi run -e ml ponzi-models rehearse [--out DIR]` fits a tiny TiDE model in about 10 s; `--model rolling` needs no torch.
 - [x] The coherence chain as worker stages: `discover`, `dem`, `coherence` (one job per pair) and `assemble`. The assembled store passes `ponzi validate-store` (`test_standard.py`).
 - [x] `ponzi-models standard-workflow`: a standard bundle as the server runs it. A rehearsed standard runs through the server and a worker (`test_standard.py`).
-- [x] Definitions in git, data in the PONZI home. The specs and test cases are in ponzi-suite, and commands take their paths (CR-046 to CR-048), or their names (CR-070). Panel specs are checked by `ponzi-models panel-check`. The coherence stores, the registry, built panels, standards and the catalogs are in `$PONZI_HOME`, made at start by the server and the worker (CR-045, CR-047).
+- [x] Definitions in git, data in the PONZI home. The specs and test cases are in ponzi-suite, and commands take their paths (CR-046 to CR-048), or their names (CR-070). Panel specs are checked by `ponzi-models panel-check`. The coherence stores, the registry, built panels, standards and the catalogs are in `$PONZI_HOME`, made at start by the server and the worker (CR-045, CR-047); since CR-088 everything is in the one home, and no setting moves a folder out of it.
 - [x] Composable yaml: every spec and standard can build on another with `extends:`; presets are gone, and the detection rules are yaml files (CR-043), now detection specs (CR-070). Specs, models and standards follow one [naming convention](../models/naming.md) (CR-052, CR-070).
 - [x] A staged calibration from commands: `null-runs --staged`, then `calibrate-staged` (CR-051).
 - [ ] **Coherence stores for the panel's bursts.** HPC.
@@ -101,7 +85,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [ ] **Weather in the onboarding.**
     - local: the code exists.
     - HPC: needs the network and CDS or EDH credentials.
-    - A TiDE standard (the default forecaster) needs the ERA5 series in its sidecars: its onboarding runs `weather` and `pairdiff`, as the defaults do (the draft `s1-general@2.0.0` takes them, through the onboarding spec `all-steps`).
+    - A TiDE standard (the default forecaster) needs the ERA5 series in its sidecars: its onboarding runs `weather` and `pairdiff`, as the defaults do (the draft `s1-general` takes them, through the onboarding spec `all-steps`).
     - Done when a TiDE standard runs through the worker on a real burst.
 - [ ] **Model stages as worker stages.** local.
     - `prepare`, `train`, `export`, `null-runs`, `null-rows` and `calibrate` run today as `ponzi-models` commands. Making them stages, with content ids, would put the lifecycle itself in the cache and its manifests.
@@ -113,14 +97,14 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - The default is set with the first standard; 40 m, the posting in use today, is the starting point.
 - [ ] **The CDSE download route.** local, then HPC.
     - A CDSE fallback search and download when ASF misses a burst. Done when `discover` and `coherence` can take CDSE as the source.
-- [ ] **Publish `s1-general@2.0.0`.** Owner.
-    - Steps: fill the model and calibrations, set `status: published`, `ponzi-models register-standard`, then `ponzi-models standard-workflow ... --source pipeline`, then copy the result into the server's standards folder (`$PONZI_HOME/standards` by default).
-    - The draft is ponzi-suite `standards/s1-general-2.0.0.yaml` (CR-055, CR-070); it waits for its model and calibrations.
+- [ ] **Publish `s1-general`.** Owner.
+    - Steps: fill the model and calibrations, set `status: published`, `ponzi-models register-standard`, then `ponzi-models standard-workflow ... --source pipeline`, which writes the server's file into the PONZI home's `standards/`, where the server of that home reads it (CR-088, CR-089).
+    - The draft is ponzi-suite `standards/s1-general.yaml` (CR-055, CR-070, CR-089); it waits for its model and calibrations.
 - [x] **Enforce a standard's `requires`.** `check-standard` and the worker check it (CR-055).
 - [x] **A standard names its panel.** The model and the calibrations must match it; no training cell may be a test cell (CR-055).
-- [x] **Versions are held against the one before.** Within a major the runs may not change, within a minor the outputs (CR-055).
+- [x] **What a version changes is known.** A standard's version is its content hash; `check-standard` and `register-standard` report and record what it changes from the one before: the runs, the products, or neither (CR-055, CR-089).
 - [x] **Library versions in content ids.** The majors of the code that computes a stage (CR-054).
-- [x] **Specs, and only the standard versioned.** The files a person writes are training, scoring, panel, detection, coherence and onboarding specs, in folders of those names in ponzi-suite and the PONZI home, each known by its name and recorded in a `specs:` block with its suite commit. A standard is `<sensor>-<scope>`, names its specs, and is written and registered by `new-standard`, `bump-standard` and `register-standard` (CR-070).
+- [x] **Specs, and only the standard versioned.** The files a person writes are training, scoring, panel, detection, coherence and onboarding specs, in folders of those names in ponzi-suite and the PONZI home, each known by its name and recorded in a `specs:` block with its suite commit. A standard is `<sensor>-<scope>`, names its specs, and is written and registered by `new-standard` and `register-standard` (CR-070); since CR-089 it is named by its file and versioned by its content hash, so nothing a person writes has a version number.
 - [x] **Versions from hashes and tags.** A spec's version is its hash, cited `name@<hash8>`, and the registry archives every version used (CR-083); a standard lists no stages (CR-084); stages have no version, store contracts and record files are versioned by the hash of their declaration, and every distribution by its git tags (CR-085). See [Versions](../reference/versions.md).
 
 ## Phase 9: watched areas
@@ -130,10 +114,10 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] Monitoring updates are new staged runs. A new acquisition computes only its new pairs and makes exactly one new staged run (`test_watched.py`).
 - [x] An area's `start_date` and `end_date` bound its jobs (CR-053).
 - [x] Areas from an administrative boundary on one orbit pass (CR-053, chosen tracks CR-057), then from one Major TOM cell (CR-066). Both were replaced by areas from tiles only (CR-067); the boundaries are now for drawing only.
-- [x] Areas from Major TOM tiles only: 1 to 64 tiles over land, every burst of both passes meeting them, its jobs made at once, and tags the server adds to the analysis outputs of its tiles (CR-067). Areas made before from bursts or a boundary keep running.
+- [x] Areas from Major TOM tiles only: tiles over land, every burst of both passes meeting them, its jobs made at once, and tags the server adds to the analysis outputs of its tiles (CR-067). Areas made before from bursts or a boundary keep running.
 - [x] An area may be more than 64 tiles: the map and the form warn past 64, the server makes it and logs a warning (CR-074).
 - [x] The monitored tiles on the map: monitored in one colour, with outputs and not monitored in another, each opened in a side panel that replaces the Monitored page (CR-075).
-- [x] Select tiles by an Admin 0, 1 or 2 boundary: a click adds every tile over land that meets it (CR-076).
+- [x] Select tiles by an Admin 1 or Admin 2 boundary: a click adds every tile over land that meets it; a whole country cannot be selected (CR-076).
 - [x] The server chooses an area's standard when none is given: `default_standard`, else the one standard it holds, else a 422 saying to set it (CR-068).
 - [x] The World Bank's disputed areas (NDLSA) are level 0 boundaries and land, so their tiles can be watched; the map draws the land from the level 0 boundaries (CR-069).
 - [x] A job lists the Items it made (`Job.items`), so an area's outputs are its done jobs' Items (CR-042).
@@ -152,12 +136,12 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - `ponzi-pipeline burst-catalog` reads the OPERA burst database, as the release GeoJSON or the bbox SQLite, and writes an R-tree SQLite catalog (1,127,661 bursts from burst_db 0.18.0);
     - the server answers box queries with a page limit, plus `/v1/bursts/summary` and `/v1/bursts/{id}`;
     - the map no longer draws the catalog; it draws the footprints of the bursts meeting the selected tiles (CR-067);
-    - with no `bursts` set, the server builds the catalog into the PONZI home at its first start, from the pinned OPERA file (CR-045).
+    - with no catalog in the home's `catalog/`, the server builds it there at its first start, from the pinned OPERA file (`fetch_catalog`, CR-045, CR-088).
 - [x] The app. Its first versions (a burst map with burst picking, runs, a Results tab, then areas chosen from administrative boundaries, CR-053, and from Major TOM cells, CR-066) were replaced step by step; what it is now:
     - the manifest view;
     - an area's page with its outputs (CR-042), a cell's events store drawn with its dates;
     - areas made from tiles only, clicked on the map, with tags; the boundaries as view-only overlays with their names; the burst footprints of the selected tiles by pass; the skin on a settings page (CR-067).
-    - tile submission only: the selected tiles, their tags and a first and last day, the standard and cadence left to the server; a Monitored page of the areas watched now with their job counts; a collapsible navigation drawer (CR-068).
+    - tile submission only: the selected tiles, their tags and a first and last day, the standard and cadence left to the server; a collapsible navigation drawer (CR-068); the areas watched now, first on a Monitored page, now as the monitored tiles on the map (CR-075).
     - a box tool for the tiles from ×32: each box adds the tiles it meets, Shift removes them, Clear empties the selection.
 - [x] Tests:
     - unit tests on the server's own answers (fixtures from `ponzi-worker demo --fixtures`);
@@ -169,7 +153,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
     - An area's page already draws a cell's events store, read in the browser from the zipped store (`src/events.ts`). Left: a `visual` COG per events Item (the Collections declare it, optional; no stage writes it yet), and a tiling endpoint only if that is slow.
     - Done when the area's page draws the events Items' `visual` COG.
 - [ ] **Burst catalog updates.** local.
-    - burst_db publishes new versions. The server's own catalog is built from the file pinned in `ponzi_spec.catalog` (burst_db 0.18.0); a new pin makes the server rebuild it. Or run `pixi run catalog VERSION` in ponzi-visual (or `ponzi-pipeline burst-catalog`) and give the file as the server's `bursts`.
+    - burst_db publishes new versions. The server builds its catalog from the file pinned in `ponzi_spec.catalog` (burst_db 0.18.0) only when its home has none; a catalog of the format in the home's `catalog/` is used whatever built it (CR-088). For a new version, run `ponzi-pipeline burst-catalog --source FILE`, which writes the home's `catalog/bursts.sqlite3`.
     - Done when the server's `/v1/bursts/summary` names the new source.
 - [ ] **Map tiles in production.** Owner.
     - An area's page draws its map on OpenStreetMap's tile servers (the main map is a vector world and needs none). They are for light use; a deployment needs its own tile source or a provider.
@@ -180,7 +164,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] The store contracts checked against the code (CR-050), and kept in this suite with the change requests (CR-071).
 - [x] Every public function has a docstring in ponzi-service, ponzi-spec and ponzi-pipeline. The tests hold that, and a ratchet in ponzi-core (`test_docstrings.py`) holds the rest.
 - [ ] **Burn down the docstring backlog.** local.
-    - 178 names in `ponzi` (126) and `ponzi_models` (52), listed in `packages/core/tests/data/docstring_allowlist.txt`. Document a module, take its names off the list, and run `pixi run test`.
+    - 175 names in `ponzi` (123) and `ponzi_models` (52), listed in `packages/core/tests/data/docstring_allowlist.txt`. Document a module, take its names off the list, and run `pixi run test`.
     - Done when the list is empty.
 - [ ] **Link check in CI.** local.
     - Add a link checker to the docs workflow. Done when broken links fail the build.

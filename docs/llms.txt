@@ -2,66 +2,69 @@
 
 > Change detection on Sentinel-1 SAR coherence time series: forecast the coherence of each new acquisition per burst, score the drop, calibrate it to p-values, date the changes as events. Four repositories: ponzi-core (computing), ponzi-service (server, worker, client), ponzi-visual (map front end), ponzi-suite (this site).
 
-Agents use PONZI through ponzi-client when a server is running (client mode), else through the ponzi-core commands and `ponzi-worker run` on the machine (local mode), never submitting cluster jobs. Agents change PONZI's code only under a signed-off change request, and do not commit or access clusters without the owner's approval.
+Agents use PONZI through ponzi-client when a server is running (client mode), else through the ponzi-core commands and `ponzi-worker run` on the machine (local mode), submitting cluster jobs or moving data only with the owner's approval, which may cover many submissions or transfers at once within the scope it names. Agents change PONZI's code only under a signed-off change request, and do not commit or access clusters without the owner's approval.
 
 ## For agents
 
-- [Using PONZI](contributing/agents/usage/): the client interface and its rules
-- [Contributing](contributing/agents/contributing/): checklists for code changes
+- [Using PONZI](contributing/agents/usage/): client mode and local mode, and how to read what PONZI makes
+- [Changing the code](contributing/agents/contributing/): checklists for code changes
 
 ## Getting started
 
 - [System overview](getting-started/overview/): components and data flow
 - [Install](getting-started/install/): the distributions and their environments
-- [Quickstart](getting-started/quickstart/): the whole system on one machine
-- [Authentication](getting-started/authentication/): the logins each part needs
-- [Paths and environment variables](getting-started/paths/): the PONZI home and every variable
+- [Quickstart: one machine](getting-started/quickstart/): the whole system on one machine
+- [Logins and keys](getting-started/authentication/): the logins each part needs
+- [Folders and environment variables](getting-started/paths/): the PONZI home and every variable
 
-## Interacting with PONZI
+## Concepts
 
+- [How PONZI works](method/workflows/): the method, where it runs, what a change makes new
+- [Stages](method/stages/): replaceable units of work
+- [Content ids and reuse](using/content-ids/): identity and reuse
+- [Provenance (manifests)](using/manifests/): provenance of an output
 - [Watched areas](using/watched-areas/): areas of Major TOM tiles and what a daily look computes
-- [The map](using/map/): ponzi-visual, choosing tiles, the monitored tiles
-- [The clients](using/clients/): Python, command line, TypeScript
-- [STAC profile](using/stac-profile/): collections, the PONZI extension, lineage links
-- [Manifests](using/manifests/): provenance of an output
-- [Content ids](using/content-ids/): identity and reuse
+- [Data sources and catalogs](method/data-sources/): where every input comes from
+- [Specs and the PONZI home](service/configuration/): the one folder, composing specs with extends
 
-## The service
+## ponzi-core
 
-- [The server](service/server/): requests, jobs and leases, the scheduler, keys
-- [The worker](service/worker/): stages, identity, the cache, executors
-- [Running on the cluster](service/hpc/): SLURM, the profile, how the worker submits
-- [Configuration](service/configuration/): ponzi.yaml, paths, secrets
+- [ponzi-core](core/): the four distributions, how they layer, their commands
+- [ponzi-spec](core/ponzi-spec/): the shared schemas, module by module
+- [STAC catalog profile](using/stac-profile/): collections, the PONZI extension, lineage links
+- [ponzi](core/ponzi/): the method's subpackages and the ponzi command
+- [Grids: processing and outputs](method/grids/): native for processing, Major TOM for outputs
+- [Store formats (contracts)](reference/contracts/): store formats C1 to C26
+- [ponzi-pipeline](core/ponzi-pipeline/): the inputs of a run and the ponzi-pipeline command
+- [Making coherence stores](method/coherence/): the ISCE3 chain
+- [Training panels](method/panels/): the training and calibration set
+- [Training and calibrating a model](models/new-model/): from a training spec to a model in a standard
+- [Building a standard](models/standards/): the lifecycle on the CPU and at scale, and the server's file
+- [Standard versions](models/versions/): a standard's id, content-hash version and key; spec hashes; new-standard, register-standard; how the server tracks a standard
+- [Naming rules](models/naming/): names of specs, models and standards; the six spec folders
+
+## ponzi-service
+
+- [Running the server](service/server/): requests, jobs and leases, outputs, keys, settings
 - [REST API](service/rest-api/): /v1 endpoints
+- [Workflows and the cache](service/worker/): stages, identity, the cache, executors, running a standard locally
+- [Running on SLURM](service/hpc/): the client loop on a cluster, the profile, how batches are made
+- [Clients: Python, CLI, TypeScript](using/clients/): ponzi-client and ponzi-visual's client
 - [Troubleshooting](service/troubleshooting/): common errors and their fixes
 
-## The method
+## ponzi-visual
 
-- [How PONZI works](method/workflows/): the workflows end to end
-- [Coherence](method/coherence/): how a coherence store is made
-- [Panels](method/panels/): the training and calibration set
-- [Grids](method/grids/): native for processing, Major TOM for outputs
-- [Stages](method/stages/): replaceable units of work
-- [Data sources and catalogs](method/data-sources/): where every input comes from
-
-## Models and standards
-
-- [Making a standard](models/standards/): the lifecycle on the CPU and at scale
-- [Standard versions and naming](models/versions/): how standards are named, versioned and tracked; spec hashes and the specs block; new-standard, bump-standard, register-standard
-- [Naming](models/naming/): names of specs, models and standards; the six spec folders
-- [A new model](models/new-model/): from a training spec to a model in a standard
+- [Using the map](using/map/): choosing tiles, watching them, the monitored tiles
 
 ## Reference
 
-- [ponzi-spec](reference/ponzi-spec/): shared schemas
-- [Store contracts](reference/contracts/): store formats C1 to C26
 - [Versions](reference/versions/): every version, who sets it and what it is computed from
-- [Terminology](reference/terminology/): the words PONZI uses
-- [References](reference/references/): papers, data and software
+- [Glossary](reference/terminology/): the words PONZI uses
+- [Citations](reference/references/): papers, data and software
 
 ## Contributing
 
 - [Roadmap](contributing/roadmap/): what is done and what is left, as a checklist
 - [Change process](contributing/process/): change requests and versions
-- [A new stage](contributing/new-stage/): adding a processing component
+- [Adding a stage](contributing/new-stage/): adding a processing component
 - [PONZI extension schema](schemas/ponzi/v0.2.0/schema.json)

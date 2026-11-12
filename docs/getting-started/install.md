@@ -20,7 +20,7 @@ workspace/
   ponzi-core/  ponzi-service/  ponzi-visual/  ponzi-suite/
 ```
 
-Then set up the logins the work needs: [Authentication](authentication.md).
+Then set up the logins the work needs: [Logins and keys](authentication.md).
 
 ## The client
 
@@ -31,7 +31,7 @@ pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@mai
             "ponzi-client @ git+https://github.com/conflict-ecology/ponzi-service@main#subdirectory=packages/client"
 ```
 
-It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [The clients](../using/clients.md).
+It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [Clients: Python, CLI, TypeScript](../using/clients.md).
 
 ## ponzi-core
 
@@ -59,7 +59,7 @@ pixi install                 # ponzi-server, ponzi-client, ponzi-worker, with po
 pixi run test                # optional
 ```
 
-It has the same four environments as ponzi-core; the worker's stages run in the one a stage declares, and a cluster's release installs all four. How the pieces run together: [Quickstart](quickstart.md) on one machine, [Running on the cluster](../service/hpc.md).
+It has the same four environments as ponzi-core; the worker's stages run in the one a stage declares, and a cluster's release installs all four. How the pieces run together: [Quickstart](quickstart.md) on one machine, [Running on SLURM](../service/hpc.md).
 
 ## ponzi-visual
 
@@ -90,13 +90,13 @@ PONZI_ENVS="ml isce3" pixi run dev-install
 pixi run dev-install ml      # the same, as arguments
 ```
 
-`ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9 ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-on-your-own-home)).
+`ml-gpu` and `isce3` need an NVIDIA driver for CUDA 12.9 ([GPUs and CUDA](#gpus-and-cuda)). Then start the whole system with `pixi run dev-up` ([Quickstart](quickstart.md#development-setup)).
 
 ## GPUs and CUDA
 
-The two environments are tied to a platform of their own, `linux-64-cuda`: Linux on x86-64 with a CUDA 12.9 driver (pixi's virtual package `__cuda`). The others are on plain `linux-64`, so each environment is solved once.
+`ml-gpu` and `isce3` are tied to a platform of their own, `linux-64-cuda`: Linux on x86-64 with a CUDA 12.9 driver (pixi's virtual package `__cuda`). The others are on plain `linux-64`, so each environment is solved once.
 
-`ml-gpu` and `isce3` use CUDA 12.9 and need an NVIDIA driver for it (575 or later); pixi refuses to install them on a machine without one. On such a machine (a CI runner, a laptop), `CONDA_OVERRIDE_CUDA=12.9` installs them anyway.
+They need an NVIDIA driver for CUDA 12.9 (575 or later); pixi refuses to install them on a machine without one. On such a machine (a CI runner, a laptop), `CONDA_OVERRIDE_CUDA=12.9` installs them anyway.
 
 - **Why 12.9.** CUDA 13 dropped GPUs below compute capability 7.5, so GPUs such as the GTX 1080 Ti (6.1) and V100 (7.0) would be lost.
 - **Why conda-forge torch.** PyTorch's own CUDA 12.8 and 12.9 wheels dropped Pascal; conda-forge's CUDA 12.9 build has kernels from SM 5.0 up, so it runs on those GPUs too.

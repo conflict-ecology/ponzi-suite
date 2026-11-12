@@ -10,7 +10,7 @@ A `ValidationReport` ([shared conventions](../contracts.md#shared-conventions)) 
 
 ## Checks
 
-In report order: the C1 checks (`store_checks`) `structure`, `dtype` (only for a float64 `coh`), `baseline_days`, `revisit_days`, `time_axis`, `chunking`, `valid_pixels`, `range`, `crs`, `identity`, `consolidated`; then `complete_sentinel`, `partial`, `generation`, `window` (only when the dates do not match `T`, fail), `pairs_declared`, `cell_quality`, `chunk_completeness`, `availability_matrix`, `finite_fraction` and, last, `engine_report`.
+In report order: the C1 checks (`store_checks`) `dtype` (only for a float64 `coh`, reported just before `structure`), `structure`, `baseline_days`, `revisit_days`, `time_axis`, `chunking`, `valid_pixels`, `range`, `crs`, `identity`, `consolidated`; then `complete_sentinel`, `partial`, `generation`, `window` (only when the dates do not match `T`, fail), `pairs_declared`, `cell_quality`, `chunk_completeness`, `availability_matrix`, `finite_fraction` and, last, `engine_report`.
 
 The store is opened once into a `StoreHeader` (attrs, per-array metadata, the values of every small array, the sentinel facts). Validation reads metadata, the pair tables, two coherence chunks (`range`: baseline 0 of `RANGE_SAMPLE_STEPS` evenly spaced time steps) and one directory listing (`chunk_completeness`); it never reads the whole `coh` array. Whether a declared pair holds data comes from the producer's `n_finite` (C1); a store without it is trusted on availability and says so (info). A store whose out-of-range values sit only in unsampled slabs passes. An absent engine report is info; `validate_store(..., require_engine_report=True)` makes it a failure (the command has no flag for it).
 

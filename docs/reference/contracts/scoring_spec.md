@@ -4,9 +4,9 @@
 
 ## Producer and consumers
 
-Producer: the user. Scoring specs live in ponzi-suite `specs/scoring_specs/` (and the PONZI home's working copies, looked in first: [Naming](../../models/naming.md#spec-folders)); a model's scoring spec is also kept as `scoring_spec.yaml` beside the model in the registry, verbatim, or composed when it uses `extends` (`ponzi_models.registry.store.copy_scoring_spec`).
+Producer: the user. Scoring specs live in ponzi-suite `specs/scoring_specs/` (and the PONZI home's working copies, looked in first: [Naming rules](../../models/naming.md#spec-folders)); a model's scoring spec is also kept as `scoring_spec.yaml` beside the model in the registry, verbatim, or composed when it uses `extends` (`ponzi_models.registry.store.copy_scoring_spec`).
 
-Consumers: `ponzi run` (`--scoring-spec NAME|FILE`, found by `ponzi_spec.specs.find_spec`; `RunRequest.scoring_spec`, C4a); the worker stage `run` (`RunParams.scoring_spec`, a composed mapping: one that still names a base with `extends` is refused; written to `_config/{scoring_spec_name}.yaml` in its work folder and handed to `RunRequest`); ponzi-models (`calibration.null_runs`, which checks the loaded hash against the model card's `scoring_spec_hash`; the registry; the standards workflow; `rehearsal`).
+Consumers: `ponzi run` (`--scoring-spec NAME|NAME@HASH|FILE`, found by `ponzi_spec.specs.find_spec`, a `NAME@HASH` version also in the registry's archive; `RunRequest.scoring_spec`, C4a); the worker stage `run` (`RunParams.scoring_spec`, a composed mapping: one that still names a base with `extends` is refused; written to `_config/{scoring_spec_name}.yaml` in its work folder and handed to `RunRequest`); ponzi-models (`calibration.null_runs`, which checks the loaded hash against the model card's `scoring_spec_hash`; the registry; the standards workflow; `rehearsal`).
 
 A file may build on others with `extends:` ([Composition](../../service/configuration.md#composition)); what is validated and hashed is the composed spec. A base's `name` is not inherited.
 

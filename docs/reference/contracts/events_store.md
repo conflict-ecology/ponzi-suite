@@ -6,7 +6,7 @@
 
 Producer: `ponzi.products`: `detect` (one burst, `ponzi detect`), `detect_path` (one path on a lattice, `ponzi detect-path`) and `tile_path` (one store per Major TOM cell through `detect_cell`, `ponzi tile`); the worker stages `detect` (collection `ponzi-events`) and `tile` (collection `ponzi-events-cell`), whose `detection` param holds the detection spec's fields. The inputs are, per burst, a p-value store (C22) and a summary store (C24) of the same run. Consumer: ponzi-visual (`src/events.ts`: `state` one date at a time, `time`, `y`, `process_pixels` and the attrs, from the zipped store the server serves for an Item's `events` asset).
 
-Location: `<run folder>/events_<calibration id>.zarr` for a burst (`events_store_name`; or `--out`); a path product wherever `--out` says; a cell `<out>/<cell id>/events_<calibration id>.zarr`.
+Location: `<run folder>/events_<calibration id>.zarr` for a burst (`events_store_name`; or `--out`); a path product `detect-path_<calibration id>.zarr` in the runs' common parent folder (or `--out`); a cell `<out>/<cell id>/events_<calibration id>.zarr`, `<out>` by default `tiles_<calibration id>/` in the runs' common parent folder (CR-088).
 
 ## The detection spec
 
@@ -62,7 +62,7 @@ A provisional detection spec (`provisional: true`) reads the stage codes of a st
 | `lattice`, `overlap` | a path product: the lattice (`Lattice.to_dict`) and the rule that combined the bursts (`max`, `min`, `first`) |
 | `resample`, `majortom_cell`, `majortom_dist_km` | a Major TOM cell: `nearest` (each lattice pixel reads the burst pixel holding its centre, in the burst's projection), the cell id and the grid distance |
 | `staged_t_hi` | a provisional detection spec only: the last anchor with a stage code |
-| `complete` | set last; `open_events_store` refuses a store without it (`IncompleteEventsStore`) |
+| `complete` | set last; `open_events_store` refuses a store without it (`IncompleteEventsStore`, a `ContractError`) |
 
 ## Invariants
 

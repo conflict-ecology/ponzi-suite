@@ -1,4 +1,4 @@
-# Panels
+# Training panels
 
 A panel is the pinned, stratified, label-free set of pixels PONZI is trained and calibrated on. Its cells are split three ways:
 
@@ -20,7 +20,7 @@ A panel is defined by its panel spec: a folder kept in git in ponzi-suite, `spec
 | `bursts.geojson` | one feature per burst: its footprint, track, subswath, orbit pass, split, cells and window |
 | `cells.geojson` | one feature per cell: its outline, split, sub-panel, stratum, window and bursts |
 
-A panel is cited by its id, the name of its folder (`majortom-global`, [Naming](../models/naming.md); ponzi-core CR-081), and its version is its spec hash, cited `majortom-global@<hash8>` (ponzi-core CR-083): over `panel.yaml`'s settings with the code's defaults filled in (not its description or `notes`), the hash of the coherence spec it names, and the two geojson files ([Specs: a name and a hash](../models/versions.md#specs-a-name-and-a-hash)). A panel spec may be edited in place: the edit is a new version under the same name. `coherence` is a name or `name@<hash>`. `ponzi-models panel-check SPEC` (a name or a folder) holds a folder to the rules: no `id` in `panel.yaml`, the three files matching their sha256, no `version`, the cells and bursts naming each other, the split counts those of the files. The panel spec holds no computed data: what is built from it goes into the PONZI home.
+A panel is cited by its id, the name of its folder (`majortom-global`, [Naming rules](../models/naming.md); ponzi-core CR-081), and its version is its spec hash, cited `majortom-global@<hash8>` (ponzi-core CR-083), which also covers the two geojson files and the coherence spec it names ([Specs: a name and a hash](../models/versions.md#specs-a-name-and-a-hash)). A panel spec may be edited in place: the edit is a new version under the same name. `coherence` is a name or `name@<hash>`. `ponzi-models panel-check SPEC` (a name or a folder) holds a folder to the rules: no `id` in `panel.yaml`, the three files matching their sha256, no `version`, the cells and bursts naming each other, the split counts those of the files. The panel spec holds no computed data: what is built from it goes into the PONZI home.
 
 ## How a panel is built
 
@@ -34,7 +34,7 @@ A panel is cited by its id, the name of its folder (`majortom-global`, [Naming](
 
 Each cell has a window: its own (`window_start`, `window_end` in the cells table) or the panel spec's. A catalogue row's window spans those of the cells it serves, and a burst's spans those of all its cells. A null run uses the burst's window for its split.
 
-`SPEC` is a name, `name@<hash>` or a folder: a name is looked up in `$PONZI_HOME/specs/panel_specs/` first, then in ponzi-suite's `specs/panel_specs/`, a version also in the registry's archive ([Naming](../models/naming.md#spec-folders)). `panel-build` builds from the folder (ponzi-core CR-056, CR-070): its geojson give the cells, their splits, strata, windows and bursts, and a cell is drawn only in the bursts it names; `panel.yaml` gives the draw. A burst of the table that the spec does not name is refused. The build archives the panel spec's version, and its coherence spec's, in the registry (`--registry`). What the folder does not give is not made up:
+`SPEC` is a name, `name@<hash>` or a folder: a name is looked up in `$PONZI_HOME/specs/panel_specs/` first, then in ponzi-suite's `specs/panel_specs/`, a version also in the registry's archive ([Naming rules](../models/naming.md#spec-folders)). `panel-build` builds from the folder (ponzi-core CR-056, CR-070): its geojson give the cells, their splits, strata, windows and bursts, and a cell is drawn only in the bursts it names; `panel.yaml` gives the draw. A burst of the table that the spec does not name is refused. The build archives the panel spec's version, and its coherence spec's, in the registry (`--registry`). What the folder does not give is not made up:
 
 - A cell with no outline has no box to draw in. The build refuses it unless `--without-outline drop` leaves it out. In `majortom-global` these are the 24 cells that were never delivered; none of their bursts has a coherence store or serves another cell.
 - The stores come from the burst table (`--bursts`: `burst_id`, `coherence`, `sidecar`).
@@ -49,4 +49,4 @@ Everything reads a built panel through `ponzi_models.panels.panel.Panel`. A pane
 
 ## Identity
 
-A panel's content id comes from its spec and the structural digests of every store it uses. When the cells carry their own windows, it also takes the digest of the cells and their windows. Models and calibrations record the panel id and content id, and the panel spec's name, hash and suite commit in their `specs:` block, so a model's manifest traces back to the cells and scenes behind it. A model trained on the panel is named `<training spec>@<hash8>--<panel spec>@<hash8>` ([Naming](../models/naming.md)).
+A panel's content id comes from its spec and the structural digests of every store it uses. When the cells carry their own windows, it also takes the digest of the cells and their windows. Models and calibrations record the panel id and content id, and the panel spec's name, hash and suite commit in their `specs:` block, so a model's manifest traces back to the cells and scenes behind it. A model trained on the panel is named `<training spec>@<hash8>--<panel spec>@<hash8>` ([Naming rules](../models/naming.md)).

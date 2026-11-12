@@ -1,4 +1,4 @@
-# Grids
+# Grids: processing and outputs
 
 - **Processing** stays on each burst's native grid: the fixed grid its coherence store was assembled on. Onboarding, runs, p-values and per-burst events are computed there; nothing is resampled except where coregistration needs it.
 - **Delivered outputs** are on the [Major TOM](https://github.com/ESA-PhiLab/Major-TOM) grid: fixed, near-equal-area cells of about 10 km over the globe, named by their bottom-left corner (`433U_621R`). The cells of panels are Major TOM cells too.

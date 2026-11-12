@@ -23,14 +23,10 @@ Everything the tests need is in the repositories: synthetic stores and small gol
 
 ## Versions
 
-Each distribution has its own [SemVer](https://semver.org):
+Each distribution has its own [SemVer](https://semver.org) version, `X.Y.Z`, from its own git tags. What raises X, Y or Z, the rule below 1.0 (where `0.Y` is the major) and worked examples are in [What X, Y and Z mean](../reference/versions.md#what-x-y-and-z-mean). In short:
 
-- **MAJOR**: a contract or store format changes, or the default behaviour of an existing spec changes.
-- **MINOR**: a new opt-in capability; every existing spec gives the same bytes.
-- **PATCH**: fixes and speed-ups shown bit-identical by the tests.
-- A change that alters numbers for an existing spec is marked **RESULTS-CHANGING** and is a MAJOR (ponzi-core CR-085): the major of the distribution that computes it is what gives its outputs new content ids, as stages have no version of their own. A results-changing fix to one stage is so a major of its distribution: everything that distribution computes is made again, and by CR-020 the calibrations of the old major are refused.
-- Below 1.0, `0.y` counts as the major version: a calibration made with another `0.y` of `ponzi` is refused, and every output a distribution computes gets a new content id.
-Every distribution takes its version from its own git tags ([Releases: the tags](../reference/versions.md#releases-the-tags)). No other version is raised by hand (ponzi-core CR-085): a stage is named by its code's majors, a spec by its hash, and a store contract or a record file by the hash of its declaration ([Versions](../reference/versions.md)).
+- A change that alters numbers for an existing spec is **RESULTS-CHANGING**: a major of the distribution that computes it (ponzi-core CR-085), so everything it computes is made again and the calibrations of the old major are refused (CR-020). Say so in the change request and the `CHANGELOG.md` entry.
+- The change request's **Version** line names the part each distribution raises. No other version is raised by hand (ponzi-core CR-085): a stage is named by its code's majors, a spec and a standard by their hash (CR-083, CR-089), and a store contract or a record file by the hash of its declaration ([Versions](../reference/versions.md)).
 
 ## What is locked
 
@@ -46,5 +42,5 @@ A standard names the versions of the distributions it needs (`requires`, PEP 440
 
 - READMEs hold only what a repository is and how to start; details live on this site.
 - Every function has a concise docstring.
-- Paths use `pathlib`; locations that may be remote are URIs (see [Configuration](../service/configuration.md)).
+- Paths use `pathlib`.
 - No em-dashes in prose.

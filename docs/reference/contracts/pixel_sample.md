@@ -4,9 +4,9 @@
 
 ## Producer and consumers
 
-Producers: `ponzi.core.sample.extract_sample`, driven by the onboarding's `sample` step (`ponzi_pipeline.onboard.onboard.extract_burst_sample`, `ponzi-pipeline onboard ... --frames FILE`, written as `<out_dir>/samples/<burst>_sample.zarr`), which opens the store with its sidecar, gathers the frames' `(y, x)` layers, codes the frame and stratum columns and normalises the pair-table dtypes; and `ponzi_models.panels.export_pixels` (`ponzi-models export-pixels`, through `write_sample_store`, from the masked input of a panel, as `{OUT}/bursts/{burst}/{burst}_{layer}.zarr`).
+Producers: `ponzi.core.sample.extract_sample`, driven by the onboarding's `sample` step (`ponzi_pipeline.onboard.onboard.extract_burst_sample`, `ponzi-pipeline onboard ... --frames FILE`, written as `<out_dir>/samples/<burst>_sample.zarr`), which opens the store with its sidecar, gathers the frames' `(y, x)` layers, and codes the frame and stratum columns; and `ponzi_models.panels.export_pixels` (`ponzi-models export-pixels`, through `write_sample_store`, from the masked input of a panel, as `{OUT}/bursts/{burst}/{burst}_{layer}.zarr`).
 
-Consumers: `ponzi.core.runner` (through `open_input`, which recognises a sample by its `pix` dimension; a sidecar or a mask store on a sample is refused), `ponzi_models` (training, `export-pixels --check`), and anything that maps a sampled run back to the source grid (`unfold` with `pix_y`, `pix_x`).
+Consumers: `ponzi.core.runner` (through `open_input`, which recognises a sample by its `pix` dimension or a `pix_y` array; a sidecar or a mask store on a sample is refused), `ponzi_models` (training, `export-pixels --check`), and anything that maps a sampled run back to the source grid (`unfold` with `pix_y`, `pix_x`).
 
 ## Arrays and tables
 

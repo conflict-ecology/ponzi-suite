@@ -1,5 +1,8 @@
 # REST API
 
+!!! warning "Under construction"
+    ponzi-server is still being built; the routes and their bodies may change.
+
 Version `v1`. The request and response bodies are the models of `ponzi_spec.api` ([reference](../reference/ponzi-spec.md#rest-api-models)). The table is generated from the OpenAPI document ponzi-server commits (`packages/server/openapi.json` in ponzi-service, written by `ponzi-server openapi`), so it is the server's own list. *Scope* is the key scope a route needs (`x-ponzi-scope`).
 
 <!-- ponzi:rest-api -->

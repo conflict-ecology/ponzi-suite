@@ -2,10 +2,10 @@
 
 `ponzi.contracts.validate` (PONZI's side) and `ponzi_pipeline.engine` (the engine's side). Two things the coherence engine and PONZI agree on without sharing code:
 
-1. **The check catalogue**: every check a delivered store is judged by, with its rule, threshold, severity, and who runs it. The thresholds are written down here and as constants of `ponzi/contracts/coherence.py`, beside C1's declaration, which `ponzi.contracts.validate` imports (`GAP_FACTOR`, `MIN_VALID_FRACTION`, `RANGE_SAMPLE_STEPS`, `LOW_VALIDITY_FLOOR`, `SNAP_TOLERANCE_DAYS`, `FINITE_FLOOR`; the catalogue itself is `CATALOGUE`); the engine repeats them in `ponzi_pipeline/engine.py`. They are part of C1's declaration, so a change to them changes C1's `contract_version` (ponzi-core CR-085); a test holds the engine's equal to them.
+1. **The check catalogue**: every check a delivered store is judged by, with its rule, threshold, severity, and who runs it. The thresholds are written down here and as constants of `ponzi/contracts/coherence.py`, beside C1's declaration, which `ponzi.contracts.validate` imports (`GAP_FACTOR`, `MIN_VALID_FRACTION`, `RANGE_SAMPLE_STEPS`, `LOW_VALIDITY_FLOOR`, `SNAP_TOLERANCE_DAYS`, `FINITE_FLOOR`; the catalogue itself is `CATALOGUE`); the engine repeats four of them in `ponzi_pipeline/engine.py`, under its own names (`GAP_FACTOR`, `MIN_VALID`, `FINITE_FLOOR`, `SNAP_DAYS`), and a test holds those four equal to C1's (`test_engine_agreement.py`). The engine samples the range on 2 time steps written as a literal, not `RANGE_SAMPLE_STEPS`, and has no `LOW_VALIDITY_FLOOR`, since it does not run `cell_quality`. The thresholds are part of C1's declaration, so a change to them changes C1's `contract_version` (ponzi-core CR-085).
 2. **The engine report**: a JSON file the engine writes beside every store it publishes, in the vocabulary of the catalogue, so PONZI can read it however the store was produced and flag any disagreement per check.
 
-The two sides are independent implementations of this page and C1: the engine's checks read the store with zarr and numpy only and import nothing of `ponzi.contracts.validate`. Drift is caught, not prevented: the diff shows in the `engine_report` check of `ponzi validate-store` (C15).
+The two sides are independent implementations of this page and C1: the engine's checks read the store with zarr and numpy only and import none of `ponzi.contracts.validate`'s checks: from PONZI it imports only the report's declaration and version (`ENGINE_REPORT_SCHEMA`, `ENGINE_REPORT_SCHEMA_VERSION`) and C1's `CONTRACT_VERSION`. Drift is caught, not prevented: the diff shows in the `engine_report` check of `ponzi validate-store` (C15).
 
 ## Producer and consumers
 
@@ -47,7 +47,7 @@ Written by the coherence engine (`ponzi_pipeline.engine.checks` and `report`, ca
 
 ## The catalogue
 
-Level `burst`. "engine" means the check is required in every engine report; "engine (optional)" means the engine runs it when it can (`ponzi_pipeline.engine` does not); "PONZI" means `ponzi.contracts.validate` alone. PONZI runs every row.
+Level `burst`. "engine" means the check is required in every engine report; "engine (optional)" means the engine runs it when it can (`ponzi_pipeline.engine` does not); "PONZI" means `ponzi.contracts.validate` alone. PONZI runs every row, and one check outside the catalogue: `window`, a fail when the `time` coordinate's length is not `coh`'s time dimension.
 
 | Check | Rule | Severity | Who |
 |---|---|---|---|
@@ -60,7 +60,7 @@ Level `burst`. "engine" means the check is required in every engine report; "eng
 | `valid_pixels` | present, `(y, x)`, at least one nonzero pixel (NaN counts as 0); below `MIN_VALID_FRACTION` (1 %) or a dtype other than uint8 warns | fail, warn | engine |
 | `range` | finite values in `[0, 1]`, sampled on `RANGE_SAMPLE_STEPS` (2) evenly spaced time steps, baseline 0 | warn | engine |
 | `crs` | `epsg` attr present, an int; `value` = the int | fail | engine |
-| `identity` | `sensor`, `producer`, `contract_version` attrs present; PONZI also warns when `contract_version` is not C1's | warn | engine |
+| `identity` | `sensor`, `producer`, `contract_version` attrs present, an empty `sensor` or `producer` counting as missing (ponzi-core CR-092); PONZI also warns when `contract_version` is not C1's | warn | engine |
 | `consolidated` | consolidated metadata present | warn | engine |
 | `complete_sentinel` | `_complete` sibling present (info for a store not named `*.coh.zarr`) | fail | engine |
 | `partial` | no `.partial` sibling (info for a store not named `*.coh.zarr`) | fail | engine |
@@ -69,7 +69,7 @@ Level `burst`. "engine" means the check is required in every engine report; "eng
 | `availability_matrix` | from `n_finite (time, baseline)` (C1): a declared cell with `n_finite` 0 outside an absent chunk is lost data (fail); data in an undeclared cell warns. PONZI never reads the slabs and, without the table, trusts the engine and says so (info) | fail, warn, info | engine |
 | `finite_fraction` | per populated acquisition, the best baseline's `n_finite` over the valid footprint at or above `FINITE_FLOOR` (0.5); `items` = the slices below; info without `n_finite` or valid pixels | warn, info | engine |
 | `generation` | the archive folder (`coherence/<generation>/`) equals the `estimation_strategy` attr and the expected generation (`validate_store(expected_generation=)`); info outside an archive tree | warn, info | engine (optional) |
-| `cell_quality` | populated cells flagged low validity (`cell_quality`) at most `LOW_VALIDITY_FLOOR` (10 %); info without the table | warn, info | engine (optional) |
+| `cell_quality` | populated cells flagged low validity (`cell_quality`) at most `LOW_VALIDITY_FLOOR` (10 %); info without the table, without a platform table, or with no declared cell | warn, info | engine (optional) |
 | `engine_report` | this report against PONZI's run, compared last: info when absent (fail with `require_engine_report=True`); warn on an unreadable file, another schema, another schema version, a contract version other than PONZI's, a verdict `published_with_fail` or outside the three, or any catalogue check present in both whose severity differs (`items` = those checks) | fail, warn, info | PONZI |
 
 ## What the engine does with it

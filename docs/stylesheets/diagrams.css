@@ -6,14 +6,14 @@
   --pz-muted: var(--md-default-fg-color--light);
   --pz-line: var(--md-default-fg-color--lighter);
   --pz-box: var(--md-code-bg-color);
-  --pz-accent: #e8590c;
-  --pz-accent-fill: rgba(232, 89, 12, 0.28);
-  --pz-blue-fill: rgba(28, 126, 214, 0.14);
+  --pz-accent: #d73f3f;
+  --pz-accent-fill: rgba(215, 63, 63, 0.22);
+  --pz-blue-fill: rgba(32, 54, 91, 0.12);
 }
 [data-md-color-scheme="slate"] {
-  --pz-accent: #ff922b;
-  --pz-accent-fill: rgba(255, 146, 43, 0.32);
-  --pz-blue-fill: rgba(116, 192, 252, 0.16);
+  --pz-accent: #ff6b6b;
+  --pz-accent-fill: rgba(255, 107, 107, 0.26);
+  --pz-blue-fill: rgba(126, 166, 224, 0.16);
 }
 .pz-figure { overflow-x: auto; margin: 1em 0; }
 .pz-figure svg { width: 100%; max-width: 760px; min-width: 520px; height: auto; display: block; font-family: var(--md-text-font-family); }
@@ -28,20 +28,21 @@
 .pz-figure .pz-head { fill: var(--pz-muted); }
 .pz-figure .pz-gap { stroke: var(--pz-accent); stroke-width: 2; stroke-dasharray: 3 3; }
 
-/* The change map (javascripts/flows.js), after the PONZI Change Workflows page */
+/* The change map (javascripts/flows.js), after the PONZI Change Workflows page, in the Conflict ecology skin's colours:
+   new is the red accent, recomputed the amber, data the navy of an area, a gap purple */
 [data-md-color-scheme] {
-  --pz-c-accent: #c2410c; --pz-c-accent-soft: rgba(234, 88, 12, 0.14);
-  --pz-c-warn: #b45309; --pz-c-warn-soft: rgba(217, 119, 6, 0.14);
-  --pz-c-data: #6b4fa0; --pz-c-data-soft: rgba(107, 79, 160, 0.12);
-  --pz-c-gap: #dc2626; --pz-c-gap-soft: rgba(220, 38, 38, 0.10);
+  --pz-c-accent: #d73f3f; --pz-c-accent-soft: rgba(215, 63, 63, 0.12);
+  --pz-c-warn: #9a6400; --pz-c-warn-soft: rgba(250, 178, 25, 0.18);
+  --pz-c-data: #20365b; --pz-c-data-soft: rgba(32, 54, 91, 0.10);
+  --pz-c-gap: #7048e8; --pz-c-gap-soft: rgba(112, 72, 232, 0.10);
   --pz-c-line: var(--md-default-fg-color--lighter); --pz-c-muted: var(--md-default-fg-color--light);
   --pz-c-panel: var(--md-default-bg-color); --pz-c-fg: var(--md-default-fg-color); --pz-c-code: var(--md-code-bg-color);
 }
 [data-md-color-scheme="slate"] {
-  --pz-c-accent: #fb923c; --pz-c-accent-soft: rgba(251, 146, 60, 0.16);
+  --pz-c-accent: #ff6b6b; --pz-c-accent-soft: rgba(255, 107, 107, 0.14);
   --pz-c-warn: #fbbf24; --pz-c-warn-soft: rgba(251, 191, 36, 0.14);
-  --pz-c-data: #b197fc; --pz-c-data-soft: rgba(177, 151, 252, 0.14);
-  --pz-c-gap: #f87171; --pz-c-gap-soft: rgba(248, 113, 113, 0.12);
+  --pz-c-data: #7ea6e0; --pz-c-data-soft: rgba(126, 166, 224, 0.14);
+  --pz-c-gap: #b197fc; --pz-c-gap-soft: rgba(177, 151, 252, 0.12);
 }
 .pz-flows { margin: 1em 0 1.4em; display: grid; gap: 12px; }
 .pz-tabs { display: flex; flex-wrap: wrap; gap: 8px; }

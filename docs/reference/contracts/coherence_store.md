@@ -17,7 +17,7 @@ A store is zarr v3: the writers write it, and the opener refuses another zarr fo
 | `coh` | `(time, y, x, baseline)` | float32 | NaN | `(1, Y, X, B)` | NaN = no pair or no data. The time chunk MUST be 1; spatial chunks smaller than the grid are allowed (warn); the baseline chunk is unconstrained |
 | `time` | `(time,)` | datetime64[ns] | | | Strictly increasing dates of the later image of each pair; an assembled series lists every acquisition, also those without a pair. `validate-store` fails `time_axis` on an axis of another dtype, such as the CF-encoded integers of the old engine's archive stores (`ponzi.contracts.time_axis.decode_time`; ponzi-core CR-086) |
 | `y`, `x` | `(y,)`, `(x,)` | float64 | | | Pixel-centre coordinates in `epsg` |
-| `baseline` | `(baseline,)` | int | | | Index `0..B-1`; the days are in the attrs |
+| `baseline` | `(baseline,)` | int32 | | | Index `0..B-1`; the days are in the attrs |
 | `valid_pixels` | `(y, x)` | uint8 | 0 | any | Required. 1 where the burst footprint has data (`CoherenceWriter`: where any acquisition is finite) |
 | `n_finite` | `(time, baseline)` | int32 | 0 | any | Optional here, required of the engine by C18. Finite pixels the producer wrote into the cell, counted while writing; 0 for an unwritten pair. It is how PONZI judges availability without reading the data |
 | `bperp` | `(time, baseline)` | float32 | NaN | | Optional. Perpendicular baseline of the pair; an assembled store leaves it out when no pair has one |

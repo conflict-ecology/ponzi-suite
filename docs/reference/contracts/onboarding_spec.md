@@ -4,7 +4,7 @@
 
 ## Producer and consumers
 
-Written by hand: an onboarding spec of ponzi-suite `specs/onboarding_specs/` (its fields at the top level), or any yaml file with an `onboarding:` section (every other top-level section is then ignored). The file is composed first ([Composition](../../service/configuration.md#composition)). Read by `load_onboarding_spec(path)` for `ponzi-pipeline onboard --onboarding-spec NAME|FILE` (none: the defaults) and `ponzi-pipeline weather-prefetch --onboarding-spec NAME|FILE` (which needs `weather_area`); names are found by `ponzi_spec.specs.find_spec`. The worker stage `onboard` takes an `OnboardingSpec` as its identity params.
+Written by hand: an onboarding spec of ponzi-suite `specs/onboarding_specs/` (its fields at the top level), or any yaml file with an `onboarding:` section (every other top-level section is then ignored). The file is composed first ([Composition](../../service/configuration.md#composition)). Read by `load_onboarding_spec(path)` for `ponzi-pipeline onboard --onboarding-spec NAME|NAME@HASH|FILE` (none: the defaults) and `ponzi-pipeline weather-prefetch --onboarding-spec NAME|FILE` (which needs `weather_area`); names are found by `ponzi_spec.specs.find_spec`. The worker stage `onboard` takes an `OnboardingSpec` as its identity params.
 
 ## Model
 
