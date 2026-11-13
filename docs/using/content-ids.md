@@ -7,7 +7,8 @@ content_id = sha256(canonical_json({
     "stage":  name,
     "inputs": [sorted content ids of the inputs],
     "config": {identity config of the stage},
-    "code":   {distribution: major version}       # only for a stage that names its code
+    # only for a stage that names its code
+    "code":   {distribution: major version}
 }))[:32]
 ```
 
@@ -23,5 +24,9 @@ Canonical JSON: sorted keys, compact separators, UTF-8, no NaN or infinity. The 
 ```python
 from ponzi_spec import StageRef, content_id
 
-cid = content_id(StageRef(name="run", code={"ponzi": "0.0"}), [coherence_id, sidecar_id], {"scoring_spec": spec, "scoring_spec_name": name})
+cid = content_id(
+    StageRef(name="run", code={"ponzi": "0.0"}),
+    [coherence_id, sidecar_id],
+    {"scoring_spec": spec, "scoring_spec_name": name},
+)
 ```

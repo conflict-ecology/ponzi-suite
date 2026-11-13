@@ -45,7 +45,7 @@ See [Running the server](server.md) and [Watched areas](../using/watched-areas.m
 
 **You see.** Making an area (approving a request on the **Admin** page, or `area-create` without `--standard`):
 
-```
+```{.text .pz-wrap}
 422 Unprocessable Content: no standard given and the server has no default: it holds 2 (...); give `standard`, or set `default_standard` in the server's settings
 ```
 
@@ -117,7 +117,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 **You see.** For example, on a Mac:
 
-```
+```{.text .pz-wrap}
 PONZI runs on Linux (x86-64) only for now: this machine is Darwin arm64.
 The pixi workspaces of ponzi-core, ponzi-service and ponzi-visual are solved for linux-64 alone.
 ```

@@ -21,7 +21,9 @@ A machine needs only the credentials of what runs on it. The server needs none t
 Earthdata and the Earth Data Hub are read from one file: `$NETRC` when that is set, else `~/.netrc`. One line per host:
 
 ```
-machine urs.earthdata.nasa.gov login YOUR_EARTHDATA_USERNAME password YOUR_EARTHDATA_PASSWORD
+machine urs.earthdata.nasa.gov
+    login YOUR_EARTHDATA_USERNAME
+    password YOUR_EARTHDATA_PASSWORD
 machine data.earthdatahub.destine.eu password YOUR_EDH_TOKEN
 ```
 
@@ -72,7 +74,8 @@ Make the first `user-admin` key on the server's machine (`ponzi-server keys add 
 A key is shown once, when it is made: `--out` writes it to a new file only its owner can read. Move that file to the machine that uses it, then point the client at it:
 
 ```
-export PONZI_KEY_FILE=~/hpc-worker.key      # a file keeps the key out of the environment of a shared node
+# a file keeps the key out of the environment of a shared node
+export PONZI_KEY_FILE=~/hpc-worker.key
 # or
 export PONZI_KEY=pz_...
 ```

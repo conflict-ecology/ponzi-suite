@@ -129,7 +129,8 @@ context: {C: 30, min_support: 6}
 forecaster: {name: rolling_ols, params: {harmonic_order: 0, pooled: false}}
 scoring: {baseline_days: [12, 24, 36, 48, 60], H: 5, alpha: 3.0}
 aggregate: {min_channels: 5, struct_weight: true}
-state_machine: {alpha: null, delta: -0.1, recovery_steps: 1, noise_floor: 0.03, nms_window: 0}
+state_machine: {alpha: null, delta: -0.1, recovery_steps: 1,
+                noise_floor: 0.03, nms_window: 0}
 ```
 
 Nulls resolve before hashing (`state_machine.alpha` → `scoring.alpha`, `nms_window: 0` → `H`). Defaults are load-bearing: an omitted default hashes the same as a written one. A run config never holds paths, dates, modes, dataset names, sinks or thread counts. The one exception is the TiDE `artifact` path.
@@ -146,9 +147,11 @@ Precedence: flags > args file > environment > model defaults.
 onboarding:
   steps: [built, weather, pairdiff, mask, sample]
   edge_margin: 20
-  weather_source: edh             # edh | cdsgrid | edh_cdsgrid
+  # edh | cdsgrid | edh_cdsgrid
+  weather_source: edh
   weather_variables: [...]
-  weather_area: [lon_min, lat_min, lon_max, lat_max]   # optional, CR-023; not with edh
+  # optional, CR-023; not with edh
+  weather_area: [lon_min, lat_min, lon_max, lat_max]
   pairdiff_baselines: [12, 24, 36, 48, 60]
 ```
 

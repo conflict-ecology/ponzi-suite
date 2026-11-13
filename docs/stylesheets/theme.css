@@ -88,3 +88,6 @@
 
 /* A name in a table's first column stays whole: `ponzi.calibration`, never `ponzi.calibrat` and `ion`. */
 .md-typeset table:not([class]) td:first-child code { white-space: nowrap; }
+
+/* Code blocks of literal output (```{.text .pz-wrap}): long lines wrap instead of scrolling sideways */
+.md-typeset .pz-wrap pre > code { white-space: pre-wrap; overflow-wrap: anywhere; }

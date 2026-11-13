@@ -5,7 +5,8 @@ A manifest is the readable provenance of one output: every step from the Sentine
 It is built by walking the output's lineage links back to the external sources (`ponzi_spec.manifest.build_manifest`). Steps come sources first; an input shared by two steps appears once; a cycle is an error. The machine form is the Items themselves; the manifest is stored as the `manifest` asset of a final Item.
 
 ```yaml
-manifest_version: b5e69bf8aca0dfcf87ae17458ca6d388   # the hash of the manifest's declaration (CR-085)
+# the hash of the manifest's declaration (CR-085)
+manifest_version: b5e69bf8aca0dfcf87ae17458ca6d388
 subject: ponzi-events-t028_058198_iw3-9c1e4d2a7b10
 content_id: 9c1e4d2a7b10...
 standard: s1-general@3f9a12c4

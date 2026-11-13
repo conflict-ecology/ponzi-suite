@@ -35,11 +35,15 @@ ponzi-worker stages
 ponzi-worker run WORKFLOW.yaml|STANDARD_FILE --set NAME=VALUE ... [--dry-run]
 ponzi-worker manifest CONTENT_ID
 ponzi-worker evict --older-than-days N | --max-gb G [--keep CONTENT_ID]
-ponzi-worker run WORKFLOW.yaml --executor slurm [--profile NAME|FILE] [--site NAME|FILE] [--each NAME=V1,V2] [--dry-run] [--print-scripts] [--sbatch CMD]
+ponzi-worker run WORKFLOW.yaml --executor slurm [--profile NAME|FILE]
+    [--site NAME|FILE] [--each NAME=V1,V2] [--dry-run] [--print-scripts]
+    [--sbatch CMD]
 ponzi-worker batch BATCH
-ponzi-worker job FILE|- [--executor local|slurm] [--profile NAME|FILE] [--site NAME|FILE] [--sbatch CMD] [--sacct CMD]
+ponzi-worker job FILE|- [--executor local|slurm] [--profile NAME|FILE]
+    [--site NAME|FILE] [--sbatch CMD] [--sacct CMD]
 ponzi-worker profile [--site NAME|FILE] [--snapshot DIR]
-ponzi-worker demo --out DIR [--url URL] [--model rolling|tide] [--fixtures FILE] [--burst-catalog FILE] [--boundaries FILE]
+ponzi-worker demo --out DIR [--url URL] [--model rolling|tide]
+    [--fixtures FILE] [--burst-catalog FILE] [--boundaries FILE]
 ```
 
 The SLURM commands are in [Running on SLURM](hpc.md), and `demo` makes the installation of the [Quickstart](../getting-started/quickstart.md), its `--out` folder the home it serves (CR-088).

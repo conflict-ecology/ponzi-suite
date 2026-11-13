@@ -6,8 +6,10 @@ A standard is a bundle: a model, its scoring spec hash, its calibrations, and th
 
 ```
 cd ponzi-core
-pixi run -e ml ponzi-models rehearse --out /tmp/rehearsal               # a tiny fit of the default, TiDE, about 10 s
-pixi run ponzi-models rehearse --out /tmp/rehearsal-r --model rolling    # no torch
+# a tiny fit of the default, TiDE, about 10 s
+pixi run -e ml ponzi-models rehearse --out /tmp/rehearsal
+# no torch
+pixi run ponzi-models rehearse --out /tmp/rehearsal-r --model rolling
 ```
 
 The rehearsal runs the functions of the real lifecycle on the synthetic world (`ponzi_models.synthetic`):
@@ -37,8 +39,8 @@ Its registry (`<out>/registry`) and its standard `s1-rehearsal` (`<out>/standard
 
 ```
 pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY \
-    --source pipeline --set burst_map=... --set slc_dir=... --set orbit_dir=... --set dem_dir=... \
-    --set start_date=2025-01-01
+    --source pipeline --set burst_map=... --set slc_dir=... \
+    --set orbit_dir=... --set dem_dir=... --set start_date=2025-01-01
 ```
 
 The standard must be registered first: its workflow is recorded beside it in the registry, once per source, and every later build must match ([One key, one workflow](versions.md#one-key-one-workflow)). This writes the standard as the server runs it, by default to `$PONZI_HOME/standards/<id>@<hash8>.yaml` where the server of that home reads it (`--out` names any file; for another home, set `PONZI_HOME`; CR-080, CR-088), with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir` and `era5_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `$PONZI_HOME/downloads/`). The steps are:

@@ -13,10 +13,14 @@ The inputs of a run: from a burst id to its coherence store and the covariates b
 ## The `ponzi-pipeline` command
 
 ```
-ponzi-pipeline discover | pairs | acquire | dem | coherence | assemble   # the coherence chain, step by step
-ponzi-pipeline onboard ...                                              # a store's sidecar and sample
-ponzi-pipeline weather-prefetch ...                                     # the shared weather download
-ponzi-pipeline burst-catalog [--source FILE]                            # the burst catalog in the home
+# the coherence chain, step by step
+ponzi-pipeline discover | pairs | acquire | dem | coherence | assemble
+# a store's sidecar and sample
+ponzi-pipeline onboard ...
+# the shared weather download
+ponzi-pipeline weather-prefetch ...
+# the burst catalog in the home
+ponzi-pipeline burst-catalog [--source FILE]
 ```
 
 `ponzi-pipeline` with no argument lists the commands. The coherence chain's options are in [Making coherence stores](../method/coherence.md#commands). Under a server, the worker runs the same code as its `discover`, `dem`, `coherence`, `assemble` and `onboard` stages ([Stages](../method/stages.md)).

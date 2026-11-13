@@ -8,23 +8,39 @@
 ```python
 from ponzi_client import Client
 
-c = Client("https://ponzi.example.org", key)        # or Client.from_env(): $PONZI_URL and $PONZI_KEY
+# or Client.from_env(): $PONZI_URL and $PONZI_KEY
+c = Client("https://ponzi.example.org", key)
 c.standards(); c.bursts(bbox=(51.2, 35.5, 51.6, 35.8))
-unit = c.boundaries(level=1, bbox=(34.2, 31.2, 34.6, 31.6))[0]          # World Bank units, to draw: name, outline
-tiles = [x.cell_id for x in c.majortom_cells(bbox=(51.38, 35.68, 51.42, 35.72))]   # Major TOM tiles over land
-c.majortom_bursts(tiles); c.majortom_tracks(tiles)                       # what an area of them watches
-asked = c.request_watch(cells=tiles, tags="tehran", start_date="2023-01-01")   # a user key; an admin user decides
-c.watch_requests()                                    # yours (all of them for an admin user)
-area = c.create_area(cells=tiles, tags=["tehran"], start_date="2023-01-01", standard="s1-general")   # client:write
-c.update_area(area.area_id, active=False); c.discover_area(area.area_id); c.jobs(area_id=area.area_id)
-c.tags("teh"); c.tag("tehran")                        # what a tag covers: tiles, bursts, outputs, places
-c.tracts(); c.pause_tract("393U_467R")               # tracts: tiles sharing an edge, managed together (user-admin)
-tagged = c.search(tags=["tehran"])                    # the analysis Items of the areas tagged so
+# World Bank units, to draw: name, outline
+unit = c.boundaries(level=1, bbox=(34.2, 31.2, 34.6, 31.6))[0]
+# Major TOM tiles over land
+tiles = [x.cell_id
+         for x in c.majortom_cells(bbox=(51.38, 35.68, 51.42, 35.72))]
+# what an area of them watches
+c.majortom_bursts(tiles); c.majortom_tracks(tiles)
+# a user key; an admin user decides
+asked = c.request_watch(cells=tiles, tags="tehran", start_date="2023-01-01")
+# yours (all of them for an admin user)
+c.watch_requests()
+# client:write
+area = c.create_area(cells=tiles, tags=["tehran"], start_date="2023-01-01",
+                     standard="s1-general")
+c.update_area(area.area_id, active=False)
+c.discover_area(area.area_id); c.jobs(area_id=area.area_id)
+# what a tag covers: tiles, bursts, outputs, places
+c.tags("teh"); c.tag("tehran")
+# tracts: tiles sharing an edge, managed together (user-admin)
+c.tracts(); c.pause_tract("393U_467R")
+# the analysis Items of the areas tagged so
+tagged = c.search(tags=["tehran"])
 run = c.submit(burst_ids=["t028_058198_iw3"], standard="s1-general")
-c.request(run.request_id).status                      # queued, running, done, failed
-items = c.search(collections=["ponzi-events-cell"], bbox=(51.2, 35.5, 51.6, 35.8))
+# queued, running, done, failed
+c.request(run.request_id).status
+items = c.search(collections=["ponzi-events-cell"],
+                 bbox=(51.2, 35.5, 51.6, 35.8))
 c.manifest(items[0].properties["ponzi:content_id"])
-c.download(items[0], "events", "out/")               # a zipped store comes back unpacked
+# a zipped store comes back unpacked
+c.download(items[0], "events", "out/")
 ```
 
 Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the status and the server's problem (title, detail). `download` copies an asset when its href is a local path (shared storage), and otherwise fetches it through the server. The loop's calls are `claim`, `heartbeat`, `upload`, `complete` and `fail`, made by `ponzi-client serve` (`ponzi_client.serve`) with a `worker` key.

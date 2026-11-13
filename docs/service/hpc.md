@@ -5,11 +5,17 @@ The worker renders SLURM job scripts from a **cluster profile**: versioned data,
 Work is asked for through the server, by a request or a watched area made with ponzi-client (or ponzi-visual). `ponzi-client serve` claims it; that loop is the only long-running process, on the login node or wherever the server can be reached. For each job it calls `ponzi-worker job`, a short command that renders the job's next batch and submits it, or checks the batch already running, and exits. The SLURM tasks invoke the core commands; when the last is done the client delivers the outputs (CR-062, CR-063).
 
 ```
-ponzi-client serve --worker-id login -- --executor slurm   # the loop: claims jobs, calls ponzi-worker job
-ponzi-worker run WORKFLOW.yaml --executor slurm --each burst=t028_058198_iw3,t028_058199_iw3   # one workflow, no server
-ponzi-worker run WORKFLOW.yaml --executor slurm ... --dry-run --print-scripts   # render and show; submit nothing
-# (on a machine without SLURM, add --profile FILE to render with a profile made on the cluster)
-ponzi-worker batch BATCH            # how far it got: job records in the cache, failures from sacct
+# the loop: claims jobs, calls ponzi-worker job
+ponzi-client serve --worker-id login -- --executor slurm
+# one workflow, no server
+ponzi-worker run WORKFLOW.yaml --executor slurm \
+    --each burst=t028_058198_iw3,t028_058199_iw3
+# render and show; submit nothing
+ponzi-worker run WORKFLOW.yaml --executor slurm ... --dry-run --print-scripts
+# (on a machine without SLURM, add --profile FILE to render with a
+# profile made on the cluster)
+# how far it got: job records in the cache, failures from sacct
+ponzi-worker batch BATCH
 ```
 
 ## Where the client loop runs
@@ -24,8 +30,10 @@ The loop needs little: it polls the server, heartbeats, calls `ponzi-worker job`
 #SBATCH --partition=<partition> --account=<account>
 #SBATCH --cpus-per-task=1 --mem=2G
 #SBATCH --time=<the longest your partition allows>
-export PONZI_HOME=/shared/scratch/ponzi           # the home, on storage the compute nodes share
-export PONZI_KEY_FILE=~/ponzi-worker.key          # a worker key (Authentication)
+# the home, on storage the compute nodes share
+export PONZI_HOME=/shared/scratch/ponzi
+# a worker key (Authentication)
+export PONZI_KEY_FILE=~/ponzi-worker.key
 ponzi-client serve --worker-id <name> -- --executor slurm --site <site>
 ```
 

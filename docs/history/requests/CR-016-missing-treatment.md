@@ -18,7 +18,8 @@ What the model is given has to be the same in training and in a run, so it canno
 ### 1. Meta keys, read by `model_inputs.treatment_of`
 
 ```
-"missing":    {"fill": "constant" | "median" | "previous" | "sentinel", "value": number, "flag": true | false}
+"missing":    {"fill": "constant" | "median" | "previous" | "sentinel",
+               "value": number, "flag": true | false}
 "future_obs": "observed" | "one" | "none"
 "covariates": "filled" | "strict"
 "support":    "ignored" | "gated"

@@ -15,12 +15,16 @@ A stage is replaced or added without touching the worker or the server. Example:
         window: str = "17x3"
         polarisation: str = "VV"
 
-    SPEC = StageSpec(name="coherence-snap", code=("ponzi-pipeline",),
-                     inputs={"scenes": "s1-slc", "orbits": "s1-orbit", "dem": "ponzi-dem", "pairs": "ponzi-pairs"},
-                     outputs={"coherence": "ponzi-coherence-pair"},
-                     identity_params=SnapCoherenceParams,
-                     resources=ResourceHint(cpus=8, memory_gb=48, walltime="04:00:00"),
-                     fan_out="per_pair")
+    SPEC = StageSpec(
+        name="coherence-snap",
+        code=("ponzi-pipeline",),
+        inputs={"scenes": "s1-slc", "orbits": "s1-orbit",
+                "dem": "ponzi-dem", "pairs": "ponzi-pairs"},
+        outputs={"coherence": "ponzi-coherence-pair"},
+        identity_params=SnapCoherenceParams,
+        resources=ResourceHint(cpus=8, memory_gb=48, walltime="04:00:00"),
+        fan_out="per_pair",
+    )
     ```
 
     `code` names the distributions whose code computes the outputs; their majors are part of the content id (CR-054).

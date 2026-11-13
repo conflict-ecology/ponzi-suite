@@ -16,10 +16,13 @@ So the server decides at startup how outputs reach it, and the worker saves them
 ```yaml
 server:
   outputs:
-    mode: upload                    # default: the worker sends each asset over the API
+    # default: the worker sends each asset over the API
+    mode: upload
   # outputs:
-  #   mode: path                    # the server and its workers see one file system
-  #   root: /shared/ponzi/outputs   # at this same path
+  #   # the server and its workers see one file system
+  #   mode: path
+  #   # at this same path
+  #   root: /shared/ponzi/outputs
 ```
 
 - `upload` (the default, and today's behaviour): the outputs folder is `data/assets`. The worker uploads, and the server writes the files there.

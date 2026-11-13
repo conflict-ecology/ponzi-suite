@@ -45,7 +45,8 @@ context: {C: 30, min_support: 6}
 forecaster: {name: rolling_ols, params: {harmonic_order: 0, pooled: false}}
 scoring: {baseline_days: [12, 24, 36, 48, 60], H: 5, alpha: 3.0}
 aggregate: {min_channels: 5, struct_weight: true}
-state_machine: {alpha: null, delta: -0.1, recovery_steps: 1, noise_floor: 0.03, nms_window: 0}
+state_machine: {alpha: null, delta: -0.1, recovery_steps: 1,
+                noise_floor: 0.03, nms_window: 0}
 ```
 
 A copy is `packages/core/tests/data/rolling-ols-pyramid.yaml`; its hash `a8e69b6b8b407d33ba8e4b800ede8d3a` is a golden value in `packages/core/tests/test_scoring_spec.py`.

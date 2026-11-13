@@ -17,23 +17,40 @@ A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grid
 Land includes the World Bank's 24 disputed areas (non-determined legal status, such as Western Sahara and Jammu and Kashmir), so their tiles can be watched; they belong to no country. Antarctica has no tiles ([The administrative boundaries](../method/data-sources.md#the-administrative-boundaries)).
 
 ```
-ponzi-client watch-request --cells 393U_467R,393U_468R --tags flood-2024,coast --start 2024-01-01   # a user key: an admin user decides
-ponzi-client watch-requests                          # yours, and what was decided
-ponzi-client area-create --cells 393U_467R,393U_468R --tags flood-2024,coast --start 2024-01-01 --end 2024-12-31   # a client:write key
-ponzi-client area-create --cells 393U_469R --standard s1-general --cadence-hours 12   # a standard of its own (its id, or id@hash8)
-ponzi-client area-update AREA_ID --active false      # pause
-ponzi-client area-update AREA_ID --tags flood-2024   # change its tags
-ponzi-client area-discover AREA_ID                   # look now, whatever the cadence
-ponzi-client jobs --area AREA_ID                     # its jobs; a done job lists the Items it made
+# a user key: an admin user decides
+ponzi-client watch-request --cells 393U_467R,393U_468R \
+    --tags flood-2024,coast --start 2024-01-01
+# yours, and what was decided
+ponzi-client watch-requests
+# a client:write key
+ponzi-client area-create --cells 393U_467R,393U_468R \
+    --tags flood-2024,coast --start 2024-01-01 --end 2024-12-31
+# a standard of its own (its id, or id@hash8)
+ponzi-client area-create --cells 393U_469R --standard s1-general \
+    --cadence-hours 12
+# pause
+ponzi-client area-update AREA_ID --active false
+# change its tags
+ponzi-client area-update AREA_ID --tags flood-2024
+# look now, whatever the cadence
+ponzi-client area-discover AREA_ID
+# its jobs; a done job lists the Items it made
+ponzi-client jobs --area AREA_ID
 ```
 
 From Python:
 
 ```python
-c.majortom_cells(bbox=[51.38, 35.68, 51.42, 35.72])      # the tiles over land of a box: Tehran's centre
-c.majortom_bursts(["397U_465R", "397U_466R"])            # the bursts an area of them would watch, both passes
-c.request_watch(cells=["397U_465R", "397U_466R"], tags="tehran, flood-2025", start_date="2025-01-01")   # a user key
-c.create_area(cells=["397U_465R", "397U_466R"], tags=["tehran"], start_date="2025-01-01", end_date="2025-12-31")   # client:write
+# the tiles over land of a box: Tehran's centre
+c.majortom_cells(bbox=[51.38, 35.68, 51.42, 35.72])
+# the bursts an area of them would watch, both passes
+c.majortom_bursts(["397U_465R", "397U_466R"])
+# a user key
+c.request_watch(cells=["397U_465R", "397U_466R"], tags="tehran, flood-2025",
+                start_date="2025-01-01")
+# client:write
+c.create_area(cells=["397U_465R", "397U_466R"], tags=["tehran"],
+              start_date="2025-01-01", end_date="2025-12-31")
 ```
 
 A tile is named by its bottom-left corner. Until the boundaries are ready (the server builds them on its first start), the tile routes and making an area answer 503, as the boundary routes do.

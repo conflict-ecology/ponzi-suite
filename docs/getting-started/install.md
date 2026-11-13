@@ -27,8 +27,9 @@ Then set up the logins the work needs: [Logins and keys](authentication.md).
 One pip command, in any Python 3.11 or later. `ponzi-spec` is named in the same command because it is not on PyPI:
 
 ```
-pip install "ponzi-spec @ git+https://github.com/conflict-ecology/ponzi-core@main#subdirectory=packages/spec" \
-            "ponzi-client @ git+https://github.com/conflict-ecology/ponzi-service@main#subdirectory=packages/client"
+REPO=git+https://github.com/conflict-ecology
+pip install "ponzi-spec @ $REPO/ponzi-core@main#subdirectory=packages/spec" \
+    "ponzi-client @ $REPO/ponzi-service@main#subdirectory=packages/client"
 ```
 
 It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [Clients: Python, CLI, TypeScript](../using/clients.md).
@@ -37,8 +38,10 @@ It needs nothing else (pydantic, PyYAML, httpx). Then point it at a server: [Cli
 
 ```
 cd ponzi-core
-pixi install                 # the default environment: ponzi-spec, ponzi, ponzi-pipeline, ponzi-models
-pixi run test                # optional: the fast tests
+# the default environment: ponzi-spec, ponzi, ponzi-pipeline, ponzi-models
+pixi install
+# optional: the fast tests
+pixi run test
 pixi run ponzi --help
 ```
 
@@ -55,8 +58,11 @@ The other environments are installed only when asked for (`pixi install -e NAME`
 
 ```
 cd ponzi-service
-pixi install                 # ponzi-server, ponzi-client, ponzi-worker, with ponzi-core's distributions from ../ponzi-core
-pixi run test                # optional
+# ponzi-server, ponzi-client, ponzi-worker,
+# with ponzi-core's distributions from ../ponzi-core
+pixi install
+# optional
+pixi run test
 ```
 
 It has the same four environments as ponzi-core; the worker's stages run in the one a stage declares, and a cluster's release installs all four. How the pieces run together: [Quickstart](quickstart.md) on one machine, [Running on SLURM](../service/hpc.md).
@@ -65,8 +71,10 @@ It has the same four environments as ponzi-core; the worker's stages run in the 
 
 ```
 cd ponzi-visual
-pixi run install             # Node and the front end's packages
-pixi run dev                 # http://localhost:5173, against PONZI_URL (default the local demo server)
+# Node and the front end's packages
+pixi run install
+# http://localhost:5173, against PONZI_URL (default the local demo server)
+pixi run dev
 ```
 
 `pixi run server` makes and serves a demo installation from the ponzi-service checkout beside it ([Quickstart](quickstart.md)).
@@ -78,7 +86,8 @@ On a workstation for developing and testing PONZI, not for deploying it, one com
 ```
 git clone https://github.com/conflict-ecology/ponzi-suite
 cd ponzi-suite
-pixi run dev-install         # ponzi-core, ponzi-service, ponzi-visual beside the suite, each installed
+# ponzi-core, ponzi-service, ponzi-visual beside the suite, each installed
+pixi run dev-install
 ```
 
 It clones each of ponzi-core, ponzi-service and ponzi-visual that is not yet beside the suite (over https, the default branch; `PONZI_REF=TAG` for another), then installs the default environments of ponzi-core and ponzi-service and ponzi-visual's packages. A checkout that exists is used as it is, never pulled, reset or overwritten, and the installs follow its lock file (`pixi install --locked`), so running it again only checks and finishes.
@@ -106,7 +115,8 @@ To check that the GPU is seen:
 
 ```
 pixi run -e ml-gpu python -c "import torch; print(torch.cuda.is_available())"
-pixi run -e isce3 python -c "import isce3.cuda.core as c; print(c.get_device_count())"
+pixi run -e isce3 python -c \
+    "import isce3.cuda.core as c; print(c.get_device_count())"
 ```
 
 ## Without pixi

@@ -17,14 +17,22 @@ How the four steps fit together (forecast, score, calibrate, detect) is in [How 
 ## The `ponzi` command
 
 ```
-ponzi run ...                                  # score one coherence store under a scoring spec
-ponzi replay ...                               # re-threshold a run's score store into a change store
-ponzi forecasting-summary ...                  # the forecasting statistics of a run
-ponzi pvalues RUN_DIR --calibration FILE       # the p-value store of a finished run
-ponzi detect RUN_DIR --calibration ID          # events of one run
-ponzi detect-path RUN_DIR... --calibration ID  # events of the bursts of one path
-ponzi tile RUN_DIR... --calibration ID         # events on every Major TOM cell the bursts reach
-ponzi validate-store PATH [--json]             # check a store against its contract
+# score one coherence store under a scoring spec
+ponzi run ...
+# re-threshold a run's score store into a change store
+ponzi replay ...
+# the forecasting statistics of a run
+ponzi forecasting-summary ...
+# the p-value store of a finished run
+ponzi pvalues RUN_DIR --calibration FILE
+# events of one run
+ponzi detect RUN_DIR --calibration ID
+# events of the bursts of one path
+ponzi detect-path RUN_DIR... --calibration ID
+# events on every Major TOM cell the bursts reach
+ponzi tile RUN_DIR... --calibration ID
+# check a store against its contract
+ponzi validate-store PATH [--json]
 ```
 
 `ponzi --help` and each subcommand's `--help` give the options. The arguments of `run`, `replay` and `forecasting-summary` can also come from `--args-file` or `PONZI_<ARGUMENT>` ([Folders and environment variables](../getting-started/paths.md#running)). What `detect`, `detect-path` and `tile` write goes beside the runs they read unless `--out` says else.

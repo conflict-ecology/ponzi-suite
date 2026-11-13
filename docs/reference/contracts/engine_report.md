@@ -29,7 +29,8 @@ Written by the coherence engine (`ponzi_pipeline.engine.checks` and `report`, ca
   "verdict": "pass",
   "reason": "",
   "checks": [
-    {"name": "structure", "severity": "ok", "detail": "...", "value": null, "items": []}
+    {"name": "structure", "severity": "ok", "detail": "...", "value": null,
+     "items": []}
   ]
 }
 ```

@@ -34,8 +34,10 @@
 
 ```yaml
 server:
-  outputs: {mode: upload}                              # default
-  # outputs: {mode: path}                             # the workers write into $PONZI_HOME/outputs
+  # default
+  outputs: {mode: upload}
+  # the workers write into $PONZI_HOME/outputs
+  # outputs: {mode: path}
 ```
 
 | Mode | For | How an asset arrives |
@@ -53,7 +55,7 @@ No route answers without a valid key, `/v1/health` included (any scope). The ser
 
 Each request is one line on the logger `ponzi_server.access`: who (the key's name and id, `-` for no key, `invalid-key` for an unknown or revoked one), the client's address, the method and path, the status and the time. A key is never logged.
 
-```
+```{.text .pz-wrap}
 2026-11-04 10:19:53,179 INFO ponzi_server.access - 127.0.0.1 GET /v1/standards 401 1ms
 2026-11-04 10:19:53,188 INFO ponzi_server.access alice[80bf1d30346d12fd] 127.0.0.1 GET /v1/health 200 2ms
 ```

@@ -13,10 +13,13 @@ Written by hand: an onboarding spec of ponzi-suite `specs/onboarding_specs/` (it
 ```yaml
 steps: [built, weather, pairdiff, mask, sample]
 edge_margin: 20
-weather_source: edh              # edh, cdsgrid, edh_cdsgrid
-weather_variables: [...]         # default: ponzi_pipeline.onboard.weather.DEFAULT_VARIABLES
+# edh, cdsgrid, edh_cdsgrid
+weather_source: edh
+# default: ponzi_pipeline.onboard.weather.DEFAULT_VARIABLES
+weather_variables: [...]
 pairdiff_baselines: [12, 24, 36, 48, 60]
-weather_area: [lon_min, lat_min, lon_max, lat_max]   # optional
+# optional
+weather_area: [lon_min, lat_min, lon_max, lat_max]
 ```
 
 | Field | Meaning |

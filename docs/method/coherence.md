@@ -27,7 +27,8 @@ ponzi-pipeline discover  --burst ID --start DATE --end DATE [--work DIR]
 ponzi-pipeline pairs     --burst ID [--work DIR]
 ponzi-pipeline acquire   --burst ID [--work DIR] --burst-map FILE
 ponzi-pipeline dem       --burst ID [--work DIR] --burst-map FILE
-ponzi-pipeline coherence --burst ID [--work DIR] --burst-map FILE --index N     # in the isce3 environment
+# in the isce3 environment
+ponzi-pipeline coherence --burst ID [--work DIR] --burst-map FILE --index N
 ponzi-pipeline assemble  --burst ID [--work DIR] --burst-map FILE [--out DIR]
 ```
 

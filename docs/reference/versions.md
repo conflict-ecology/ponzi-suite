@@ -86,8 +86,12 @@ Between tags:
 A stage has no version. `StageSpec.code` names the distributions whose code computes it, and their majors enter its content id:
 
 ```
-content id = sha256(canonical_json({"stage": name, "inputs": sorted ids, "config": identity params,
-                                    "code": {distribution: major}}))[:32]
+content id = sha256(canonical_json({
+    "stage": name,
+    "inputs": sorted ids,
+    "config": identity params,
+    "code": {distribution: major},
+}))[:32]
 ```
 
 - A patch or minor release keeps every id, so the cache is reused; a major gives everything its distribution computes a new id, so it is made again ([Content ids and reuse](../using/content-ids.md)).

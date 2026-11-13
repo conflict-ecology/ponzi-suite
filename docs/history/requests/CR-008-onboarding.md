@@ -12,7 +12,8 @@ CR-007 moved the monorepo's whole pipeline package in (15 modules, 8,684 lines):
 ### The new interface
 
 ```
-ponzi onboard --store PATH --out DIR [--burst ID] [--config FILE] [--steps a,b] [--rebuild] [--frames FILE] [--ghsl-cache DIR]
+ponzi onboard --store PATH --out DIR [--burst ID] [--config FILE]
+              [--steps a,b] [--rebuild] [--frames FILE] [--ghsl-cache DIR]
 ponzi validate-store PATH [--json]
 ```
 
@@ -27,8 +28,10 @@ Example:
 
 ```
 ponzi validate-store /scratch/coherence/t094_200136_iw2.coh.zarr --json
-ponzi onboard --store /scratch/coherence/t094_200136_iw2.coh.zarr --out /scratch/onboarded/t094_200136_iw2 \
-              --config onboarding.yaml --steps built,weather,pairdiff,mask --ghsl-cache /scratch/ghsl
+ponzi onboard --store /scratch/coherence/t094_200136_iw2.coh.zarr \
+              --out /scratch/onboarded/t094_200136_iw2 \
+              --config onboarding.yaml \
+              --steps built,weather,pairdiff,mask --ghsl-cache /scratch/ghsl
 ```
 
 ### Kept, module by module (lines before, after)

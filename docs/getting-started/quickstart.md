@@ -8,9 +8,14 @@ The demo makes a working installation on local disk, with no cluster, no GPU and
 - a watched area.
 
 ```
-git clone .../ponzi-core && git clone .../ponzi-service && git clone .../ponzi-visual   # side by side
+# side by side
+git clone .../ponzi-core
+git clone .../ponzi-service
+git clone .../ponzi-visual
 cd ponzi-visual && pixi run install
-pixi run server        # makes the demo the first time (about 15 s), serves it on :8799, prints the keys to log in with
+# makes the demo the first time (about 15 s), serves it on :8799,
+# prints the keys to log in with
+pixi run server
 ```
 
 Then, in another shell:
@@ -26,8 +31,11 @@ The demo's five bursts are synthetic and on no land, so the map has no tiles to 
 From ponzi-service, in Python or a shell:
 
 ```
-export PONZI_KEY=$(python -c "import json; print(json.load(open('../ponzi-visual/.e2e/demo/keys.json'))['user'])")
-pixi run ponzi-client --url http://127.0.0.1:8799 search --collections ponzi-events-cell
+export PONZI_KEY=$(python -c \
+    "import json, sys; print(json.load(sys.stdin)['user'])" \
+    < ../ponzi-visual/.e2e/demo/keys.json)
+pixi run ponzi-client --url http://127.0.0.1:8799 \
+    search --collections ponzi-events-cell
 ```
 
 ## What the demo did
@@ -44,7 +52,9 @@ For developing and testing on Linux ([Install](install.md)), not for deploying, 
 
 ```
 cd ponzi-suite
-pixi run dev-up              # the server on :8780, the client loop, the app on http://localhost:5180; prints two keys
+# the server on :8780, the client loop, the app on http://localhost:5180;
+# prints two keys
+pixi run dev-up
 ```
 
 - **The server** is `ponzi-server serve` on the PONZI home, listening on 127.0.0.1 only. On its first start it downloads the World Bank boundaries and the burst catalog in the background.
@@ -78,8 +88,10 @@ A `dev-browser.key` left from before is revoked and removed. The logs are append
 To keep a development home apart from your own, point `PONZI_HOME` elsewhere. To skip the downloads, give a settings file:
 
 ```
-printf 'server:\n  fetch_boundaries: false\n  fetch_catalog: false\n' > /tmp/dev-server.yaml
-PONZI_HOME=/tmp/ponzi-dev PONZI_SERVER_SETTINGS=/tmp/dev-server.yaml pixi run dev-up
+printf 'server:\n  fetch_boundaries: false\n  fetch_catalog: false\n' \
+    > /tmp/dev-server.yaml
+PONZI_HOME=/tmp/ponzi-dev PONZI_SERVER_SETTINGS=/tmp/dev-server.yaml \
+    pixi run dev-up
 ```
 
 To run a real standard instead, write its server file into `$PONZI_HOME/standards` with `ponzi-models standard-workflow` ([Building a standard](../models/standards.md)) and name it as `default_standard` in a settings file given as `PONZI_SERVER_SETTINGS` ([Watched areas](../using/watched-areas.md)). Areas made before keep the standard they were made with.

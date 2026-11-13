@@ -249,7 +249,8 @@ Lineage is STAC links: a `derived_from` link per input Item, plus `ponzi:model`,
 ```
 content_id = sha256( canonical_json({
     "stage":   {"name": ..., "version": ...},
-    "inputs":  [sorted content_ids of input Items; for external Items the granule or file name and checksum],
+    "inputs":  [sorted content_ids of input Items; for external Items
+                the granule or file name and checksum],
     "config":  <identity part of the stage config>,
 }))[:32]
 ```
@@ -265,7 +266,10 @@ content_id = sha256( canonical_json({
 Today `forecaster.params.artifact` is a relative path inside the config hash, and `null_runs.py` works around it with a symlink. Target:
 
 ```yaml
-forecaster: {name: tide, params: {artifact: "registry:tide_s1_mt04@sha256:3f2a...", batch: 4096, device: cpu}}
+forecaster:
+  name: tide
+  params: {artifact: "registry:tide_s1_mt04@sha256:3f2a...",
+           batch: 4096, device: cpu}
 ```
 
 - The hash covers the model's identity (id + digest), not its location. Core resolves the reference through an `ArtifactResolver` (protocol in `ponzi`; folder, object-store and server-backed implementations in `ponzi_models` and the worker).
@@ -281,7 +285,8 @@ standard: s1-general@1.2.0
 created: 2026-11-04T10:12:03Z
 chain:
   - stage: discover@ponzi-pipeline 0.1.0
-    produced: 41 Sentinel-1 IW SLC scenes, relative orbit 28, 2025-06-01 .. 2026-10-30 (ASF)
+    produced: 41 Sentinel-1 IW SLC scenes, relative orbit 28,
+      2025-06-01 .. 2026-10-30 (ASF)
   - stage: acquire@ponzi-pipeline 0.1.0
     produced: 41 SLCs, 41 orbit files (checksums in the Items)
   - stage: dem@ponzi-pipeline 0.1.0
@@ -289,20 +294,25 @@ chain:
   - stage: pairs@ponzi-pipeline 0.1.0
     produced: 195 pairs at baselines 12, 24, 36, 48, 60 days
   - stage: coherence@ponzi-pipeline 0.1.0 (isce3 <version>)
-    config: {polarisation: VV, looks: 10x2, window: 5x5, posting: <D9>, config hash: ...}
+    config: {polarisation: VV, looks: 10x2, window: 5x5, posting: <D9>,
+             config hash: ...}
     produced: 195 pair COGs (12 new in this update, 183 reused)
   - stage: assemble@ponzi-pipeline 0.1.0
-    produced: ponzi-coherence-t028_058198_iw3-...; engine report: all checks pass; validate-store: pass
+    produced: ponzi-coherence-t028_058198_iw3-...; engine report: all
+      checks pass; validate-store: pass
   - stage: onboard@ponzi-pipeline 0.1.0
-    config: {weather_source: edh, steps: [built, weather, pairdiff, mask, sample]}
+    config: {weather_source: edh,
+             steps: [built, weather, pairdiff, mask, sample]}
   - stage: run@ponzi 0.3.1
-    model: tide_s1_mt04 (sha256:3f2a...), run config mon_b5h5_d38pc04_mean (hash ...)
+    model: tide_s1_mt04 (sha256:3f2a...),
+      run config mon_b5h5_d38pc04_mean (hash ...)
     request: {staged: true, summaries: [et]}
   - stage: pvalues@ponzi 0.3.1
     calibration: mt04-ceiling
   - stage: detect@ponzi 0.3.1
     recipe: default (digest ...)
-executed_by: worker ceoas-hina01 (profile ceoas@2026.11), slurm jobs 5812231, 5812240
+executed_by: worker ceoas-hina01 (profile ceoas@2026.11),
+  slurm jobs 5812231, 5812240
 ```
 
 ## 5. Workflow stages and their interfaces
@@ -311,13 +321,20 @@ A stage is the unit of replacement. Each declares, in `ponzi-spec`:
 
 ```python
 class StageSpec(BaseModel):
-    name: str                      # "coherence"
-    version: str                   # from the implementing distribution
-    inputs: dict[str, str]         # role -> collection
-    params: type[BaseModel]        # identity params (hashed) and request params (not hashed), kept apart
-    outputs: dict[str, str]        # role -> collection
-    resources: ResourceHint        # cpus, memory, gpu, walltime, environment (default, ml, ml-gpu, isce3)
-    fan_out: str | None            # e.g. "per_pair", "per_burst": how the worker splits it into array tasks
+    # "coherence"
+    name: str
+    # from the implementing distribution
+    version: str
+    # role -> collection
+    inputs: dict[str, str]
+    # identity params (hashed) and request params (not hashed), kept apart
+    params: type[BaseModel]
+    # role -> collection
+    outputs: dict[str, str]
+    # cpus, memory, gpu, walltime, environment (default, ml, ml-gpu, isce3)
+    resources: ResourceHint
+    # e.g. "per_pair", "per_burst": how the worker splits it into array tasks
+    fan_out: str | None
 ```
 
 Implementations register through Python entry points (`ponzi.stages`); a new or replacement stage is a distribution that registers a name, and the worker finds it without code changes.
@@ -347,14 +364,17 @@ One deployment config per installation, the same schema for every distribution (
 
 ```yaml
 # ponzi.yaml
-roots:                     # URIs through fsspec: file://, s3://, gs://
+# URIs through fsspec: file://, s3://, gs://
+roots:
   data: file:///storage/ceoas-scratch/barthelp/ponzi/data
   cache: file:///storage/ceoas-scratch/barthelp/ponzi/cache
   registry: file:///storage/ceoas-scratch/barthelp/ponzi/data/registry
   scratch: file:///storage/ceoas-scratch/barthelp/ponzi/data/tmp
 server: {url: https://ponzi.example.org, key_env: PONZI_WORKER_KEY}
-credentials: {file: ~/.config/ponzi/credentials.env}   # Earthdata, CDSE, CDS, wandb; never inline
-cluster_profile: ceoas@2026.11                          # worker only
+# Earthdata, CDSE, CDS, wandb; never inline
+credentials: {file: ~/.config/ponzi/credentials.env}
+# worker only
+cluster_profile: ceoas@2026.11
 ```
 
 - Lookup: `--config`, then `$PONZI_CONFIG`, then `./ponzi.yaml`, then the user config dir (platformdirs), then built-in defaults.
@@ -411,21 +431,33 @@ ponzi_worker/
 ```yaml
 profile: ceoas
 version: 2026.11
-login: shell-hpc                      # shell.hpc.oregonstate.edu
-roots: {data: /storage/ceoas-scratch/barthelp/ponzi/data, lab: /ceoas/Vandenhoek_Lab/home/barthelp}
+# shell.hpc.oregonstate.edu
+login: shell-hpc
+roots:
+  data: /storage/ceoas-scratch/barthelp/ponzi/data
+  lab: /ceoas/Vandenhoek_Lab/home/barthelp
 partitions:
-  gpu:   {name: ceoas-gpu, nodes: [ayaya01, ayaya05], gres: "gpu:1", note: "GTX 1080 Ti, SM 6.1: torch 2.6 / CUDA 12.4 only; cuDNN off"}
+  gpu:   {name: ceoas-gpu, nodes: [ayaya01, ayaya05], gres: "gpu:1",
+    note: "GTX 1080 Ti, SM 6.1: torch 2.6 / CUDA 12.4 only; cuDNN off"}
   cpu:   {nodelist: hina01, note: "other nodes read scratch slowly"}
-  bulk:  {name: ceoas, account: ceoas, note: "coherence arrays; 250G nodes: 48G per task fits 5, 64G fits 3"}
-environments:                         # pixi environments of a tagged ponzi-core release
-  default: "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/default/bin/python"
-  ml:      "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/ml/bin/python"
-  ml-gpu:  "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/ml-gpu/bin/python"
-  isce3:   "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/isce3/bin/python"
+  bulk:  {name: ceoas, account: ceoas,
+    note: "coherence arrays; 250G nodes: 48G per task fits 5, 64G fits 3"}
+# pixi environments of a tagged ponzi-core release
+environments:
+  default:
+    "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/default/bin/python"
+  ml:
+    "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/ml/bin/python"
+  ml-gpu:
+    "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/ml-gpu/bin/python"
+  isce3:
+    "{lab}/ponzi-core-releases/{core_version}/.pixi/envs/isce3/bin/python"
 redirect_under_data: [TMPDIR, WANDB_DIR, TORCH_HOME, XDG_CACHE_HOME]
 logs: "{data}/logs"
-stage_resources:                      # from hpc/*.sbatch and repeat_ccd defaults
-  coherence: {partition: bulk, cpus: 8, mem: 48G, time: "04:00:00", array_throttle: 100}
+# from hpc/*.sbatch and repeat_ccd defaults
+stage_resources:
+  coherence: {partition: bulk, cpus: 8, mem: 48G, time: "04:00:00",
+              array_throttle: 100}
   acquire:   {partition: cpu, cpus: 8, parallel_downloads: 8}
   train:     {partition: gpu, cpus: 8, mem: 32G, time: "08:00:00"}
   prepare:   {partition: cpu, cpus: 4, mem: 32G, time: "04:00:00"}
