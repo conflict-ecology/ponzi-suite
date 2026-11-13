@@ -6,7 +6,7 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 
 | Word | Meaning 1 | Meaning 2 |
 | --- | --- | --- |
-| **stage** | a unit of a workflow the worker runs: `discover`, `dem`, `coherence`, `assemble`, `onboard`, `run`, `pvalues`, `detect`, `tile`, and the `ingest-coherence` and `ingest-calibration` stages ([Stages](../method/stages.md)) | in progressive scoring, how many of an anchor's future acquisitions are known: stage 1 to H - 1 is provisional, stage H is final (CR-021) |
+| **stage** | a unit of a workflow the worker runs: `discover`, `dem`, `coherence`, `assemble`, `onboard`, `run`, `pvalues`, `detect`, `tile`, and the `ingest-layer` (`ingest-coherence` before CR-102) and `ingest-calibration` stages ([Stages](../method/stages.md)) | in progressive scoring, how many of an anchor's future acquisitions are known: stage 1 to H - 1 is provisional, stage H is final (CR-021) |
 | **window** | the span of anchors a run scores (`t_lo` to `t_hi`) | the area of a mask layer a run reads; or the estimator's Gaussian window in coherence |
 | **run** | one forecast run of one burst under one scoring spec (`ponzi run`, a `ponzi-run` Item) | loosely, any execution; this documentation uses *job* for that |
 | **path** | one track seen in one direction, the bursts a detection combines (`detect-path`) | a file path |

@@ -1,7 +1,7 @@
 # CR-100: the tiles are the only upload
 
 - **Requested by / date:** owner, 2026-11-13 ("make the tile the only upload")
-- **Status:** implemented on the owner's instruction (2026-11-13), awaiting review; uncommitted
+- **Status:** implemented on the owner's instruction (2026-11-13), released in 0.1.2
 
 ## Why
 A standard's jobs delivered two final Items per burst: `events` (`detect`, the burst's events on its own grid, `ponzi-events`) and `cells` (`tile`, the same burst's events on each Major TOM cell it reaches, `ponzi-events-cell`). The delivered output is on the Major TOM grid (overhaul plan D18, CR-030); the per-burst store was the final output before CR-030 added the tiles and was never removed. It doubled what each job zips and uploads, and gave two products for one pixel.

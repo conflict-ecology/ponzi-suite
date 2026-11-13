@@ -30,7 +30,7 @@ A path (`ponzi detect-path`, `ponzi tile`) combines bursts of one track seen in 
 
 ## The PONZI extension
 
-Schema: <a href="../../schemas/ponzi/v0.2.0/schema.json"><code>schemas/ponzi/v0.2.0/schema.json</code></a> (published by this site's build from `ponzi-spec`), listed in every Item's `stac_extensions`.
+Schema: <a href="../../schemas/ponzi/v0.3.0/schema.json"><code>schemas/ponzi/v0.3.0/schema.json</code></a> (published by this site's build from `ponzi-spec`, with every earlier version: <a href="../../schemas/ponzi/v0.2.0/schema.json"><code>v0.2.0</code></a>), listed in every Item's `stac_extensions`.
 
 | Field | Required | Meaning |
 | --- | --- | --- |
@@ -40,6 +40,7 @@ Schema: <a href="../../schemas/ponzi/v0.2.0/schema.json"><code>schemas/ponzi/v0.
 | `ponzi:request` | no | the request fields that do not change the result, for the record |
 | `ponzi:standard` | no | the standard it was made under |
 | `ponzi:tags` | no | assigned by the server as it serves an analysis Item (runs, p-values, events, events of a cell; a standard's jobs deliver only the events of a cell, the others are Items held from before CR-100): the tags of the watched areas of its burst or tile ([Watched areas](watched-areas.md#tags)). Never set by a stage, never stored in the Item and never part of its content id |
+| `ponzi:layer` | no | the name of the input layer a `ponzi-input-layer` Item holds: `sar` or `onboard` (CR-102; extension `v0.3.0`). Items made before name `v0.2.0`, whose schema is still published |
 
 Unknown `ponzi:` fields are refused.
 

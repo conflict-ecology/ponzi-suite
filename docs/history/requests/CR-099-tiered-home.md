@@ -1,7 +1,7 @@
 # CR-099: one home on three tiers of storage: hot, warm and cold
 
 - **Requested by / date:** owner, 2026-11-13 ("I may need to use multiple NAS stores which are faster for processing and another that is larger colder storage"; "what if I had a $PONZI_HOME_COLD $PONZI_HOME_WARM $PONZI_HOME_HOT?"; the stores are "mounted on login nodes and will have the same paths on other nodes"; "downloads should be on cold"; "leave $PONZI_HOME_HOT out and just use $PONZI_HOME"; "what if I want to do a partial promote (i.e some downloads?)")
-- **Status:** signed off (2026-11-13: decisions 1 to 5 confirmed, partial promotion folded in; "approved to execute"), implemented (unreleased), awaiting review; uncommitted
+- **Status:** signed off (2026-11-13: decisions 1 to 5 confirmed, partial promotion folded in; "approved to execute"), implemented (0.1.2)
 - **Changes in part:** CR-088 (one home, no folder moved out of it): the home spans up to three roots, each folder in one of them by a fixed rule; CR-047 (a home's records name its files by relative paths): they are relative to the home, read through the tiers.
 
 ## Why

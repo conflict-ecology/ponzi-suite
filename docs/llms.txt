@@ -67,4 +67,4 @@ Agents use PONZI through two tools: ponzi-client asks a server for what it holds
 - [Roadmap](contributing/roadmap/): what is done and what is left, as a checklist
 - [Change process](contributing/process/): change requests and versions
 - [Adding a stage](contributing/new-stage/): adding a processing component
-- [PONZI extension schema](schemas/ponzi/v0.2.0/schema.json)
+- [PONZI extension schema](schemas/ponzi/v0.3.0/schema.json)

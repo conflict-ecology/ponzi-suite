@@ -17,7 +17,7 @@ sources:
   href: https://datapool.asf.alaska.edu/SLC/SA/S1A_IW_SLC__1SDV_20260901....zip
   title: S1A_IW_SLC__1SDV_20260901...
 steps:
-- item: ponzi-coherence-t028_058198_iw3-51c0a9e2d4f7
+- item: ponzi-input-layer-t028_058198_iw3-51c0a9e2d4f7
   stage: {name: assemble, code: {ponzi: '0.0', ponzi-pipeline: '0.0'}}
   spec_hash: ...
   inputs: [3fa1..., ...]

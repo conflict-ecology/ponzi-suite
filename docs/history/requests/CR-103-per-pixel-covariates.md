@@ -1,7 +1,8 @@
 # CR-103: per-pixel covariates for the learned forecasters, and the grid every input agrees on
 
 - **Requested by / date:** owner, 2026-11-13 ("yes draft piece 3 and fold in the following: And then to be usable in the same model any input data feature just needs to agree on temporal cadence and pixel size which we enforce via the zarr format and specs I guess")
-- **Status:** draft. Parts 1 to 4 wait on part 0, an experiment whose result decides whether they are made (D5).
+- **Status:** signed off (2026-11-13, "execute"), not started: it follows CR-102 (a) and (b) (D6). Parts 1 to 4 wait on part 0, whose result decides whether they are made (D5).
+- **Owner decisions 2026-11-13:** D1 approved (a model on another grid is refused); D2 approved (SAR-derived variables never known-future); D3 approved (static variables as repeated channels); D4 approved (ESA WorldCover, `fraction` per class, `static`); D5 approved (part 0 gates parts 1 to 4; part 1 may be made alone), its margins left open for the owner to set before the run; D6 approved (the order).
 - **Builds on:** CR-102 (input layers, variable kinds, `scoring.target`, amplitude, the sample carrying per-pixel variables), CR-016 (the treatment of missing values), CR-021 (unknown future rows), CR-010 (the single-anchor template).
 - **Leaves for a later request:** forecasting a variable other than coherence.
 

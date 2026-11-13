@@ -128,6 +128,12 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] Outputs reach the server by upload or by a shared path, as the server's `outputs` setting says (CR-041).
 - [x] The tiles are the only upload: a job delivers its `ponzi-events-cell` Items, not the per-burst `ponzi-events` (CR-100).
 - [x] A job is named by its burst's newest acquisition, so a look with nothing new makes no new job, and an upload the server already holds is answered `held` and not sent (CR-101 part a).
+- [ ] **Input layers and SAR features (CR-102).** local, then HPC.
+    - Signed off: (a) input layers in place of the coherence store and its sidecar, and `scoring.target` (implemented, awaiting review); (b) the features module, the pair chain refactored onto it with byte parity, and amplitude; (c) the stack coregistration and the CSLC cache entry; (d) the stack against pair comparison (owner, cluster).
+    - Part (a) lands before CR-101 part (b). Done when a run reads a list of layers, every existing store gives the same outputs bit for bit, and a SAR spec makes coherence and amplitude from CSLCs.
+- [ ] **Per-pixel covariates (CR-103).** HPC, then local.
+    - Signed off, not started: (0) amplitude as a past-only channel in a ponzi-models experiment, which decides (1) to (4); (1) the model records its input grid and refuses another; (2) the channel kinds and roles; (3) the runner; (4) training. The experiment's margins are the owner's, set before it runs.
+    - Follows CR-102 (a) and (b).
 - [ ] **Tile series (CR-101 parts b to e).** local, then HPC.
     - Signed off, not started: (b) the burst series, appended update by update, and its parity with a full run; (c) detection with carried state and one tile series per cell and track; (d) delivery of the changed chunks only, and the server's versioned copy of each series; (e) offers, a loop sending the server the series made without it.
     - Each part is implemented and reviewed on its own. Done when a new acquisition sends only the tail chunks of each tile series, and an appended series equals the full run bit for bit.

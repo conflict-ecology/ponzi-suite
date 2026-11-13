@@ -1,10 +1,14 @@
-# C2: Covariates sidecar
+# C2: Covariates sidecar (the onboarding layer)
 
-`ponzi_pipeline.onboard.onboard`. `{burst_id}_covariates.zarr` beside an immutable coherence store: the per-pixel and per-acquisition covariates a run may read (strata for L0, covariates for forecasters), merged at open with the sidecar winning over same-named store variables. It also carries the run's `process_mask`, so the edge margin is preprocessing rather than a scoring spec field.
+!!! note "Folded into C1 (CR-102)"
+    Since CR-102 the sidecar is the onboarding layer of an input ([C1](coherence_store.md)): `{burst}.onboard.zarr`, with `layer: onboard`, C1's `contract_version` and the SAR layer's `burst_id`, `epsg` and `revisit_days`, and each variable's `source` (the step and the onboarding spec's hash). A name the SAR layer also has is refused when the two are opened together, where the sidecar won before. A `{burst}_covariates.zarr` written before is read as an onboarding layer, and its C2 `contract_version` is still accepted by `validate_sidecar`. What follows is what the onboarding layer holds; the functions keep their `sidecar` names.
+
+
+`ponzi_pipeline.onboard.onboard`. `{burst_id}.onboard.zarr` (`{burst_id}_covariates.zarr` before CR-102) beside an immutable SAR layer: the per-pixel and per-acquisition covariates a run may read (strata for L0, covariates for forecasters), merged at open; a name in both is refused (CR-102). It also carries the run's `process_mask`, so the edge margin is preprocessing rather than a scoring spec field.
 
 ## Producer and consumers
 
-Producer: `ponzi_pipeline.onboard.onboard.onboard_store` (`ponzi-pipeline onboard --store PATH [--out DIR] [--burst ID] [--onboarding-spec SPEC] [--steps LIST] [--rebuild] [--frames FILE] [--ghsl-cache DIR] [--era5-cache DIR]`, or the worker stage `onboard`; `--out` defaults to the store's folder, and the two caches to the PONZI home's `downloads/ghsl` and `downloads/era5`), which writes `<out_dir>/<burst>_covariates.zarr` and the stamp `<out_dir>/onboard_meta.json`; the worker keeps the two as one cache entry (assets `covariates` and `onboard_meta`). Its parameters are the onboarding spec (C17).
+Producer: `ponzi_pipeline.onboard.onboard.onboard_store` (`ponzi-pipeline onboard --store PATH [--out DIR] [--burst ID] [--onboarding-spec SPEC] [--steps LIST] [--rebuild] [--frames FILE] [--ghsl-cache DIR] [--era5-cache DIR]`, or the worker stage `onboard`; `--out` defaults to the store's folder, and the two caches to the PONZI home's `downloads/ghsl` and `downloads/era5`), which writes `<out_dir>/<burst>.onboard.zarr` and the stamp `<out_dir>/onboard_meta.json`; the worker keeps the two as one cache entry (assets `covariates` and `onboard_meta`). Its parameters are the onboarding spec (C17).
 
 Consumers: `ponzi.core.runner` (`open_input(coh, sidecar)`, `RunRequest.sidecar`, `ponzi run --sidecar`, the worker stage `run`), the onboarding's `sample` step (`extract_burst_sample`: the series and layers travel into the C3 sample), `ponzi_models` (the masked input of a panel, through `open_input`).
 
@@ -24,7 +28,7 @@ The pair differences are `v(t) - v(t - d days)`, signed (a rise and a fall are d
 
 ## Attrs
 
-`contract_version` (the hash of C2's declaration, ponzi-core CR-085; `validate_sidecar` fails another), `producer` (`ponzi_pipeline.onboard`), `source_store`, `source_digest`, `sidecar_of`, `onboard_steps`, and the provenance of each step: `built_source`, `land_source`; `{var}_source`, `weather_source` and the source's own (`weather_url`, `cds_dataset`, `weather_area`, `cds_area`, `cds_area_key`, `n_cells`, `era5_cell_lat`, `era5_cell_lon`, `era5_burst_value`); `era5_pd_source`, `era5_pd_baselines`, `era5_pd_levels`.
+`layer` (`onboard`), `contract_version` (C1's since CR-102; the hash of C2's declaration before, ponzi-core CR-085; `validate_sidecar` accepts these two and fails another), the SAR layer's `burst_id`, `epsg` and `revisit_days`, `producer` (`ponzi_pipeline.onboard`), `source_store`, `source_digest`, `sidecar_of`, `onboard_steps`, and the provenance of each step: `built_source`, `land_source`; `{var}_source`, `weather_source` and the source's own (`weather_url`, `cds_dataset`, `weather_area`, `cds_area`, `cds_area_key`, `n_cells`, `era5_cell_lat`, `era5_cell_lon`, `era5_burst_value`); `era5_pd_source`, `era5_pd_baselines`, `era5_pd_levels`.
 
 The margin lives in the `edge_margin` attr of `process_mask`: the runner stamps it into `run_meta.pixels.edge_margin` and `ponzi_edge_margin` (C7), and the `sample` step into the C3 sample. Without a `process_mask` the runner processes the whole valid footprint and records margin 0; with one it processes `process_mask & valid_pixels`.
 

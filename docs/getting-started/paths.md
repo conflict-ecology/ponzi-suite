@@ -27,7 +27,7 @@ $PONZI_HOME/                     ~/.ponzi by default
                                  registered (ponzi-models calibrate; CR-088)
   work/<burst>/                  ponzi-pipeline's coherence work folders
                                  (CR-080), and the store `assemble` writes,
-                                 <burst>.coh.zarr (CR-088)
+                                 <burst>.sar.zarr (CR-088, CR-102)
   tmp/                           scratch, removed after use (CR-080, CR-088)
   specs/                         working copies of the specs, looked in
                                  before ponzi-suite's (CR-070, CR-078)

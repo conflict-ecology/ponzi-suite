@@ -1,7 +1,8 @@
 # CR-102: input layers in place of the coherence store and its sidecar, and SAR features made from CSLCs
 
 - **Requested by / date:** owner, 2026-11-13 ("PONZI should probably have different modules for CSLC creation and feature creation from CSLC (currently just coherence computation but might test some other coherence estimation techniques plus some other outputs like amplitude which would all take CSLC but produce different outputs). And then instead of having coherence + sidecar we could just have a general "input data" format that can contain pairwise or timestep specific variables (coherence, amplitude, weather, LUC, etc.) and then the model just splits into input data it forecasts vs input data used as covariates"; "draft all of 1 and 2 together")
-- **Status:** draft
+- **Status:** signed off (2026-11-13, "execute"); part (a) implemented (0.2.0). Parts (b) to (d) not started.
+- **Owner decisions 2026-11-13:** D1 to D8 approved as recommended: D1 one store per layer; D2 a name in two layers refused; D3 the new names, old ones read; D4 `pair` coregistration the default; D5 CSLCs a warm-tier cache entry; D6 amplitude beta0 dB; D7 `SarSpec`, legacy hashes kept; D8 the order (a) to (d), part (a) before CR-101 part (b).
 - **Builds on:** CR-008 (onboarding, the sidecar), CR-032 (the coherence chain, the engine report; its D4 left the CSLC route out), CR-085 (contract versions), CR-089 and CR-091 (standard keys), CR-099 (the tiered home).
 - **Touches:** CR-101 parts (b) to (e), not started: their appended "coherence store and sidecar" become appended layers (D8).
 - **Leaves for a later request:** per-pixel covariates read by the forecasters (amplitude, land use as model inputs: CR-103), and forecasting a variable other than coherence. This request stores, validates and samples such variables; no model reads them yet.
@@ -42,7 +43,7 @@ Each data variable carries `long_name`, `units`, `source` (the step and its spec
 
 The rest of the input is read as today: every `pair_table` and `series` variable is a covariate the forecasters may name in `fcov_spec`, and `built` and `land` are the L0 strata. Other `pair`, `acquisition` and `static` variables are checked and carried into the sample (1.8), but not read by a run.
 
-**1.7 Run requests and commands.** `RunRequest.inputs: list[path]` replaces `coh`, `sidecar` and `extra_sidecar` (`runner.merge_extra_series` becomes one more layer); `ponzi run --input PATH` (repeatable) replaces `--coh` and `--sidecar`, which remain as deprecated spellings of `--input` for one major. `ponzi validate-store` validates a layer, or an input with `--input` repeated (the cross-layer checks of 1.4).
+**1.7 Run requests and commands.** `RunRequest.inputs: list[path]` replaces `coh` and `sidecar` (`extra_sidecar` stays its own option: its series are matched by calendar day to the input's dates, a time axis of its own, which a layer may not have); `ponzi run --input PATH` (repeatable) replaces `--coh` and `--sidecar`, which remain as deprecated spellings of `--input` for one major. `ponzi validate-store` validates a layer, or an input with `--input` repeated (the cross-layer checks of 1.4).
 
 **1.8 The pixel sample (C3).** The sample copies every `pair` and `acquisition` variable of the input as `(time, pix, baseline)` and `(time, pix)`, every `static` one as `(pix,)`, and every `pair_table` and `series` as today. The variables keep their names and attrs. `coh` is no longer special in C3 except as the default target.
 
@@ -96,6 +97,11 @@ Every feature's raster is geocoded onto the burst lattice by the one shared `geo
 
 ### Docs
 Contracts: C1 (rewritten as *Input layer*), C2 (retired; points to C1), C3, C18, C17 (the onboarding writes a layer), C4 (`scoring.target`, the noise floor's source), `run_request.md`, `command_args.md`, `staged_store.md` and C7 where they name C1. Method: `method/coherence.md` (CSLCs, features, the two coregistration modes, amplitude). Using: `using/` pages naming `--coh` and `--sidecar`. Service: `service/worker.md` (the collection, the stages). The API reference. ponzi-visual if it shows `ponzi-coherence` or `ponzi-sidecar` Items (its own change).
+
+## Implementation notes (part a, 2026-11-13)
+- **1.9 moves to part (b).** The engine and PONZI checks keep running on `coh` alone: until part (b) adds `amp_db`, no SAR layer holds a second pixel variable to check or to test them on. The report's name follows the store (`{burst}.sar.zarr.validation.json`).
+- **1.10 and the STAC extension.** `ponzi:layer` is a new `ponzi:*` field, so the PONZI STAC extension is `v0.3.0` (owner, 2026-11-13: "bump"); `v0.2.0` stays shipped and published for the Items made before. The stages keep their roles (`coherence`, `sidecar`), and `ingest-coherence` stays as the same stage as `ingest-layer`, so the workflows of the standards made before and their `workflow_hash` (CR-091) are unchanged; a new `standard-workflow --source stores` starts at `ingest-layer`. The `ponzi-coherence` and `ponzi-sidecar` Collections stay, for the Items made before; a stage reads them as layers.
+- `run_meta.input.coherence_store` stays, as the layer holding the target; `layers` and `target` are added beside it.
 
 ## Do results change?
 - **Part 1: no**, and that is the condition. Every scoring spec over every existing store, opened as legacy layers, gives bit-for-bit the outputs it gives today, and the golden files under `packages/core/tests/data/` are not regenerated. The one behaviour that changes is a name found in two layers: refused, where today the sidecar wins (D2). Before the change lands, every store and sidecar in the archive is scanned for such a name.

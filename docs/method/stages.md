@@ -5,7 +5,7 @@ A stage is one replaceable unit of work with a fixed interface (`ponzi_spec.stag
 | Field | Meaning |
 | --- | --- |
 | `name` | the stage; it has no version ([Versions](../reference/versions.md#stages-the-majors-of-their-code)) |
-| `inputs` | role → Collection, e.g. `{coherence: ponzi-coherence, sidecar: ponzi-sidecar}` |
+| `inputs` | role → Collection, e.g. `{coherence: ponzi-input-layer, sidecar: ponzi-input-layer}` (the roles keep their names of before CR-102) |
 | `outputs` | role → Collection |
 | `identity_params` | a pydantic model, hashed into the content id |
 | `request_params` | a pydantic model, recorded but never hashed |
@@ -24,10 +24,10 @@ The stages ponzi-worker registers, each a thin adapter over the distribution nam
 | `discover` | a burst id and span (ASF search) | `ponzi-pairs`: the acquisitions and their pyramid pairs | ponzi-pipeline |
 | `dem` | the burst's box | `ponzi-dem` | ponzi-pipeline |
 | `coherence` | `ponzi-dem`, `ponzi-pairs` (one job per pair; it downloads the pair's SLCs and orbits) | `ponzi-coherence-pair` | ponzi-pipeline |
-| `assemble` | `ponzi-pairs`, `ponzi-coherence-pair` | `ponzi-coherence`, with the engine report | ponzi-pipeline |
-| `ingest-coherence` | a coherence store made elsewhere | `ponzi-coherence` | ponzi-worker |
-| `onboard` | `ponzi-coherence` | `ponzi-sidecar` | ponzi-pipeline |
-| `run` | `ponzi-coherence`, `ponzi-sidecar`; the model through the scoring spec | `ponzi-run` | ponzi |
+| `assemble` | `ponzi-pairs`, `ponzi-coherence-pair` | `ponzi-input-layer` (`ponzi:layer: sar`), with the engine report | ponzi-pipeline |
+| `ingest-layer` (`ingest-coherence`, its name before CR-102) | an input layer made elsewhere (a SAR layer with its engine report) | `ponzi-input-layer` | ponzi-worker |
+| `onboard` | `ponzi-input-layer` (the SAR layer) | `ponzi-input-layer` (`ponzi:layer: onboard`) | ponzi-pipeline |
+| `run` | the SAR and the onboarding layer (`ponzi-input-layer`; Items of `ponzi-coherence` and `ponzi-sidecar` made before are read too); the model through the scoring spec | `ponzi-run` | ponzi |
 | `ingest-calibration` | a calibration file | `ponzi-calibrations` | ponzi-worker |
 | `pvalues` | `ponzi-run`, `ponzi-calibrations` | `ponzi-pvalues` | ponzi |
 | `detect` | `ponzi-pvalues`, `ponzi-run` | `ponzi-events` | ponzi |

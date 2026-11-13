@@ -24,7 +24,7 @@ flowchart TB
 | --- | --- | --- | --- |
 | **release** | git tags, one prefix per distribution (below) | `MAJOR.MINOR.PATCH` | a release is cut, by [what X, Y and Z mean](#what-x-y-and-z-mean) |
 | **REST API** | `ponzi_spec.api.API_VERSION`, the path prefix and openapi's `info.version` | `v1` | a breaking change to the API ([REST API](../service/rest-api.md)) |
-| **STAC extension** | `ponzi_spec.stac.PONZI_EXTENSION_VERSION`, its schema's folder and `$id` | `v0.2.0` | the `ponzi:*` fields change ([STAC catalog profile](../using/stac-profile.md)) |
+| **STAC extension** | `ponzi_spec.stac.PONZI_EXTENSION_VERSION`, its schema's folder and `$id` | `v0.3.0` | the `ponzi:*` fields change ([STAC catalog profile](../using/stac-profile.md)); every version stays shipped and published, since an Item names the one it was made with (`v0.3.0`: `ponzi:layer`, CR-102) |
 
 ## Releases: the tags
 
@@ -96,7 +96,7 @@ content id = sha256(canonical_json({
 
 - A patch or minor release keeps every id, so the cache is reused; a major gives everything its distribution computes a new id, so it is made again ([Content ids and reuse](../using/content-ids.md)).
 - Every Item and manifest step records `ponzi:stage = {name, code}`, the releases that made it.
-- A stage that computes nothing (`ingest-coherence`, `ingest-calibration`) and the server's jobs and batches (`workflow-job`, `slurm-batch`) name no code: their ids follow their payload alone.
+- A stage that computes nothing (`ingest-layer` and its old name `ingest-coherence`, `ingest-calibration`) and the server's jobs and batches (`workflow-job`, `slurm-batch`) name no code: their ids follow their payload alone.
 - A calibration made under another `ponzi` major is refused (CR-020).
 - A standard's `requires` gives the releases it runs on; a worker whose installed versions do not meet it fails the job (CR-055).
 

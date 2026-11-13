@@ -20,7 +20,7 @@ import re
 from pathlib import Path
 
 from ponzi_spec.collections import COLLECTIONS
-from ponzi_spec.stac import PONZI_EXTENSION_VERSION, extension_schema
+from ponzi_spec.stac import extension_schema, extension_versions
 
 MARKER = "<!-- ponzi:collections -->"
 REQUESTS = "<!-- ponzi:requests -->"
@@ -52,10 +52,11 @@ def on_page_markdown(markdown, page, config, files):
 
 
 def on_post_build(config):
-    """Publish the extension schema."""
-    out = Path(config["site_dir"]) / "schemas" / "ponzi" / PONZI_EXTENSION_VERSION / "schema.json"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(extension_schema(), indent=2) + "\n", encoding="utf-8")
+    """Publish the extension schema, every version shipped (an Item made before names its own; CR-102)."""
+    for version in extension_versions():
+        out = Path(config["site_dir"]) / "schemas" / "ponzi" / version / "schema.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(extension_schema(version), indent=2) + "\n", encoding="utf-8")
 
 
 def _repo(config, name: str) -> Path:

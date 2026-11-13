@@ -6,7 +6,7 @@
 Sentinel-1 SLCs (ASF)
   → pair coherence per burst (ISCE3)            ponzi-pipeline
   → coherence store per burst (Zarr)            ponzi-pipeline
-  → covariates sidecar (weather, built-up)      ponzi-pipeline
+  → onboarding layer (weather, built-up)        ponzi-pipeline
   → forecast run: scores and changes            ponzi
   → p-values under a calibration                ponzi
   → dated events under a detection spec         ponzi

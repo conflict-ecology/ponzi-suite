@@ -21,6 +21,7 @@ A file may build on others with `extends:` ([Composition](../../service/configur
 | `context` | `min_support` | int | 1..C | required | Minimum non-NaN context observations for a pixel-channel to be fitted |
 | `forecaster` | `name` | str | non-empty | required | registered: `rolling_ols`, `tide`, `external`, `stored` |
 | `forecaster` | `params` | dict | validated by the forecaster's own pydantic model | `{}` | e.g. `{harmonic_order: 0, pooled: false}` for `rolling_ols` |
+| `scoring` | `target` | str | non-empty | `coh` | The input's `pair` variable the run forecasts and scores (CR-102): a coherence in [0, 1] whose estimator gives the noise floor (`noise_floor: derived` and the ceiling read the target's `estimator_params`, else the store's). Left out of the hash when it is `coh`, so a spec written before keeps its hash |
 | `scoring` | `baseline_days` | list[int] | non-empty, positive, strictly increasing | required | The pyramid's baselines, matched by value against the store |
 | `scoring` | `H` | int | > 0 | required | Horizon length |
 | `scoring` | `alpha` | float | > 0 | required | z-level for the sensitivity channel `s` |

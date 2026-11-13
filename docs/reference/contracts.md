@@ -8,7 +8,7 @@ The code is the authority: where a contract and the code disagree, the contract 
 
 | # | File | Producer | Read by |
 |---|---|---|---|
-| C1 | [coherence_store.md](contracts/coherence_store.md) | `ponzi_pipeline.assemble` (`ponzi-pipeline assemble`, worker `assemble`); a store made elsewhere enters through worker `ingest-coherence` | `ponzi.core.runner.open_input`, `ponzi validate-store`, `ponzi_pipeline.onboard`, `ponzi_models` (through `open_input`) |
+| C1 | [coherence_store.md](contracts/coherence_store.md) | `ponzi_pipeline.assemble` (`ponzi-pipeline assemble`, worker `assemble`); a layer made elsewhere enters through worker `ingest-layer` (`ingest-coherence` before CR-102) | `ponzi.core.runner.open_input`, `ponzi validate-store`, `ponzi_pipeline.onboard`, `ponzi_models` (through `open_input`) |
 | C2 | [covariates_sidecar.md](contracts/covariates_sidecar.md) | `ponzi_pipeline.onboard.onboard.onboard_store` (`ponzi-pipeline onboard`, worker `onboard`) | the runner (`open_input`), the onboarding's `sample` step, `ponzi_models` (masked input) |
 | C3 | [pixel_sample.md](contracts/pixel_sample.md) | the onboarding's `sample` step (`ponzi.core.sample.extract_sample`), `ponzi-models export-pixels` | the runner (`open_input`), `ponzi_models` training, `export-pixels --check` |
 | C4 | [scoring_spec.md](contracts/scoring_spec.md) | the user (ponzi-suite `specs/scoring_specs/`, the PONZI home's), the registry's `scoring_spec.yaml` | `ponzi run`, worker `run`, `ponzi_models` (`null-runs`, the registry, the standards workflow) |
@@ -24,7 +24,7 @@ The code is the authority: where a contract and the code disagree, the contract 
 | C15 | [validation_table.md](contracts/validation_table.md) | `ponzi.contracts.validate.validate_store` (`ponzi validate-store`) | the caller |
 | C16 | [aoi_results.md](contracts/aoi_results.md) | `ponzi.evaluation.events.write_design_table` | `read_design_table` |
 | C17 | [onboarding_spec.md](contracts/onboarding_spec.md) | the user (ponzi-suite `specs/onboarding_specs/`, or an `onboarding:` section) | `ponzi_pipeline.onboard.onboarding_spec` (`ponzi-pipeline onboard`, `weather-prefetch`), worker `onboard` |
-| C18 | [engine_report.md](contracts/engine_report.md) | `ponzi_pipeline.engine` (through `assemble`) | `validate_store`, worker `ingest-coherence` (requires it) |
+| C18 | [engine_report.md](contracts/engine_report.md) | `ponzi_pipeline.engine` (through `assemble`) | `validate_store`, worker `ingest-layer` (requires it of a SAR layer) |
 | C20 | [row_set.md](contracts/row_set.md) | `ponzi.evaluation.rows`, `ponzi-models null-rows` | `ponzi.evaluation.metrics`, `ponzi.evaluation.events`, `ponzi-models calibrate` |
 | C21 | [channel_z_store.md](contracts/channel_z_store.md) | the runner (optional, `save_all_channels`) | side analyses only |
 | C22 | [pvalue_store.md](contracts/pvalue_store.md) | `ponzi.calibration.write_pvalues` (`ponzi pvalues`, worker `pvalues`) | `ponzi.products` (`ponzi detect`, `detect-path`, `tile`) |

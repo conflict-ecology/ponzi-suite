@@ -145,7 +145,7 @@ flowchart TB
   pvalues --> tile["tile, by the detection spec<br/>events per Major TOM cell"]
 ```
 
-`tile` is the final step: its `ponzi-events-cell` Items are the ones the server keeps. `detect` still runs, and its per-burst events stay in the worker's cache (CR-100). A standard made from existing stores starts at `ingest-coherence` instead of the first four stages.
+`tile` is the final step: its `ponzi-events-cell` Items are the ones the server keeps. `detect` still runs, and its per-burst events stay in the worker's cache (CR-100). A standard made from existing stores starts at `ingest-layer` instead of the first four stages (`ingest-coherence` in the standards made before CR-102, the same stage).
 
 ## How the registered pieces are made
 

@@ -10,8 +10,9 @@ Producers: the CLI (`ponzi run` flags, an optional `--args-file` yaml, `PONZI_*`
 
 | Field | Type | Default | Meaning |
 |---|---|---|---|
-| `coh` | path | required | Coherence store (C1) or pixel sample (C3) |
-| `sidecar` | path or null | null | Covariates sidecar (C2), merged at open |
+| `inputs` | list of paths | `[]` | The input's layers (C1, CR-102), in any order: the SAR layer, the onboarding layer, any other layer on the same grid; or one pixel sample (C3). `--input PATH`, repeated. The layer holding `scoring.target` gives the input's meta |
+| `coh` | path or null | null | Deprecated (CR-102): the SAR layer or a pixel sample, as before; give `inputs`. A request names `inputs` or `coh`, never both, and one of them |
+| `sidecar` | path or null | null | Deprecated (CR-102): the onboarding layer (C2), with `coh` only |
 | `extra_sidecar` | path or null | null | A store of `(time,)` series (e.g. the Sentinel-1 `s1_pd_vv_db_{d}d`) merged into the input's covariates by calendar day; recorded in `run_meta.input.extra_sidecar` |
 | `mask_store`, `mask` | path, str or null | null | Both or neither: restrict the run to one named layer of a mask store (C23) on the grid of `coh`. The run processes its usual process mask AND the layer and reads and writes only their bounding window (`run_meta.mask`). Refused with the `stored` forecaster and on a pixel sample |
 | `scoring_spec` | path | required | Scoring spec (C4); `--scoring-spec NAME|FILE` |

@@ -9,19 +9,19 @@ The two sides are independent implementations of this page and C1: the engine's 
 
 ## Producer and consumers
 
-Written by the coherence engine (`ponzi_pipeline.engine.checks` and `report`, called by `ponzi_pipeline.assemble.assemble`) after its own checks and before the `_complete` sentinel. Read by `ponzi.contracts.validate` (`read_engine_report`, `check_engine_report`: the `engine_report` check of `validate_store`) and by people. The worker stage `ingest-coherence` refuses a store without the file beside it and copies both into the cache; the file is the `engine_report` asset of a `ponzi-coherence` Item.
+Written by the coherence engine (`ponzi_pipeline.engine.checks` and `report`, called by `ponzi_pipeline.assemble.assemble`) after its own checks and before the `_complete` sentinel. Read by `ponzi.contracts.validate` (`read_engine_report`, `check_engine_report`: the `engine_report` check of `validate_store`) and by people. The worker stage `ingest-layer` (`ingest-coherence` before CR-102) refuses a SAR layer without the file beside it and copies both into the cache; the file is the `engine_report` asset of a `ponzi-input-layer` Item (of a `ponzi-coherence` one before).
 
 ## The file
 
-`{burst}.coh.zarr.validation.json`, a sibling of the store like `_complete` (`engine_report_path`):
+`{burst}.sar.zarr.validation.json` (`{burst}.coh.zarr.validation.json` before CR-102), a sibling of the store like `_complete` (`engine_report_path`):
 
 ```json
 {
   "schema": "ponzi.engine_report",
   "schema_version": "d3584839241858096bc1b2ee105ca69a",
-  "contract_version": "d30f943e410871ccabe4ee78e978dbf4",
+  "contract_version": "77850e4a6475a634ed7a317fa6a75f96",
   "burst_id": "t021_043813_iw2",
-  "store": "t021_043813_iw2.coh.zarr",
+  "store": "t021_043813_iw2.sar.zarr",
   "producer": "ponzi-pipeline 0.4.2",
   "validator": "ponzi-pipeline 0.4.2 engine checks",
   "validated_at": "2026-09-10T14:03:11Z",
@@ -63,8 +63,8 @@ Level `burst`. "engine" means the check is required in every engine report; "eng
 | `crs` | `epsg` attr present, an int; `value` = the int | fail | engine |
 | `identity` | `sensor`, `producer`, `contract_version` attrs present, an empty `sensor` or `producer` counting as missing (ponzi-core CR-092); PONZI also warns when `contract_version` is not C1's | warn | engine |
 | `consolidated` | consolidated metadata present | warn | engine |
-| `complete_sentinel` | `_complete` sibling present (info for a store not named `*.coh.zarr`) | fail | engine |
-| `partial` | no `.partial` sibling (info for a store not named `*.coh.zarr`) | fail | engine |
+| `complete_sentinel` | `_complete` sibling present (info for a store not named `*.sar.zarr` or `*.coh.zarr`) | fail | engine |
+| `partial` | no `.partial` sibling (info for a store not named `*.sar.zarr` or `*.coh.zarr`) | fail | engine |
 | `pairs_declared` | `n_pairs_packed` attr equals the populated cells of the platform table (fail); cell collisions (`n_cell_collisions`) or a `secondary_date` off `time - baseline_days[b]` by more than `SNAP_TOLERANCE_DAYS` (3) days warn; info without a platform table | fail, warn, info | engine |
 | `chunk_completeness` | every `coh` chunk holding a declared pair exists on disk (a directory listing of the zarr v3 layout), and every other array has all its chunks; absent chunks without declared pairs and whole absent baseline blocks are info | fail, info | engine |
 | `availability_matrix` | from `n_finite (time, baseline)` (C1): a declared cell with `n_finite` 0 outside an absent chunk is lost data (fail); data in an undeclared cell warns. PONZI never reads the slabs and, without the table, trusts the engine and says so (info) | fail, warn, info | engine |
@@ -72,9 +72,10 @@ Level `burst`. "engine" means the check is required in every engine report; "eng
 | `generation` | the archive folder (`coherence/<generation>/`) equals the `estimation_strategy` attr and the expected generation (`validate_store(expected_generation=)`); info outside an archive tree | warn, info | engine (optional) |
 | `cell_quality` | populated cells flagged low validity (`cell_quality`) at most `LOW_VALIDITY_FLOOR` (10 %); info without the table, without a platform table, or with no declared cell | warn, info | engine (optional) |
 | `engine_report` | this report against PONZI's run, compared last: info when absent (fail with `require_engine_report=True`); warn on an unreadable file, another schema, another schema version, a contract version other than PONZI's, a verdict `published_with_fail` or outside the three, or any catalogue check present in both whose severity differs (`items` = those checks) | fail, warn, info | PONZI |
+| `layers` | with `--input` (`validate_input`, CR-102): the layers share the grid (the axes two layers carry, the dim sizes, the grid attrs where recorded), no variable name is in two layers, one layer holds the target as a `pair` variable | fail | PONZI |
 
 ## What the engine does with it
 
-Per burst, before publishing (`ponzi_pipeline.assemble.assemble`): write into `{burst}.coh.zarr.partial` one acquisition at a time (counting `n_finite`), consolidate the metadata, run its own checks (every `engine` row above; the two sentinel checks state what publication then makes true), write the report, and on `pass` rename to `{burst}.coh.zarr` and write `_complete`. A store that fails stays `.partial` and the failure is raised (`AssembleError`); the engine writes no `published_with_fail`.
+Per burst, before publishing (`ponzi_pipeline.assemble.assemble`): write into `{burst}.sar.zarr.partial` one acquisition at a time (counting `n_finite`), consolidate the metadata, run its own checks (every `engine` row above; the two sentinel checks state what publication then makes true), write the report, and on `pass` rename to `{burst}.sar.zarr` and write `_complete`. A store that fails stays `.partial` and the failure is raised (`AssembleError`); the engine writes no `published_with_fail`.
 
 The two implementations give every shared check the same severity on a conforming store, a float64 `coh` store and a store with a declared pair's chunk absent (ponzi-pipeline `tests/test_engine_agreement.py`). They differ only where the engine checks a store being published: the two sentinel checks.
