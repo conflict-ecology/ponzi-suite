@@ -28,7 +28,8 @@ Check first: `ponzi-client standards` answers in client mode; a connection error
 | --- | --- | --- | --- |
 | Find bursts over an area | `c.bursts(bbox=...)` | `ponzi-client bursts --bbox ...` | burst ids look like `t028_058198_iw3` |
 | See what can be run | `c.standards()` | `ponzi-client standards` | a standard is named `s1-general@<hash8>`, its version its content hash; its id alone names the one version a server holds |
-| Watch an area | `c.majortom_cells(bbox=...)`, then `c.create_area(cells=[...], tags=[...])` | `ponzi-client area-create --cells C[,C] --tags T[,T]` | needs a `client:write` key; 1 or more tiles over land (past 64 a warning); the standard is optional (the server's); see [Watched areas](../../using/watched-areas.md) |
+| Ask for an area to be watched | `c.majortom_cells(bbox=...)`, then `c.request_watch(cells=[...], tags="a,b")` | `ponzi-client watch-request --cells C[,C] --tags T[,T]` | a `user` key; an admin user approves it (a `client:write` key makes it directly: `create_area`, `area-create`); 1 or more tiles over land; tags one word each (letters, digits, `-`, `_`); see [Watched areas](../../using/watched-areas.md) |
+| See what a tag covers | `c.tags("q")`, `c.tag("gaza")` | `ponzi-client tags q`, `ponzi-client tag gaza` | its areas, tiles, bursts, outputs and places (admin 0, 1, 2) |
 | Pause or change a watched area | `c.update_area(area_id, active=False)` | `ponzi-client area-update ID --active false` | fields left out stay as they are |
 | Find the outputs of tagged areas | `c.search(tags=[...])` | `ponzi-client search --tags T[,T]` | analysis Items only ([Tags](../../using/watched-areas.md#tags)) |
 | Look at an area now | `c.discover_area(area_id)` | `ponzi-client area-discover ID` | whatever its cadence |

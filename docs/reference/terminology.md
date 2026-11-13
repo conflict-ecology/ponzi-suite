@@ -24,8 +24,10 @@ The words PONZI uses, grouped with the words they are easily confused with. Each
 | **grid**, **lattice** | the fixed raster a burst is processed on (UTM, 40 m), or the raster a path or cell is resampled to | ([Grids: processing and outputs](../method/grids.md)) |
 | **tile** | a cell of the Major TOM grid over land, as a watched area is made from it | |
 | **boundary** | an administrative unit of the World Bank Official Boundaries, level 0 (a country, or a disputed area of non-determined legal status), 1 or 2; drawn on the map and the land a tile must meet, never what an area is made from | an area |
+| **tract** | watched tiles that touch by an edge, of one or more areas: what an admin user manages together; computed from the areas, named by its first tile (CR-094) | an area (one approved request); a region (a panel spec's) |
 | **area** (watched area) | what the server keeps running: 1 or more tiles, every burst of both passes meeting them, a standard (the server's `default_standard` when none is given), a cadence, tags and optionally a first and last day | an AOI |
-| **tag** | free text of an area, added by the server to the analysis outputs of its tiles as it serves them; never part of a content id | a name; a label (C11) |
+| **tag** | one word of an area (letters, digits, `-`, `_`), added by the server to the analysis outputs of its tiles as it serves them; never part of a content id | a name; a label (C11) |
+| **watch request** | a person's request to watch tiles over a span of days, which an admin user approves (making the area) or denies | a run request (one-off bursts) |
 | **AOI** | area of interest: a place studied (Gaza, Tehran), as a test case or an area | |
 
 ## What: the data
@@ -126,7 +128,9 @@ Only a model can be used: calibrations are made for it, and scoring specs and st
 | **server** | keeps the areas, requests, jobs and final outputs; computes nothing | the worker |
 | **worker** | `ponzi-worker job`: one short call on one job, run by the client loop; runs the stages or their SLURM jobs, keeps the outputs in its cache | the client loop |
 | **client** | the Python `ponzi-client`, or ponzi-visual in the browser; `ponzi-client serve` is the client loop, the only long-running process | |
-| **request** | a one-off run of bursts under a standard | an area (which keeps making jobs) |
+| **request** | a one-off run of bursts under a standard | an area (which keeps making jobs); a watch request |
+| **user**, **admin user** | a person with a key of scope `user` (asks for areas, searches, downloads) or `user-admin` (also decides requests and makes people's keys) | the `admin` scope (the server's operator) |
+| **session** | a person logged in to the app: a cookie the page cannot read, swapped for their key at login; the server keeps only its hash | a key |
 | **job** | one unit the server hands out: a workflow for one burst and span | a run |
 | **lease** | the client loop's hold on a job, renewed by heartbeats | |
 | **home** | the one folder an installation keeps everything in, `$PONZI_HOME`, else `~/.ponzi` (CR-088) | a repository |

@@ -9,7 +9,7 @@ What each part of PONZI needs to log in to, and where to put it. A secret is nev
 | **Earthdata Login** (NASA) | the worker, `ponzi-pipeline acquire` | downloading the SLCs and orbit files from ASF | `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`, else `~/.netrc` |
 | **Earth Data Hub** token (DestinE) | the worker, onboarding with weather source `edh` or `edh_cdsgrid` | ERA5-Land weather for the sidecar | `~/.netrc` |
 | **Copernicus CDS** key | the worker, onboarding with weather source `cdsgrid` or `edh_cdsgrid` | ERA5-Land weather newer than the Earth Data Hub store | `~/.cdsapirc` |
-| **PONZI server key** | `ponzi-client` (and its loop, `ponzi-client serve`), ponzi-visual | every call to a running server | `PONZI_KEY` (or the variable `--key-env` names), else the file `$PONZI_KEY_FILE` |
+| **PONZI server key** | `ponzi-client` (and its loop, `ponzi-client serve`), a person logging in to ponzi-visual, the app itself | every call to a running server | `PONZI_KEY` (or the variable `--key-env` names), else the file `$PONZI_KEY_FILE`; a person types theirs into the app's login form; the app's own key in `PONZI_VISUAL_KEY_FILE` |
 | **wandb** key | `ponzi-models train` with `--wandb online` (its default) | logging training runs | wandb's own: `WANDB_API_KEY` or `wandb login` |
 
 Needs no login: ASF's burst search (`discover`, and the server's [burst availability](../service/rest-api.md)), the Copernicus GLO-30 DEM, the GHSL built-up layers and the World Bank boundaries the server downloads.
@@ -49,7 +49,7 @@ chmod 600 ~/.cdsapirc
 
 ## PONZI server keys
 
-The server's own keys are made on the server's machine, with the server running or not:
+Keys are made on the server's machine, with the server running or not. An admin user can also make people's keys in the app (below).
 
 ```
 ponzi-server keys add --scope worker --name hpc-worker --out ~/hpc-worker.key
@@ -57,12 +57,17 @@ ponzi-server keys list
 ponzi-server keys revoke hpc-worker
 ```
 
-| Scope | Can |
-| --- | --- |
-| `client:read` | read areas, requests, jobs and outputs |
-| `client:write` | that, and create areas and submit runs |
-| `worker` | claim jobs, heartbeat and deliver outputs: the key of `ponzi-client serve` |
-| `admin` | everything |
+| Scope | Can | For |
+| --- | --- | --- |
+| `user` | read areas, jobs and outputs; ask for areas to be watched | a person using the app (or Python, or the command line) |
+| `user-admin` | that, and approve or deny watch requests; pause, resume, look now at and delete areas and tracts; make and revoke `user` and `user-admin` keys | a person who runs the lab's PONZI |
+| `visual` | log a person in and pass their session on; nothing else | the app itself: its dev server or the deployment's reverse proxy |
+| `client:read` | read areas, requests, jobs and outputs | scripts and agents |
+| `client:write` | that, and create, change and delete areas directly, and submit runs | scripts and agents |
+| `worker` | claim jobs, heartbeat and deliver outputs: the key of `ponzi-client serve` | the client loop |
+| `admin` | everything | the server's operator |
+
+Make the first `user-admin` key on the server's machine (`ponzi-server keys add --scope user-admin --name YOUR_NAME --out ...`); that person then makes everyone else's in the app.
 
 A key is shown once, when it is made: `--out` writes it to a new file only its owner can read. Move that file to the machine that uses it, then point the client at it:
 
@@ -72,7 +77,16 @@ export PONZI_KEY_FILE=~/hpc-worker.key      # a file keeps the key out of the en
 export PONZI_KEY=pz_...
 ```
 
-`--key-env` may name another variable (`--key-env PONZI_WORKER_KEY`); the file `$PONZI_KEY_FILE` is read when that variable is unset. ponzi-visual asks for a key in the browser and sends it as `Authorization: Bearer <key>`, as every client does.
+`--key-env` may name another variable (`--key-env PONZI_WORKER_KEY`); the file `$PONZI_KEY_FILE` is read when that variable is unset.
+
+## Logging in to the app
+
+ponzi-visual never keeps a key in the browser (ponzi-core CR-093):
+
+- **The app's own key** (scope `visual`) is added to every call by whatever serves the app: Vite's dev server reads it from `PONZI_VISUAL_KEY`, else the file `PONZI_VISUAL_KEY_FILE`, else the demo's `keys.json`; in a deployment, the reverse proxy adds it. The browser never sees it.
+- **A person logs in with their own key** (`user` or `user-admin`). The server swaps it for a session cookie the page cannot read (`HttpOnly`), kept 14 days (the server setting `session_days`); the server keeps only the hash of the session's token. Every call through the app then acts as that person, and the access log names them.
+- **Log out** ends the session on the server. Revoking a key ends all of its sessions.
+- Python, the command line and agents keep sending a key as `Authorization: Bearer <key>`; a `user` key works there too.
 
 ## On the cluster
 
@@ -88,4 +102,5 @@ A failed login names its source, never the secret:
 | `ASFAuthenticationError ... 401 Unauthorized` | the entry was found and refused: the username or password is wrong, or the ASF application is not approved |
 | `<file>: ... (line N)` | `~/.netrc` does not parse |
 | `401 a valid key is needed` | the server key is missing, revoked or mistyped |
+| `401 log in first` | the app's own key came without a person's session: log in to the app again |
 | `403` | the key is valid but its scope does not allow the call |

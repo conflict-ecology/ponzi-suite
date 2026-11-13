@@ -54,9 +54,11 @@ There are two lifecycles. Both go through the same opener (`ponzi.core.runner.op
 ### 2a. Model lifecycle (ponzi-models)
 
 ```
-panel package ──► 1 masks ──► 1b pixel export (opt.) ──► 2 prepare ──► 3 train ──► 4 export
-                                                                                    │
-     registry ◄── 8 register calibrations ◄── 7 calibrate ◄── 6 null ◄── 5 register model
+panel package ──► 1 masks ──► 1b pixel export (opt.) ──► 2 prepare
+                                                             │
+5 register model ◄── 4 export ◄── 3 train ◄──────────────────┘
+  │
+  └──► 6 null ──► 7 calibrate ──► 8 register calibrations ──► registry
 ```
 
 | # | Stage | Command | Writes | Runs on |
@@ -80,17 +82,23 @@ The model is registered before the null because the null is a run of a registere
 ```
 coherence store (C1, external)
   │  ponzi validate-store PATH
-  │  ponzi weather-prefetch --config F --cache DIR --start D --end D      (optional, once per AOI)
-  │  ponzi onboard --store PATH --out DIR [--config F]                    → sidecar C2, sample C3, onboard_meta.json
+  │  ponzi weather-prefetch --config F --cache DIR --start D --end D
+  │        (optional, once per AOI)
+  │  ponzi onboard --store PATH --out DIR [--config F]
+  │        → sidecar C2, sample C3, onboard_meta.json
   ▼
-ponzi run --coh .. --sidecar .. --config RUN_CONFIG --out RUN_DIR [...]    → score C7, change C8, run_meta C9 (+ optional stores)
-  │  ponzi replay SCORE --out PATH                                        (re-threshold only)
+ponzi run --coh .. --sidecar .. --config RUN_CONFIG --out RUN_DIR [...]
+  │        → score C7, change C8, run_meta C9 (+ optional stores)
+  │  ponzi replay SCORE --out PATH        (re-threshold only)
   │  ponzi forecasting-summary --stats FILE
   ▼
-ponzi pvalues RUN_DIR --model M --calibration CAL                         → pvalues_<cal>.zarr (C22)
+ponzi pvalues RUN_DIR --model M --calibration CAL
+  │        → pvalues_<cal>.zarr (C22)
   ▼
-ponzi detect RUN_DIR --calibration CAL [--recipe PRESET|FILE]             → events_<cal>.zarr (C25)
-ponzi detect-path RUN_DIR... --calibration CAL --out PATH [--lattice F] [--overlap max|min|first]
+ponzi detect RUN_DIR --calibration CAL [--recipe PRESET|FILE]
+           → events_<cal>.zarr (C25)
+ponzi detect-path RUN_DIR... --calibration CAL --out PATH
+           [--lattice F] [--overlap max|min|first]
 ```
 
 Onboarding steps, in order: `built`, `weather`, `pairdiff`, `mask`, `sample`. `ponzi detect` needs `summary.zarr`, so the run needs `--summaries et`. Progressive scoring (`--staged`) adds `staged.zarr`, and with a format-3 calibration it adds staged codes and provisional flags. Monitoring updates are ordinary staged runs written to new folders; there is no append mode.
@@ -224,9 +232,11 @@ Full specifications are in `ponzi-core/docs/contracts/`.
 ```
 <registry>/
   <model_id>/
-    model.json            ModelCard: sensor, forecaster, run_config_name, run_config_hash, artifact_digest, provenance
+    model.json            ModelCard: sensor, forecaster, run_config_name,
+                          run_config_hash, artifact_digest, provenance
     run_config.yaml
-    artifact/             torchscript/model_ts.pt + meta.json (sha256 over files = artifact_digest)
+    artifact/             torchscript/model_ts.pt + meta.json (sha256 over
+                          files = artifact_digest)
     calibrations/
       <calibration_id>/calibration.npz
 ```

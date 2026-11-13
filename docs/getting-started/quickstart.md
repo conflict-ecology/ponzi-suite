@@ -10,7 +10,7 @@ The demo makes a working installation on local disk, with no cluster, no GPU and
 ```
 git clone .../ponzi-core && git clone .../ponzi-service && git clone .../ponzi-visual   # side by side
 cd ponzi-visual && pixi run install
-pixi run server        # makes the demo the first time (about 15 s), serves it on :8799, prints the key to enter
+pixi run server        # makes the demo the first time (about 15 s), serves it on :8799, prints the keys to log in with
 ```
 
 Then, in another shell:
@@ -19,14 +19,14 @@ Then, in another shell:
 cd ponzi-visual && pixi run dev      # http://localhost:5173
 ```
 
-Connect with the key the server printed; every scope's key is in `ponzi-visual/.e2e/demo/keys.json`.
+Log in with the **Admin user key** or the **User key** the server printed. Every scope's key is in `ponzi-visual/.e2e/demo/keys.json`; the app's own key (`visual`) is read from there by the dev server, never by the browser.
 
-The demo's five bursts are synthetic and on no land, so the map has no tiles to choose at first. The demo's folder, `.e2e/demo`, is the server's PONZI home (CR-088). Its server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, copy a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`, into `.e2e/demo/catalog/`. For the bursts of the tiles chosen, build every Sentinel-1 burst with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or copy `.e2e/bursts.sqlite3` into `.e2e/demo/catalog/`. A `client:write` key can create areas in the app, and submit runs from Python or the command line.
+The demo's five bursts are synthetic and on no land, so the map has no tiles to choose at first. The demo's folder, `.e2e/demo`, is the server's PONZI home (CR-088). Its server downloads no administrative boundaries (`fetch_boundaries: false`); to see the boundaries and choose tiles, copy a built `boundaries.sqlite3`, which a server's first start makes in `$PONZI_HOME/catalog/`, into `.e2e/demo/catalog/`. For the bursts of the tiles chosen, build every Sentinel-1 burst with `pixi run catalog` in ponzi-visual before the first `pixi run server`, which then makes the demo with it; or copy `.e2e/bursts.sqlite3` into `.e2e/demo/catalog/`. With the user key you ask for areas on the map (**Request**); with the admin user key you approve them on the **Admin** page, which makes the area. A `client:write` key makes areas and submits runs from Python or the command line directly.
 
 From ponzi-service, in Python or a shell:
 
 ```
-export PONZI_KEY=$(python -c "import json; print(json.load(open('../ponzi-visual/.e2e/demo/keys.json'))['client:read'])")
+export PONZI_KEY=$(python -c "import json; print(json.load(open('../ponzi-visual/.e2e/demo/keys.json'))['user'])")
 pixi run ponzi-client --url http://127.0.0.1:8799 search --collections ponzi-events-cell
 ```
 
@@ -44,14 +44,27 @@ For developing and testing on Linux ([Install](install.md)), not for deploying, 
 
 ```
 cd ponzi-suite
-pixi run dev-up              # the server on :8780, the client loop, the app on http://localhost:5180
+pixi run dev-up              # the server on :8780, the client loop, the app on http://localhost:5180; prints two keys
 ```
 
 - **The server** is `ponzi-server serve` on the PONZI home, listening on 127.0.0.1 only. On its first start it downloads the World Bank boundaries and the burst catalog in the background.
 - **The client loop** is `ponzi-client serve -- --executor local`: it claims the server's jobs and runs each on this machine. Its worker key is `$PONZI_HOME/keys/dev-worker.key`.
-- **The front end** is ponzi-visual's dev server, forwarding the API to this server.
+- **The front end** is ponzi-visual's dev server, forwarding the API to this server and adding the app's own key to every call.
 
-The first start makes the two keys it needs in `$PONZI_HOME/keys/`: `dev-worker.key` (scope `worker`) and `dev-browser.key` (`client:write`). A key file is never overwritten, so later starts use the same keys. The browser key is printed for you to enter in the app; the worker key is never shown. The logs are appended to `$PONZI_HOME/logs/server/`, `logs/client/` and `logs/visual/`. Ctrl+C stops all three, and when one of them stops, the others are stopped too.
+The first start makes four keys in `$PONZI_HOME/keys/`, and a key file is never overwritten, so later starts use the same keys:
+
+| File | Scope | Used by |
+| --- | --- | --- |
+| `dev-visual.key` | `visual` | the app's dev server, which adds it to every call; never shown |
+| `dev-worker.key` | `worker` | the client loop; never shown |
+| `dev-admin.key` | `user-admin` | you: printed as **Admin user key**, to log in and approve requests and make keys |
+| `dev-user.key` | `user` | you: printed as **User key**, to log in as a plain user |
+
+A `dev-browser.key` left from before is revoked and removed. The logs are appended to `$PONZI_HOME/logs/server/`, `logs/client/` and `logs/visual/`. Ctrl+C stops all three, and when one of them stops, the others are stopped too.
+
+**The development standard.** `dev-up` writes `s1-dev` into the home's `standards/` when it is not there, and makes it the server's `default_standard` unless your settings name another. Its workflow is one step of the stage `dev-hold`, which no worker installs: an area under it gets its jobs, and they wait in the queue, so nothing is downloaded or computed on a development machine.
+
+**The Gaza example.** Once the server's boundaries and burst catalog are ready (a first start builds them in the background), `dev-up` adds a watch request for the tiles over the Gaza Strip, tag `gaza`, from 7 October 2023 with no last day, asked by `dev-user` and approved by `dev-admin`, so the home has an area to search and look at. It is added once per home; `logs/server/dev-seed.log` says how it went.
 
 | Variable | Sets | Default |
 | --- | --- | --- |
@@ -69,4 +82,4 @@ printf 'server:\n  fetch_boundaries: false\n  fetch_catalog: false\n' > /tmp/dev
 PONZI_HOME=/tmp/ponzi-dev PONZI_SERVER_SETTINGS=/tmp/dev-server.yaml pixi run dev-up
 ```
 
-A new home has no standard, and a watched area needs one: write the server's file of one into `$PONZI_HOME/standards` with `ponzi-models standard-workflow` and start again ([Building a standard](../models/standards.md)). With several there, name the one the app's areas take as `default_standard` in a settings file given as `PONZI_SERVER_SETTINGS` ([Watched areas](../using/watched-areas.md)).
+To run a real standard instead, write its server file into `$PONZI_HOME/standards` with `ponzi-models standard-workflow` ([Building a standard](../models/standards.md)) and name it as `default_standard` in a settings file given as `PONZI_SERVER_SETTINGS` ([Watched areas](../using/watched-areas.md)). Areas made before keep the standard they were made with.

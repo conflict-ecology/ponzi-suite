@@ -23,7 +23,7 @@ Everything the tests need is in the repositories: synthetic stores and small gol
 
 ## Versions
 
-Each distribution has its own [SemVer](https://semver.org) version, `X.Y.Z`, from its own git tags. What raises X, Y or Z, the rule below 1.0 (where `0.Y` is the major) and worked examples are in [What X, Y and Z mean](../reference/versions.md#what-x-y-and-z-mean). In short:
+Each distribution has its own [SemVer](https://semver.org) version, `X.Y.Z`, from its own git tags. What raises X, Y or Z and worked examples are in [What X, Y and Z mean](../reference/versions.md#what-x-y-and-z-mean); below 1.0, where every distribution is now, Y is the major part ([Below 1.0](../reference/versions.md#below-10)). In short:
 
 - A change that alters numbers for an existing spec is **RESULTS-CHANGING**: a major of the distribution that computes it (ponzi-core CR-085), so everything it computes is made again and the calibrations of the old major are refused (CR-020). Say so in the change request and the `CHANGELOG.md` entry.
 - The change request's **Version** line names the part each distribution raises. No other version is raised by hand (ponzi-core CR-085): a stage is named by its code's majors, a spec and a standard by their hash (CR-083, CR-089), and a store contract or a record file by the hash of its declaration ([Versions](../reference/versions.md)).

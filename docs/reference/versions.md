@@ -8,12 +8,14 @@ Three numbers in PONZI are set by a person: the release tags, the REST API's ver
 
 Nothing else is raised by hand, so no version can be forgotten (ponzi-core CR-083, CR-085, CR-086, CR-089). This page lays the system out; the pages it links hold the details.
 
-```
-release tag (person) ──► installed version ──► major ──► content id of every Item ──► cache reused or work made again
-                                                 └─────► calibrations accepted or refused (CR-020)
-spec file (person) ────► spec hash ──► name@hash8 ──► model id, built panel, standard's references
-contract declaration ──► contract hash ──► attr or field in each store and file ──► reader accepts or refuses
-standard file (person) ► id@hash8 ──► specs, model, calibrations, requires ──► what a watched area runs
+```mermaid
+flowchart TB
+  tag(["release tag<br/>(person)"]) --> inst["installed version"] --> major["major"]
+  major --> cid["content id<br/>of every Item"] --> cache["cache reused or<br/>work made again"]
+  major --> cal["calibrations accepted<br/>or refused (CR-020)"]
+  spec(["spec file<br/>(person)"]) --> shash["spec hash"] --> nh["name@hash8"] --> uses["model id, built panel,<br/>standard's references"]
+  decl(["contract<br/>declaration"]) --> chash["contract hash"] --> attr["attr or field in each<br/>store and file"] --> reader["reader accepts<br/>or refuses"]
+  std(["standard file<br/>(person)"]) --> sid["id@hash8"] --> refs["specs, model,<br/>calibrations, requires"] --> area["what a watched<br/>area runs"]
 ```
 
 ## Set by a person
@@ -41,7 +43,7 @@ Every distribution takes its version from git tags at install time (`hatch-vcs`,
 
 ### What X, Y and Z mean
 
-A tag is [SemVer](https://semver.org), `X.Y.Z`, each distribution numbered on its own. Raise the leftmost part the change calls for, and set the parts to its right to 0.
+A tag is [SemVer](https://semver.org), `X.Y.Z`, each distribution numbered on its own. Raise the leftmost part the change calls for, and set the parts to its right to 0. The table is the rule from 1.0 on; every distribution is below 1.0 now, where the parts shift by one ([Below 1.0](#below-10)).
 
 | Part | Raise it when | What follows |
 | --- | --- | --- |
@@ -49,16 +51,29 @@ A tag is [SemVer](https://semver.org), `X.Y.Z`, each distribution numbered on it
 | **Y**, minor | something new that is opt-in: every existing spec gives the same bytes, every existing call works as before | nothing is made again: content ids, caches and calibrations stay |
 | **Z**, patch | a fix or a speed-up the tests show bit-identical, or a change to docs and docstrings only | nothing changes |
 
-**Below 1.0, which is where every distribution is now,** the major is `0.Y`, not `0` (`ponzi_spec.identity.library_major`): Y takes the place of X, and Z covers both new features and fixes.
+| From | To | Because |
+| --- | --- | --- |
+| `v1.4.2` | `v2.0.0` | a store format changes |
+| `v1.4.2` | `v1.5.0` | a new forecaster, opt-in |
+| `v1.4.2` | `v1.4.3` | a faster kernel, bit-identical |
+
+### Below 1.0
+
+Every distribution is below 1.0 now, so this is the rule in use. X stays 0, and each kind of change moves one part to the right:
+
+| Change | From 1.0 | Below 1.0 |
+| --- | --- | --- |
+| breaking or results-changing | X | **Y** |
+| new and opt-in | Y | **Z** |
+| a fix, bit-identical | Z | **Z** |
+
+The major is then `0.Y`, the first two numbers (`ponzi_spec.identity.library_major`: `0.3.1` and `0.3.1.dev4+gabc1234` give `0.3`; `1.4.2` gives `1`). It is what enters content ids, so it must move whenever results change: were it `0` alone, every release below 1.0 would share one major, and a results-changing release would reuse the outputs of the code before it. What is lost is the line between a new feature and a fix, since both raise Z; PONZI acts only on whether results stay the same, which Y carries.
 
 | From | To | Because |
 | --- | --- | --- |
-| `v0.3.1` | `v0.4.0` | a fix that changes the scores of an existing scoring spec: results-changing, so the major moves |
+| `v0.3.1` | `v0.4.0` | a fix that changes the scores of an existing scoring spec: results-changing, so the major moves to `0.4` |
 | `pipeline-v0.3.1` | `pipeline-v0.4.0` | a new ISCE3 build that changes coherence values ([Stages](#stages-the-majors-of-their-code)) |
-| `models-v0.3.1` | `models-v0.3.2` | a new opt-in flag of a command, or a fix with identical results |
-| `v1.4.2` | `v2.0.0` | a store format changes (after 1.0) |
-| `v1.4.2` | `v1.5.0` | a new forecaster, opt-in (after 1.0) |
-| `v1.4.2` | `v1.4.3` | a faster kernel, bit-identical (after 1.0) |
+| `models-v0.3.1` | `models-v0.3.2` | a new opt-in flag of a command, or a fix with identical results: the major stays `0.3` |
 
 Between tags:
 

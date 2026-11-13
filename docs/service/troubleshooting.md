@@ -8,7 +8,7 @@ The failures met most often, as you see them, with their cause and what to do. T
 | `... could not be made: ...`, or `no boundaries: set fetch_boundaries ...` | [Could not be made](#the-boundaries-or-the-burst-catalog-could-not-be-made) |
 | `422 ...: no standard given and the server has no default: ...` | [No default](#no-standard-given-and-the-server-has-no-default) |
 | `422 ...: no standard ...`, or the warning `area ...: no standard ...` | [A standard the server does not hold](#a-standard-the-server-does-not-hold) |
-| `401 Unauthorized`, `403 Forbidden` | [Keys](#401-or-403-from-the-server) |
+| `401 Unauthorized`, `403 Forbidden`, `log in first` | [Keys](#401-or-403-from-the-server) |
 | `no Earthdata credentials: ...`, or a 401 from Earthdata Login | [Earthdata](#earthdata-refuses-the-download) |
 | `this worker cannot run ...: requires ...` | [Requirements](#a-worker-refuses-a-standards-job) |
 | a box on the map adds no tiles, or only some | [Tiles](#a-box-on-the-map-adds-no-tiles-or-only-some) |
@@ -43,7 +43,7 @@ See [Running the server](server.md) and [Watched areas](../using/watched-areas.m
 
 ## No standard given and the server has no default
 
-**You see.** Making an area (from the map's **Watch**, or `area-create` without `--standard`):
+**You see.** Making an area (approving a request on the **Admin** page, or `area-create` without `--standard`):
 
 ```
 422 Unprocessable Content: no standard given and the server has no default: it holds 2 (...); give `standard`, or set `default_standard` in the server's settings
@@ -65,11 +65,15 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 ## 401 or 403 from the server
 
-**You see.** `401 Unauthorized: a valid key is needed (Authorization: Bearer <key>)`, or `403 Forbidden: the key does not hold the scope ...`. In the app, the key form shows it on **Connect**; a key revoked while connected makes every call answer 401.
+**You see.** `401 Unauthorized: a valid key is needed (Authorization: Bearer <key>)`, `401 Unauthorized: log in first: the app's key needs a person's session`, or `403 Forbidden: the key does not hold the scope ...`. In the app, the login form shows `that key is not valid` for a wrong or revoked key, and a session that ended (logged out elsewhere, expired after 14 days, or its key revoked) sends you back to the login form.
 
-**Cause.** 401: no key was sent, or the key is unknown or revoked. 403: the key is valid but its scope does not cover the call. The scopes are `client:read` (read), `client:write` (that, and make areas and runs), `worker` (claim jobs and deliver outputs: the key of `ponzi-client serve`, and only that) and `admin` (everything). A `worker` key cannot read areas, and a `client:write` key cannot claim jobs.
+**Cause.**
 
-**Fix.** Check the key with `ponzi-server keys list` on the server's machine, and make one of the right scope with `ponzi-server keys add` ([Logins and keys](../getting-started/authentication.md#ponzi-server-keys)). ponzi-client reads `$PONZI_KEY`, else the file `$PONZI_KEY_FILE` (an empty file stops it with `$PONZI_KEY_FILE: ... is empty`). In the app, **Disconnect** and enter the new key. A server with no active key logs `no active keys: nothing can be called; make one with ponzi-server keys add` at start.
+- **`a valid key is needed`:** no key was sent, or it is unknown or revoked. In the app this means its own key is missing: the dev server found neither `PONZI_VISUAL_KEY`, `PONZI_VISUAL_KEY_FILE` nor the demo's `keys.json` (its log says so), or the reverse proxy does not add it.
+- **`log in first`:** the app's own key came without a live session.
+- **403:** the key is valid but its scope does not cover the call. A `user` key cannot approve requests or make keys; a `worker` key cannot read areas; only `user` and `user-admin` keys log in to the app ([the scopes](../getting-started/authentication.md#ponzi-server-keys)).
+
+**Fix.** Check the key with `ponzi-server keys list` on the server's machine, and make one of the right scope with `ponzi-server keys add`, or, for a person, ask an admin user to make one on the app's **Admin** page ([Logins and keys](../getting-started/authentication.md#ponzi-server-keys)). ponzi-client reads `$PONZI_KEY`, else the file `$PONZI_KEY_FILE` (an empty file stops it with `$PONZI_KEY_FILE: ... is empty`). In the app, log in again. A server with no active key logs `no active keys: nothing can be called; make one with ponzi-server keys add` at start.
 
 ## Earthdata refuses the download
 
@@ -103,7 +107,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 ## No burst of the catalog meets the tiles
 
-**You see.** The panel says `No burst of the catalog meets them.` and **Watch** is off; from the command line, `422 Unprocessable Content: no burst of the catalog meets the tile ...` (or `the N tiles`).
+**You see.** The panel says `No burst of the catalog meets them.` and **Request** is off; from the command line, `422 Unprocessable Content: no burst of the catalog meets the tile ...` (or `the N tiles`).
 
 **Cause.** The server's burst catalog holds no burst whose footprint meets the tiles. The home's catalog built from the OPERA burst database covers the world's bursts; a home with only a small `catalog/bursts.json`, as the demo's, covers only those.
 

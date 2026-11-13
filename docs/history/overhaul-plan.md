@@ -36,17 +36,25 @@ Four repositories. Each distribution is pip installable from git (`pip install "
 
 ```
 ponzi-core/
-  pixi.toml                  environments: default, ml, ml-gpu, isce3 (conda-forge: isce3, s1reader, compass, dem_stitcher)
+  pixi.toml                  environments: default, ml, ml-gpu, isce3
+                             (conda-forge: isce3, s1reader, compass,
+                             dem_stitcher)
   packages/
-    spec/      ponzi-spec      pydantic only: STAC profile, manifest, content ids, deployment config, API models, StageSpec
-    core/      ponzi           the algorithm, as today minus onboarding and the registry
-    pipeline/  ponzi-pipeline  discover, pairs, acquire, dem, coherence, assemble, onboard
-    models/    ponzi-models    panels, labels, training, calibration, registry store, standards
+    spec/      ponzi-spec      pydantic only: STAC profile, manifest, content
+                               ids, deployment config, API models, StageSpec
+    core/      ponzi           the algorithm, as today minus onboarding and
+                               the registry
+    pipeline/  ponzi-pipeline  discover, pairs, acquire, dem, coherence,
+                               assemble, onboard
+    models/    ponzi-models    panels, labels, training, calibration, registry
+                               store, standards
   data/
     specs/                   fit specs (versioned data)
     standards/               standard bundles (versioned data)
-    run_configs/             run configs (from configs/run/ and the registry entries)
-  docs/requests/             one change-request process for all four distributions
+    run_configs/             run configs (from configs/run/ and the registry
+                             entries)
+  docs/requests/             one change-request process for all four
+                             distributions
   docs/contracts/            C1 .. C26 and the new ones
 ```
 
@@ -73,19 +81,34 @@ Everything that turns a burst and a date range into the inputs of a run, as func
 
 ```
 ponzi_pipeline/
-  bursts/       the ESA Sentinel-1 burst id map (repeat_ccd scripts/download_burst_catalog.sh, bursts.py), burst footprints and grids
-  discover/     scene search on ASF and CDSE (repeat_ccd asf.py, cdse.py, granules.py)
-  pairs/        the pyramid pair list: every acquisition with each baseline of baseline_days, with bperp (repeat_ccd baselines.py; new rule, below)
-  acquire/      SLC and orbit download with auth (repeat_ccd asf.py, cdse.py, and the ASF and CDSE parts of auth.py; its GEE and GCS parts are not absorbed)
-  dem/          DEM per burst footprint (repeat_ccd isce3_coh.prepare_dem, dem_stitcher, Copernicus GLO-30)
+  bursts/       the ESA Sentinel-1 burst id map (repeat_ccd
+                scripts/download_burst_catalog.sh, bursts.py), burst
+                footprints and grids
+  discover/     scene search on ASF and CDSE (repeat_ccd asf.py, cdse.py,
+                granules.py)
+  pairs/        the pyramid pair list: every acquisition with each baseline of
+                baseline_days, with bperp (repeat_ccd baselines.py; new rule,
+                below)
+  acquire/      SLC and orbit download with auth (repeat_ccd asf.py, cdse.py,
+                and the ASF and CDSE parts of auth.py; its GEE and GCS parts
+                are not absorbed)
+  dem/          DEM per burst footprint (repeat_ccd isce3_coh.prepare_dem,
+                dem_stitcher, Copernicus GLO-30)
   coherence/
-    isce3.py    the primary backend: topo, coregistration, interferogram, multilook, coherence, geocode per burst
-                (repeat_ccd isce3_coh.compute_burst_topo, coregister_burst, process_burst_pair, geocode_one_burst)
-    snap.py     optional backend, extra `snap` (repeat_ccd snap.py), only if D4 keeps it
-    hyp3.py     optional backend, extra `hyp3` (repeat_ccd hyp3.py), only if D4 keeps it
-  assemble/     per burst: the pair GeoTIFFs into one coherence store (C1) and its engine report (C18). NEW: nothing does this today
-  onboard/      the covariates sidecar and pixel sample (from ponzi.onboarding, unchanged bytes)
-  config.py     CoherenceConfig: the identity of a coherence computation, hashed like the run config
+    isce3.py    the primary backend: topo, coregistration, interferogram,
+                multilook, coherence, geocode per burst
+                (repeat_ccd isce3_coh.compute_burst_topo, coregister_burst,
+                process_burst_pair, geocode_one_burst)
+    snap.py     optional backend, extra `snap` (repeat_ccd snap.py), only if
+                D4 keeps it
+    hyp3.py     optional backend, extra `hyp3` (repeat_ccd hyp3.py), only if
+                D4 keeps it
+  assemble/     per burst: the pair GeoTIFFs into one coherence store (C1) and
+                its engine report (C18). NEW: nothing does this today
+  onboard/      the covariates sidecar and pixel sample (from
+                ponzi.onboarding, unchanged bytes)
+  config.py     CoherenceConfig: the identity of a coherence computation,
+                hashed like the run config
 ```
 
 Two gaps the absorption has to close, because repeat_ccd and PONZI do not meet today:
@@ -99,10 +122,13 @@ Two gaps the absorption has to close, because repeat_ccd and PONZI do not meet t
 
 ```
 ponzi_models/
-  panels/        the panel builder (new, section 1e), masks, masked_input, export_pixels, the panel reader
-  training/      fit_spec, prepare, train, export, augment, tide, tracking, eval_breakdowns
+  panels/        the panel builder (new, section 1e), masks, masked_input,
+                 export_pixels, the panel reader
+  training/      fit_spec, prepare, train, export, augment, tide, tracking,
+                 eval_breakdowns
   calibration/   null_runs, null_rows, build, compare, panel_files
-  registry/      the registry store (from ponzi.models, plus STAC Items for models and calibrations)
+  registry/      the registry store (from ponzi.models, plus STAC Items for
+                 models and calibrations)
   standards/     the standard bundles
   cli.py         `ponzi-models <stage> ...`, one subcommand per former script
 ```
@@ -139,16 +165,28 @@ ponzi-apps and ponzi-paper do not exist (owner, 2026-10-23), so the Major-TOM pa
 
 ## 2. Dependency graph
 
-```
-                      ponzi-spec  (pydantic)
-          ┌───────────────┼───────────────────────────────┐
-          ▼               │                               ▼
-        ponzi             │                          ponzi-client     openapi.json ──► ponzi-visual's TS client
-       ▲     ▲            │                               ▲
-       │     │            │                               │ REST only
- ponzi-pipeline ◄── ponzi-models                          │
-       ▲            ▲     │                               │
-       └─ ponzi-worker ───┴─────────── REST only ───► ponzi-server
+```mermaid
+flowchart BT
+  spec["ponzi-spec<br/>(pydantic)"]
+  ponzi["ponzi"]
+  pipeline["ponzi-pipeline"]
+  models["ponzi-models"]
+  worker["ponzi-worker"]
+  server["ponzi-server"]
+  client["ponzi-client"]
+  openapi["openapi.json"]
+  ts["ponzi-visual's<br/>TS client"]
+  ponzi --> spec
+  client --> spec
+  pipeline --> ponzi
+  models --> ponzi
+  models --> pipeline
+  worker --> pipeline
+  worker --> models
+  worker --> spec
+  worker -. "REST only" .-> server
+  client -. "REST only" .-> server
+  openapi --> ts
 ```
 
 Rules, enforced by a layering test in each repository:
@@ -356,8 +394,10 @@ Auth: scoped keys (`worker`, `client:read`, `client:write`, `admin`), hashed in 
 ```
 ponzi_worker/
   loop.py        claim -> plan -> execute -> heartbeat -> publish
-  plan.py        expand a job into stage jobs; skip existing content ids; fan out per pair or per burst
-  executors/     local.py (subprocess or in-process), slurm.py (sbatch arrays, squeue/sacct polling)
+  plan.py        expand a job into stage jobs; skip existing content ids; fan
+                 out per pair or per burst
+  executors/     local.py (subprocess or in-process), slurm.py (sbatch arrays,
+                 squeue/sacct polling)
   profiles/      cluster profiles (versioned data)
   cache.py       content-addressed cache with retention and NFS-safe locking
   stages/        thin adapters over ponzi, ponzi_pipeline and ponzi_models
@@ -418,20 +458,31 @@ MkDocs Material on GitHub Pages; mkdocstrings for the Python API of every distri
 
 ```
 docs/
-  index.md                       what PONZI is, the 4 repositories and their distributions, how they talk
-  concepts/                      runs, coherence, calibration, standards, STAC profile, content ids, manifests
-  guides/                        install, deploy a server, run a worker (local, slurm, cloud), use the client
-  reference/                     API per distribution, REST (OpenAPI), contracts C1..C26 and new, STAC collections
-  methods/                       coherence estimation (repeat_ccd docs/coherence_estimation_methods.md: why radar geometry, the backends compared)
+  index.md                       what PONZI is, the 4 repositories and their
+                                 distributions, how they talk
+  concepts/                      runs, coherence, calibration, standards, STAC
+                                 profile, content ids, manifests
+  guides/                        install, deploy a server, run a worker
+                                 (local, slurm, cloud), use the client
+  reference/                     API per distribution, REST (OpenAPI),
+                                 contracts C1..C26 and new, STAC collections
+  methods/                       coherence estimation (repeat_ccd
+                                 docs/coherence_estimation_methods.md: why
+                                 radar geometry, the backends compared)
   contributing/
-    process.md                   change requests, SemVer per distribution, the compatibility matrix
-    new-stage.md                 onboarding a new processing component (e.g. a coherence backend)
+    process.md                   change requests, SemVer per distribution, the
+                                 compatibility matrix
+    new-stage.md                 onboarding a new processing component (e.g. a
+                                 coherence backend)
     new-model.md                 onboarding a new model
   agents/
     llms.txt                     index for agents
-    usage.md                     using the system: ponzi-client only, with recipes
-    contributing.md              the agent version of contributing/, as checklists
-  history/                       what moved from where; the decision log; repeat_ccd's backend experiments
+    usage.md                     using the system: ponzi-client only, with
+                                 recipes
+    contributing.md              the agent version of contributing/, as
+                                 checklists
+  history/                       what moved from where; the decision log;
+                                 repeat_ccd's backend experiments
 ```
 
 **Onboarding a new component** (the same checklist in `contributing/` for people and `agents/contributing.md` for agents):

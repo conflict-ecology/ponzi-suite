@@ -8,9 +8,13 @@
 #   PONZI_VISUAL_PORT=5180    the front end's port
 #   PONZI_SERVER_SETTINGS=F   a server settings file (its public_url is set to the server's address when it has none)
 #   PONZI_WORKER_ID=NAME      the name the server records for the client loop (default dev-<host name>)
-# The first start makes two keys in $PONZI_HOME/keys, never overwritten: dev-worker.key (scope worker, for the client
-# loop) and dev-browser.key (client:write, printed for the app). The logs are appended to $PONZI_HOME/logs/server/,
-# logs/client/ and logs/visual/.
+# The first start makes four keys in $PONZI_HOME/keys, never overwritten (ponzi-core CR-093): dev-visual.key (scope
+# visual, the app's own, which its dev server adds to every call), dev-worker.key (worker, for the client loop),
+# dev-admin.key (user-admin) and dev-user.key (user), the two printed to log in to the app with. A dev-browser.key of
+# before is revoked and removed. The home gets the development standard s1-dev, whose jobs no worker claims (its one
+# stage, dev-hold, is installed nowhere), as the server's default_standard unless the given settings name another;
+# and the Gaza example, a watch request approved into an area (scripts/dev-seed.py, once the server's catalogs are
+# ready). The logs are appended to $PONZI_HOME/logs/server/, logs/client/ and logs/visual/.
 set -euo pipefail
 # shellcheck source=scripts/linux-only.sh
 . "$(dirname "$0")/linux-only.sh"
@@ -48,9 +52,11 @@ chmod 700 "$keys"
 mkdir -p "$home/tmp"
 settings="$(mktemp "$home/tmp/ponzi-dev-up.XXXXXX.yaml")"     # in the home's tmp/ (ponzi-core CR-088)
 pids=()
+seed=""
 # shellcheck disable=SC2329  # called by the EXIT trap
 stop() {
   trap - INT TERM EXIT
+  [ -n "$seed" ] && kill -TERM -- "-$seed" 2>/dev/null || true
   for pid in "${pids[@]}"; do kill -TERM -- "-$pid" 2>/dev/null || true; done
   for pid in "${pids[@]}"; do wait "$pid" 2>/dev/null || true; done
   rm -f "$settings"
@@ -59,18 +65,33 @@ trap stop EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-pixi run --manifest-path "$service" python - "${PONZI_SERVER_SETTINGS:-}" "$url" "$settings" <<'PY'
+# The development standard (CR-093), in the home's standards/ when it is not there: a server file written by hand,
+# its version the first 8 characters of its workflow's hash, whose one step is of the stage dev-hold, which no worker
+# installs: its jobs are made and wait in the queue, so nothing is downloaded or computed here.
+pixi run --manifest-path "$service" python - "${PONZI_SERVER_SETTINGS:-}" "$url" "$settings" "$home/standards" <<'PY'
 import sys
 from pathlib import Path
 
 import yaml
+from ponzi_spec.identity import workflow_hash
 
-src, url, out = sys.argv[1:]
+src, url, out, standards = sys.argv[1:]
+standards = Path(standards)
+standards.mkdir(parents=True, exist_ok=True)
+if not list(standards.glob("s1-dev@*.yaml")):
+    workflow = {"workflow": "s1-dev", "steps": [{"id": "hold", "stage": "dev-hold"}]}
+    version = workflow_hash(workflow)[:8]
+    workflow["version"] = version
+    doc = {"standard": f"s1-dev@{version}", "final": ["hold"], "workflow": workflow,
+           "description": "Development only (pixi run dev-up): its jobs wait in the queue, since no worker has the "
+                          "stage dev-hold, so nothing is downloaded or computed."}
+    (standards / f"s1-dev@{version}.yaml").write_text(yaml.safe_dump(doc, sort_keys=False))
 doc = {}
 if src:
     raw = yaml.safe_load(Path(src).expanduser().read_text()) or {}
     doc = dict(raw.get("server", raw))
 doc.setdefault("public_url", url)
+doc.setdefault("default_standard", "s1-dev")
 Path(out).write_text(yaml.safe_dump({"server": doc}))
 PY
 
@@ -84,8 +105,15 @@ make_key() {
     pixi run --manifest-path "$service" ponzi-server keys add --settings "$settings" --scope "$scope" \
       --name "$name-$(date +%Y%m%dT%H%M%S)" --out "$file"
 }
+make_key visual dev-visual
 make_key worker dev-worker
-make_key client:write dev-browser
+make_key user-admin dev-admin
+make_key user dev-user
+# the one shared app key of before CR-093: revoked, its file removed
+if [ -f "$keys/dev-browser.key" ]; then
+  pixi run --manifest-path "$service" ponzi-server keys revoke --settings "$settings" dev-browser >/dev/null 2>&1 || true
+  rm -f "$keys/dev-browser.key"
+fi
 
 # job control: each process runs in a process group of its own (its id is the pid), so stopping one group stops
 # pixi and everything under it together
@@ -111,9 +139,13 @@ set -m
 env -u PONZI_KEY PONZI_KEY_FILE="$keys/dev-worker.key" pixi run --manifest-path "$service" \
   ponzi-client --url "$url" serve --worker-id "$worker_id" -- --executor local >> "$logs/client/serve.log" 2>&1 &
 pids+=("$!")
-(cd "$visual" && PONZI_URL="$url" exec pixi run --manifest-path "$visual/pixi.toml" npm run dev -- --host 127.0.0.1 --port "$vport" --strictPort) \
+(cd "$visual" && PONZI_URL="$url" PONZI_VISUAL_KEY_FILE="$keys/dev-visual.key" exec pixi run --manifest-path "$visual/pixi.toml" npm run dev -- --host 127.0.0.1 --port "$vport" --strictPort) \
   >> "$logs/visual/dev.log" 2>&1 &
 pids+=("$!")
+# the Gaza example, once the server's catalogs are ready; not one of the three: its end stops nothing
+pixi run --manifest-path "$service" python "$suite/scripts/dev-seed.py" "$url" "$keys/dev-admin.key" \
+  "$keys/dev-user.key" >> "$logs/server/dev-seed.log" 2>&1 &
+seed=$!
 set +m
 
 cat <<MSG
@@ -124,9 +156,12 @@ cat <<MSG
     client loop  worker $worker_id, --executor local
     app          http://localhost:$vport
 
-  Key to enter in the app (client:write):
+  Log in to the app with:
 
-      $(cat "$keys/dev-browser.key")
+    Admin user key   $(cat "$keys/dev-admin.key")
+    User key         $(cat "$keys/dev-user.key")
+
+  The Gaza example is added once the server's catalogs are ready ($logs/server/dev-seed.log).
 
   Logs: $logs/{server,client,visual}/     Stop: Ctrl+C
 

@@ -14,7 +14,10 @@
 - **Outputs.** The server's settings fix at startup how final assets reach it, `upload` (the default) or `path`, and every lease carries it ([Outputs](#outputs)). Either way the stored Item points at `/v1/assets/<item_id>/<asset>` on the server.
 - **The catalogs.** The burst catalog and the World Bank boundaries are downloaded and built into `$PONZI_HOME/catalog` on the first start, in the background; until they are ready, their routes and the Major TOM tile routes answer 503 ([Data sources and catalogs](../method/data-sources.md#fetched-by-the-server-on-its-first-start)).
 - **Watched areas** are made from Major TOM tiles over land; the server watches every burst of both passes meeting them, chooses the standard when none is given, makes the jobs at once and then at the area's cadence, and adds the area's tags to the analysis Items it serves ([Watched areas](../using/watched-areas.md)).
-- **Keys** are scoped (`worker`, `client:read`, `client:write`, `admin`) and kept as hashes. Errors are RFC 9457 problems. The OpenAPI document is committed, and the TypeScript client is generated from it.
+- **Keys** are scoped (`user`, `user-admin`, `visual`, `client:read`, `client:write`, `worker`, `admin`) and kept as hashes ([Logins and keys](../getting-started/authentication.md#ponzi-server-keys)). Errors are RFC 9457 problems. The OpenAPI document is committed, and the TypeScript client is generated from it.
+- **People** (CR-093). A person logs in to the app with their own key, through the app's own key (`visual`), and gets a session cookie; the server keeps the hash of the session's token and acts as that person on each call through the app. People ask for areas with **watch requests**, which an admin user approves (the area is made as `POST /v1/areas` makes one) or denies with a reason. An admin user also makes and revokes people's keys.
+- **Tracts** (CR-094): the watched tiles grouped by shared edges, computed from the areas (`GET /v1/tracts`, `/v1/tracts/{tract_id}`). An admin user (`user-admin`) pauses, resumes, looks now at or deletes a tract's areas together, or one area at a time; the `areas` permission, held by `user-admin`, `client:write` and `admin`, covers both. A pending watch request lists the tracts it would join (`touches`).
+- **Tags** (CR-093) are one word each: letters, digits, `-` and `_`. `GET /v1/tags` lists them with what each covers, and `GET /v1/tags/{tag}` gives a tag's places (admin 0, 1 and 2) and one row per tile.
 
 **`ponzi-client`** (Python, and the `ponzi-client` command) is how people and agents reach a running server; the front end does the same through its own TypeScript client, generated from the same OpenAPI document ([Clients: Python, CLI, TypeScript](../using/clients.md)). Without a server, PONZI runs from its own commands ([local mode](../contributing/agents/usage.md#local-mode)).
 
@@ -78,6 +81,7 @@ A settings file holds a `server:` section (or the fields at its top). Every fiel
 | `lease_seconds`, `max_attempts` | how long a lease lives unheartbeated; the attempts before a job fails | 600, 3 |
 | `upload_seconds` | how long an announced upload stays open | 3600 |
 | `scheduler_seconds` | how often watched areas are looked at; 0 never (`POST /v1/areas/{id}/discover` still looks) | 300 |
+| `session_days` | how long a person's session in the app lasts (CR-093) | 14 |
 | `default_standard` | the standard of an area made without one: a key `<id>@<hash8>`, or an id when one version of it is held (CR-089) | the one standard held |
 | `fetch_catalog` | whether to make the home's burst catalog when it has none | true |
 | `fetch_boundaries` | whether to make the home's boundaries when it has none | true |
