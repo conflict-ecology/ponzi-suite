@@ -43,7 +43,7 @@ c.manifest(items[0].properties["ponzi:content_id"])
 c.download(items[0], "events", "out/")
 ```
 
-Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the status and the server's problem (title, detail). `download` copies an asset when its href is a local path (shared storage), and otherwise fetches it through the server. The loop's calls are `claim`, `heartbeat`, `upload`, `complete` and `fail`, made by `ponzi-client serve` (`ponzi_client.serve`) with a `worker` key.
+Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the status and the server's problem (title, detail). `download` copies an asset when its href is a local path (shared storage), and otherwise fetches it through the server. The loop's calls are `claim`, `heartbeat`, `heartbeats`, `report`, `upload`, `complete` and `fail`, made by `ponzi-client serve` (`ponzi_client.serve`) with a `worker` key. `job`, `jobs(worker=...)` and `workers` follow the work (CR-097; the loops and where a job runs need the `operations` permission).
 
 ## The command line: `ponzi-client`
 
@@ -56,7 +56,8 @@ The commands are:
 - `tracts`, `tract ID [--do pause|resume|discover|delete]` (tracts, CR-094);
 - `submit`, `request`, `requests`, `jobs`;
 - `search`, `item`, `manifest`, `download`;
-- `serve`, the client loop (with a `worker` key).
+- `job ID`, `jobs --worker ID`, `workers`: where a job stands, a loop's jobs, the loops and their last reports (CR-097; with `user-admin`, `client:write` or `admin`).
+- `serve`, the client loop (with a `worker` key). `--worker-host HOST` runs its worker on that host over one ssh connection it keeps (`--ssh-prompt start|never`), and `--deliver direct|through-client` says who sends the outputs to the server (CR-098; [From another machine](../service/hpc.md#from-another-machine)). With a SLURM worker (`-- --executor slurm ...`) it sweeps every held job each `--step-seconds`, claims every queued job its worker can run unless `--max-jobs N` caps it, and kills a sweep past `--sweep-timeout` (default 600 s); see [Running on SLURM](../service/hpc.md#sweeps).
 
 The commands but `serve` print JSON. The server is `--url`, else `$PONZI_URL`; the key `$PONZI_KEY` (or `--key-env`, or the file `$PONZI_KEY_FILE`). There is no config file (CR-088).
 

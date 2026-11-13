@@ -126,8 +126,14 @@ Only a model can be used: calibrations are made for it, and scoring specs and st
 | Term | What it is | Not to be confused with |
 | --- | --- | --- |
 | **server** | keeps the areas, requests, jobs and final outputs; computes nothing | the worker |
-| **worker** | `ponzi-worker job`: one short call on one job, run by the client loop; runs the stages or their SLURM jobs, keeps the outputs in its cache | the client loop |
+| **worker** | the `ponzi-worker` program, run by the client loop in short calls (`sweep`, `package`, `job`); runs the stages or submits their SLURM jobs, keeps the outputs in its cache. Also the name of a key scope (`worker`, what a loop's key holds) and of the server's `worker_id`, which names a loop | the client loop |
 | **client** | the Python `ponzi-client`, or ponzi-visual in the browser; `ponzi-client serve` is the client loop, the only long-running process | |
+| **loop** | one `ponzi-client serve` process, known to the server by its `--worker-id` | the worker |
+| **sweep** | one short call of the worker over every job a loop holds: what is in flight checked, all new work submitted once (CR-096) | a batch |
+| **task** | one job of the worker's plan (one stage on its inputs, named by its content id); one element of a SLURM array | a job (the server's) |
+| **in flight** | a task in a live SLURM batch, whoever submitted it, neither finished nor failed | |
+| **hot**, **warm**, **cold** | the tiers of a home's storage (CR-099): `$PONZI_HOME` (the home, and the hot tier), `$PONZI_HOME_WARM`, `$PONZI_HOME_COLD`; each folder on one by a fixed rule | |
+| **agent** | anything that runs PONZI work on the cluster without a loop (`ponzi-worker run`), by a person, a script or an AI agent | a loop |
 | **request** | a one-off run of bursts under a standard | an area (which keeps making jobs); a watch request |
 | **user**, **admin user** | a person with a key of scope `user` (asks for areas, searches, downloads) or `user-admin` (also decides requests and makes people's keys) | the `admin` scope (the server's operator) |
 | **session** | a person logged in to the app: a cookie the page cannot read, swapped for their key at login; the server keeps only its hash | a key |

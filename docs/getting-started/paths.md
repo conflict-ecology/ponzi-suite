@@ -81,6 +81,29 @@ Inside the folders, by path in the home:
 
 A home records its own files by paths relative to itself, so a home copied to another machine runs unchanged with the same repositories.
 
+### Tiers: hot, warm and cold
+
+**`$PONZI_HOME` is the home, and the hot tier.** There is no other name for it. Two more variables put parts of the home on other storage (CR-099): `$PONZI_HOME_WARM` and `$PONZI_HOME_COLD`. Unset, cold falls back to warm and warm to hot, so a home without them is one folder, as above.
+
+| Tier | Root | Folders |
+| --- | --- | --- |
+| hot | `$PONZI_HOME` | `cache/` (where entries are made, with its `work/`, `locks/`, `jobs/`, `slurm/`), `tmp/`, `work/`, `logs/`, `cluster/`, `keys/`, `server/`, `specs/`, `catalog/`, `standards/` |
+| warm | `$PONZI_HOME_WARM` | `outputs/`, `registry/`, `models/`, `calibrations/`, `panels/`, `training/` |
+| cold | `$PONZI_HOME_COLD` | `downloads/` (`slc/`, `orbits/`, `dem/`, `ghsl/`, `era5/`) |
+
+The rule is fixed in the code: every machine agrees where a folder is without settings. Every tier is mounted at the same path on the login node and every compute node; a SLURM script exports the tiers set.
+
+`cache/` and `downloads/` hold files written once and named by what they are, so a copy in any tier is the same file. New ones are written at the folder's tier (entries on hot, downloads on cold); each is looked up hot, then warm, then cold, and read where it is found. Copies move only when asked:
+
+```
+ponzi-worker promote 'downloads/slc/*_202609*'      # copy downloads up to hot (paths, globs, folders)
+ponzi-worker promote <content id> ...               # copy cache entries up to hot
+ponzi-worker evict --older-than-days 30 --to cold   # move old cache entries down instead of deleting them
+ponzi-worker evict --promoted downloads/slc --older-than-days 7   # drop promoted copies; originals stay
+```
+
+A record naming a file of the home names it relative to the home, marked `home:` (a panel's `home:cache/ponzi-coherence/<id>/coherence.zarr`), and is read through the tiers: it holds when the file is promoted or evicted to another tier, and when the tiers are copied to another machine (with the variables set there).
+
 ## Other paths
 
 | Path | What | Changed by |
@@ -97,7 +120,9 @@ A home records its own files by paths relative to itself, so a home copied to an
 
 | Variable | Sets | Default |
 | --- | --- | --- |
-| `PONZI_HOME` | the PONZI home | `~/.ponzi` |
+| `PONZI_HOME` | the PONZI home, and its hot tier | `~/.ponzi` |
+| `PONZI_HOME_WARM` | the home's warm tier: outputs, registry, models, calibrations, panels, training (CR-099) | `PONZI_HOME` |
+| `PONZI_HOME_COLD` | the home's cold tier: downloads (CR-099) | `PONZI_HOME_WARM` |
 | `PONZI_URL` | the server `ponzi-client` and the client loop talk to, without `--url` (CR-088) | |
 | `PONZI_SUITE` | the ponzi-suite checkout a spec name is looked up in, after the home's spec folders ([Naming rules](../models/naming.md#spec-folders)) | `ponzi-suite` beside the ponzi-core checkout |
 

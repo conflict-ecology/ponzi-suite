@@ -2,6 +2,7 @@
 
 - **Requested by / date:** owner, 2026-11-05 ("I want the client to be the only long running process. the work should be short lived to perform tasks that the client retrieves from the server.")
 - **Status:** implemented on the owner's instruction (2026-11-05)
+- **Superseded in part:** "the worker talks to no server": since CR-098 it sends a job's outputs to the server with one-time upload tickets the client hands it (no key, no other call); and since CR-096 a SLURM worker is swept (`ponzi-worker sweep`) rather than called per job
 
 ## Why
 

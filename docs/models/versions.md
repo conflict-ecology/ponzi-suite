@@ -69,7 +69,7 @@ Two commands write and register a standard, so no hash is copied by hand. Each t
 | Model | `ponzi_models.standards.Standard` | `ponzi_server.catalog.Standard` |
 | Written by | a person, kept in git (ponzi-suite `standards/`) | `ponzi-models standard-workflow`, from a published, registered bundle and the registry |
 | Says | what runs: model, scoring spec hash, calibrations, and the panel, detection, onboarding and coherence specs by name, `requires` | how it runs: the steps of `ponzi-worker`, each spec's resolved fields given to the steps that use it |
-| Fields | `status`, `sensor`, `description`, `panel`, `coherence`, `onboarding`, `model`, `scoring_spec_hash`, `calibrations`, `detection`, `requires` | `standard` (the key), `description`, `final` (`[events, cells]`), `requires`, `variables` (`registry` and those given with `--set`), `workflow` (`{workflow: <id>, version: <hash8>, steps: [...]}`), `workflow_hash` and `built_by` (below), `specs` (the `specs:` block of every spec named and of the bundle) |
+| Fields | `status`, `sensor`, `description`, `panel`, `coherence`, `onboarding`, `model`, `scoring_spec_hash`, `calibrations`, `detection`, `requires` | `standard` (the key), `description`, `final` (`[cells]`, CR-100), `requires`, `variables` (`registry` and those given with `--set`), `workflow` (`{workflow: <id>, version: <hash8>, steps: [...]}`), `workflow_hash` and `built_by` (below), `specs` (the `specs:` block of every spec named and of the bundle) |
 | Read by | `check-standard`, `register-standard`, `standard-workflow` | the server, and through each job's payload the worker |
 
 The steps of the server's file, and the `--source pipeline|stores` choice, are in [Building a standard](standards.md#from-bundle-to-server).
