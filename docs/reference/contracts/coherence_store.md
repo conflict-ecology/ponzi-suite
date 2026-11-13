@@ -15,7 +15,7 @@ A store is zarr v3: the writers write it, and the opener refuses another zarr fo
 | Name | Dims | dtype | Fill | Chunks | Notes |
 |---|---|---|---|---|---|
 | `coh` | `(time, y, x, baseline)` | float32 | NaN | `(1, Y, X, B)` | NaN = no pair or no data. The time chunk MUST be 1; spatial chunks smaller than the grid are allowed (warn); the baseline chunk is unconstrained |
-| `time` | `(time,)` | datetime64[ns] | | | Strictly increasing dates of the later image of each pair; an assembled series lists every acquisition, also those without a pair. `validate-store` fails `time_axis` on an axis of another dtype, such as the CF-encoded integers of the old engine's archive stores (`ponzi.contracts.time_axis.decode_time`; ponzi-core CR-086) |
+| `time` | `(time,)` | datetime64[ns] | | | Strictly increasing dates of the later image of each pair; an assembled series lists every acquisition, also those without a pair. `validate-store` fails `time_axis` on an axis of another dtype (`ponzi.contracts.time_axis.decode_time`) |
 | `y`, `x` | `(y,)`, `(x,)` | float64 | | | Pixel-centre coordinates in `epsg` |
 | `baseline` | `(baseline,)` | int32 | | | Index `0..B-1`; the days are in the attrs |
 | `valid_pixels` | `(y, x)` | uint8 | 0 | any | Required. 1 where the burst footprint has data (`CoherenceWriter`: where any acquisition is finite) |

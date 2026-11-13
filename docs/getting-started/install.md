@@ -126,7 +126,7 @@ Each distribution also installs with pip from its folder (`packages/<name>` of i
 | Distribution | Folder | Depends on | Extras |
 | --- | --- | --- | --- |
 | `ponzi-spec` | ponzi-core `packages/spec` | | |
-| `ponzi` | ponzi-core `packages/core` | `ponzi-spec` | `tide` (torch), `grid` (shapely, pyproj) |
+| `ponzi` | ponzi-core `packages/core` | `ponzi-spec` | `tide` (torch), `grid` (shapely, pyproj), `stac` (ponzi-spec) |
 | `ponzi-pipeline` | ponzi-core `packages/pipeline` | `ponzi` | `asf`, `dem` |
 | `ponzi-models` | ponzi-core `packages/models` | `ponzi-spec`, `ponzi[grid]`, `ponzi-pipeline` | `train` (torch, wandb) |
 | `ponzi-client` | ponzi-service `packages/client` | `ponzi-spec` | |

@@ -61,7 +61,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 **Cause.** The server reads its standards once, from the standards folder, when it starts. A file added, renamed or removed afterwards is not seen; an area whose standard is no longer there is skipped.
 
-**Fix.** Put the standard's file in the standards folder and restart the server. Or move the area to a standard the server holds: `ponzi-client area-update AREA_ID --standard ...`. `GET /v1/standards` (or **Connect** in the app, which calls it) lists what the server holds.
+**Fix.** Put the standard's file in the standards folder and restart the server. Or move the area to a standard the server holds: `ponzi-client area-update AREA_ID --standard ...`. `GET /v1/standards` (or `ponzi-client standards`) lists what the server holds.
 
 ## 401 or 403 from the server
 
@@ -89,7 +89,7 @@ or `... it holds none; ...`. Or `422 Unprocessable Content: the server's default
 
 **Cause.** A standard can name the distributions and versions a worker must have (`requires`, PEP 440 specifiers; ponzi-core CR-055). The worker checks them before it runs the job and refuses when its environment does not meet them. The failure is reported to the server, which queues the job again while attempts remain (`max_attempts`, default 3) and then marks it failed.
 
-**Fix.** Install a release of the worker's environment that meets the standard's `requires`. An area's next look on a later day makes new jobs (a job is named by its payload, which holds its last day), so they run again; **Look now** on the same day finds the same failed jobs. A one-off run submitted again (`ponzi-client submit`) gives its failed jobs another round of attempts. See [Workflows and the cache](worker.md) and [Standard versions](../models/versions.md).
+**Fix.** Install a release of the worker's environment that meets the standard's `requires`. An area's look makes a new job once its burst has a new acquisition (a job is named by its payload, which ends on the day after the burst's newest acquisition; ponzi-core CR-101), so it runs again then; until then a look, **Look now** included, finds the same failed job. A one-off run submitted again (`ponzi-client submit`) gives its failed jobs another round of attempts. See [Workflows and the cache](worker.md) and [Standard versions](../models/versions.md).
 
 ## A box on the map adds no tiles, or only some
 

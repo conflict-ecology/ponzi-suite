@@ -32,6 +32,6 @@ ponzi-pipeline coherence --burst ID [--work DIR] --burst-map FILE --index N
 ponzi-pipeline assemble  --burst ID [--work DIR] --burst-map FILE [--out DIR]
 ```
 
-`--work` defaults to `$PONZI_HOME/work/` (one folder per burst), `assemble --out` to the burst's own work folder (the store `<burst>.coh.zarr`; CR-088), and the SLCs, orbits and DEM tiles go to `$PONZI_HOME/downloads/` unless `--slc-dir`, `--orbit-dir` or `--dem-dir` say else (CR-079, CR-080). ISCE3's scratch goes to `$PONZI_HOME/tmp/` (CR-088).
+`--work` defaults to `$PONZI_HOME/work/` (one folder per burst), `assemble --out` to the burst's own work folder (the store `<burst>.coh.zarr`; CR-088), and the SLCs, orbits and DEM tiles go to `$PONZI_HOME/downloads/` (on the cold tier when one is set, and looked up in every tier first, CR-099) unless `--slc-dir`, `--orbit-dir` or `--dem-dir` say else (CR-079, CR-080). ISCE3's scratch goes to `$PONZI_HOME/tmp/` (CR-088).
 
 All take `--coherence-spec NAME|FILE`, the coherence spec (looks, window, grid, DEM, platforms, baselines; `specs/coherence_specs/`, [Naming rules](../models/naming.md#spec-folders)), whose hash names the computation; without it, the code's defaults.

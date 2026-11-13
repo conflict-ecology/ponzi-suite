@@ -43,7 +43,7 @@ c.manifest(items[0].properties["ponzi:content_id"])
 c.download(items[0], "events", "out/")
 ```
 
-Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the status and the server's problem (title, detail). `download` copies an asset when its href is a local path (shared storage), and otherwise fetches it through the server. The loop's calls are `claim`, `heartbeat`, `heartbeats`, `report`, `upload`, `complete` and `fail`, made by `ponzi-client serve` (`ponzi_client.serve`) with a `worker` key. `job`, `jobs(worker=...)` and `workers` follow the work (CR-097; the loops and where a job runs need the `operations` permission).
+Every call takes and returns the `ponzi_spec.api` models. An error response raises `ApiError`, which carries the status and the server's problem (title, detail). `download` copies an asset when its href is a local path (shared storage), and otherwise fetches it through the server. The loop's calls are `claim`, `heartbeat`, `heartbeats`, `report`, `ticket`, `upload`, `complete` and `fail`, made by `ponzi-client serve` (`ponzi_client.serve`) with a `worker` key. `job`, `jobs(worker=...)` and `workers` follow the work (CR-097; the loops and where a job runs need the `operations` permission).
 
 ## The command line: `ponzi-client`
 

@@ -6,7 +6,7 @@
 
 Producer: whoever defines the selection, through `write_mask_store`; for a panel, `ponzi_models.panels.draw.draw_panel` (`ponzi-models panel-build`), with the layers `cell_<split>` (the processable pixels of the split's cells) and `sample_<split>` (the drawn pixels) and the attrs `panel` (the panel spec's id), `panel_spec_hash` (its `spec_hash`) and `draw_seed`. Consumers: `ponzi.core.runner.open_input` (`WindowedInput`), and through it `ponzi run`, the panel null runs (`ponzi-models null-runs`) and the masked input of a panel burst (`ponzi_models.panels.masked_input`: training, `ponzi-models export-pixels`).
 
-Location: never inside the sidecar, which stays byte-identical. A panel's are in the panel folder, `<panel>/<burst>/<burst>_masks.zarr` (default panel folder `{PONZI home}/panels/<id>@<hash8>`), recorded relative to it in the panel record (`Panel.masks_path`).
+Location: never inside the sidecar, which stays byte-identical. A panel's are in the panel folder, `<panel>/<burst>/<burst>_masks.zarr` (default panel folder the home's `panels/<id>@<hash8>`, on the warm tier, CR-099), recorded relative to it in the panel record (`Panel.masks_path`).
 
 ## Arrays
 

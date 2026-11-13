@@ -40,6 +40,10 @@ Pick an open item, read the pages it links to, and follow the [change process](p
 - [x] The cluster profile, the script template, batches with dependencies, status from the cache and `sacct`, and the SLURM route of `ponzi-worker job` under `ponzi-client serve` (CR-063).
     - The tests render the scripts from the profile of a made-up cluster (`test_slurm.py`); no cluster's job files are compared any more (CR-065).
     - A fake `sbatch` runs them locally, and the result equals the direct calls.
+- [x] Workers sweep: under SLURM a loop runs one `ponzi-worker sweep` over every job it holds; each sweep submits the new work while earlier batches run, never submits a running batch again, and finds the work an agent submitted (CR-095, CR-096).
+- [x] What the sweeps see reaches the server: each job's progress, SLURM ids and batches, and each loop's last report (`ponzi-client job`, `jobs --worker`, `workers`; CR-097).
+- [x] The client runs anywhere: its worker here or on another host over one ssh connection (`serve --worker-host`), the final outputs sent from the worker's machine with one-time upload tickets (CR-098).
+- [x] One home on three tiers: `$PONZI_HOME` (the hot tier), `$PONZI_HOME_WARM` and `$PONZI_HOME_COLD`; `ponzi-worker promote`, `evict --to` and `evict --promoted` (CR-099).
 - [x] The release environments `default`, `ml`, `ml-gpu` and `isce3` in ponzi-service's `pixi.toml`.
 - [ ] **Install a ponzi-service release on the lab share.** HPC, owner.
     - Tag ponzi-core and ponzi-service. Check both out under `$LAB/ponzi-service-releases/<release>/` (ponzi-core beside it), then run `pixi install` for each of the four environments.
@@ -109,7 +113,7 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 
 ## Phase 9: watched areas
 
-- [x] The server's scheduler, with one job per burst and day; `POST /v1/areas/{id}/discover`; `GET /v1/jobs`.
+- [x] The server's scheduler, with one job per burst at each area's cadence; `POST /v1/areas/{id}/discover`; `GET /v1/jobs`.
 - [x] Discovery is named by what it found, not by the day it looked; a pair keeps its id however the series grows.
 - [x] Monitoring updates are new staged runs. A new acquisition computes only its new pairs and makes exactly one new staged run (`test_watched.py`).
 - [x] An area's `start_date` and `end_date` bound its jobs (CR-053).
@@ -122,6 +126,12 @@ The lifecycle runs end to end on the CPU with the registry on local disk: `ponzi
 - [x] The World Bank's disputed areas (NDLSA) are level 0 boundaries and land, so their tiles can be watched; the map draws the land from the level 0 boundaries (CR-069).
 - [x] A job lists the Items it made (`Job.items`), so an area's outputs are its done jobs' Items (CR-042).
 - [x] Outputs reach the server by upload or by a shared path, as the server's `outputs` setting says (CR-041).
+- [x] The tiles are the only upload: a job delivers its `ponzi-events-cell` Items, not the per-burst `ponzi-events` (CR-100).
+- [x] A job is named by its burst's newest acquisition, so a look with nothing new makes no new job, and an upload the server already holds is answered `held` and not sent (CR-101 part a).
+- [ ] **Tile series (CR-101 parts b to e).** local, then HPC.
+    - Signed off, not started: (b) the burst series, appended update by update, and its parity with a full run; (c) detection with carried state and one tile series per cell and track; (d) delivery of the changed chunks only, and the server's versioned copy of each series; (e) offers, a loop sending the server the series made without it.
+    - Each part is implemented and reviewed on its own. Done when a new acquisition sends only the tail chunks of each tile series, and an appended series equals the full run bit for bit.
+- [x] People log in with their own key and ask for areas to be watched; an admin user decides, and manages the watched tiles as tracts (CR-093, CR-094).
 - [ ] **Presigned uploads to object storage.** local.
     - Assets go to the server's disk for now, by upload or by a shared path.
     - Done when the loop can upload a final asset straight to object storage, through a URL the server signs.

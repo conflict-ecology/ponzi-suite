@@ -15,7 +15,7 @@ Where each input of PONZI comes from, who fetches it and where it lands. The ser
 | [Weather](#era5-land-weather) (ERA5-Land) | worker, `onboard` | per burst and month | `$PONZI_HOME/downloads/era5/` (CDS); Earth Data Hub is read in place | Earth Data Hub or CDS |
 | [Built-up and land](#ghsl-built-up-and-land) (GHSL) | worker, `onboard` | per tile | `$PONZI_HOME/downloads/ghsl/` | none |
 
-`$PONZI_HOME` is the home of every part: the server's, the worker's, the SLURM tasks' (CR-088; [Workflows and the cache](../service/worker.md)).
+`$PONZI_HOME` is the home of every part: the server's, the worker's, the SLURM tasks' (CR-088; [Workflows and the cache](../service/worker.md)). `downloads/` is on the home's cold tier, `$PONZI_HOME_COLD` when it is set; a file found in any tier is not downloaded again (CR-099).
 
 ## Fetched by the server on its first start
 
@@ -62,7 +62,7 @@ When each burst was acquired, and when it will be next (CR-060), for `GET /v1/bu
 
 ## Fetched by the worker, per job
 
-The steps of a standard's workflow name their shared inputs by variables (`burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`). Those a job does not set come from the worker's home. They are request parameters, never part of a content id, so where a home is changes no output ([Building a standard](../models/standards.md#from-bundle-to-server)).
+The steps of a standard's workflow name their shared inputs by variables (`burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir`, `era5_dir`). Those a job does not set come from the worker's home. They are request parameters, never part of a content id, so where a home is changes no output ([Building a standard](../models/standards.md#from-bundle-to-server)).
 
 ### The burst map
 

@@ -11,7 +11,7 @@ A watched area is one or more Major TOM tiles (cells of the grid at 10 km, [Grid
 - **Every burst.** The server watches every burst, of both passes, whose footprint meets the union of the tiles. There is no burst, pass or track to choose.
 - **The standard is the server's.** An area may name its standard; one made without, as the front end makes them, takes the server's setting `default_standard`, else the one standard the server holds. A server holding several standards and no `default_standard` (or none, or a `default_standard` it does not hold) refuses such an area with a 422 that says to set it (ponzi-core CR-068). `cadence_hours` may be left out too: 24 hours.
 - **At once.** Making an area makes its jobs, one `workflow` job per burst, so the scenes of its bursts are found and downloaded as soon as a worker claims them. After that the scheduler, every `scheduler_seconds` (default 300), makes each due area's jobs at its cadence.
-- **Days.** A job's span starts on the area's `start_date` when it has one, and ends on the day of the tick or on the area's `end_date`, whichever is first. Before its first day an area makes no jobs.
+- **Days.** A job's span starts on the area's `start_date` when it has one, and ends on the day after its burst's newest acquisition before the day of the tick or the area's `end_date`, whichever is first (ponzi-core CR-101); without an answer from ASF, or with no acquisition in the 60 days before, on that bound itself ([How work flows](../service/server.md#how-work-flows)). Before its first day an area makes no jobs.
 - **Tags.** An area has tags instead of a name to choose (its name defaults to its first tile and how many more, e.g. `393U_467R +3`). A tag is one word of letters, digits, `-` and `_`, at most 40 characters and 20 per area, given comma separated; a leading `#` and spaces are dropped, and a repeat in any case is kept once (CR-093). The server attaches them to the analysis outputs of its tiles as it serves them: see [Tags](#tags).
 
 Land includes the World Bank's 24 disputed areas (non-determined legal status, such as Western Sahara and Jammu and Kashmir), so their tiles can be watched; they belong to no country. Antarctica has no tiles ([The administrative boundaries](../method/data-sources.md#the-administrative-boundaries)).
@@ -67,7 +67,7 @@ ponzi-visual asks for areas the same way, and nothing else: tiles, tags and a sp
 
 Outputs are content-addressed and shared between areas: one store may serve several areas. A tag is therefore never part of an Item, its content id or a worker's cache. The server adds it as it serves an Item (`GET /v1/stac/collections/{c}/items/{id}` and `GET /v1/stac/search`), as the property `ponzi:tags` ([STAC catalog profile](stac-profile.md)).
 
-- **Which Items.** Only the analysis outputs: runs, p-values, events and the events of a Major TOM cell. Never the downloads and inputs (scenes, orbits, DEMs, pairs, coherence, sidecars, masks, samples), nor models, calibrations and the registry.
+- **Which Items.** Only the analysis outputs: runs, p-values, events and the events of a Major TOM cell. A standard's jobs deliver only the events of a cell (CR-100); runs, p-values and per-burst events on a server are Items held from before. Never the downloads and inputs (scenes, orbits, DEMs, pairs, coherence, sidecars, masks, samples), nor models, calibrations and the registry.
 - **Which tags.** The tags, once each, of every area whose bursts hold the Item's burst, or, for an Item of a cell, whose tiles hold that cell. Two areas sharing a tile both tag its outputs, and a change of an area's tags shows at once.
 - **Search.** `c.search(tags=["flood-2024"])` (or `ponzi-client search --tags ...`, `?tags=` in the API) returns the analysis Items carrying any of the tags.
 - **What a tag covers.** `c.tags("gaza")` (`ponzi-client tags gaza`, `GET /v1/tags?q=`) lists the matching tags with their areas, tiles, bursts, outputs and latest output; `c.tag("gaza")` (`ponzi-client tag gaza`, `GET /v1/tags/{tag}`) gives its places (the admin 0, 1 and 2 boundaries its tiles meet, each once) and one row per tile. The app's **Search** page shows the same ([Using the map](map.md)).
@@ -76,7 +76,7 @@ Outputs are content-addressed and shared between areas: one store may serve seve
 
 Content ids decide. The worker plans the standard's workflow and runs only what is not in its cache.
 
-- **Nothing new at ASF.** Discovery is named by what it found, not by the day it looked, so every job is cached and nothing runs.
+- **Nothing new at ASF.** The look makes the job it made before, which is already there, so nothing is claimed or run. Without an answer from ASF it makes a new job, but discovery is named by what it found, not by the day it looked, so every step is cached and nothing runs.
 - **A new acquisition.**
     - A new pairs Item.
     - Only the new pairs' coherence, at most one per baseline. A pair's id depends only on its two granules and the coherence spec, never on the rest of the series.

@@ -14,7 +14,7 @@ Consumers: `ponzi.core.runner` (through `open_input`, which recognises a sample 
 |---|---|---|---|---|
 | `coh` | `(time, pix, baseline)` | float32 | NaN | The sampled coherence, all baselines of the source or a subset |
 | `time` | `(time,)` | datetime64[ns] | | Copied from the source |
-| `baseline` | `(baseline,)` | int | | Index |
+| `baseline` | `(baseline,)` | int32 | | Index |
 | `pix_y`, `pix_x` | `(pix,)` | int32 | | Row and column of each pixel on the source grid |
 | `weight` | `(pix,)` | float64 | NaN | Optional, producer-defined |
 | `frame_code`, `stratum_code`, `label` | `(pix,)` | uint8 | 0 | Optional codes; the onboarding codes a frames column from 1 in name order (0 = none), names in the attrs `frame_names`, `stratum_names`. `label` is the frames' column as is, a diagnostic (an evaluation reads a label store, C11) |

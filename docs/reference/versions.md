@@ -108,7 +108,7 @@ A spec has no version field: its version is its `spec_hash`, cited `name@<hash8>
 | --- | --- | --- |
 | a spec (panel, coherence, onboarding, detection, training, scoring) | `spec_hash` | `majortom-global@2436d8cb` |
 | a model | its training spec's and panel spec's hashes | `tide-weather-fill-previous@93771aa3--majortom-global@2436d8cb` |
-| a built panel | its panel spec's hash | `$PONZI_HOME/panels/majortom-global@2436d8cb/` |
+| a built panel | its panel spec's hash | the home's `panels/majortom-global@2436d8cb/`, on the warm tier (CR-099) |
 | a standard | the hash of its file `standards/<id>.yaml`, but its description, with the hashes of the specs it names (CR-089) | `s1-general@3f9a12c4` ([Standard versions](../models/versions.md)) |
 | a calibration | the sha256 of its files, and the staged rule's version (below) | |
 

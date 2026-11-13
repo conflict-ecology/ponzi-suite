@@ -43,7 +43,7 @@ pixi run ponzi-models standard-workflow STANDARD.yaml --registry REGISTRY \
     --set orbit_dir=... --set dem_dir=... --set start_date=2025-01-01
 ```
 
-The standard must be registered first: its workflow is recorded beside it in the registry, once per source, and every later build must match ([One key, one workflow](versions.md#one-key-one-workflow)). This writes the standard as the server runs it, by default to `$PONZI_HOME/standards/<id>@<hash8>.yaml` where the server of that home reads it (`--out` names any file; for another home, set `PONZI_HOME`; CR-080, CR-088), with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir` and `era5_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `$PONZI_HOME/downloads/`). The steps are:
+The standard must be registered first: its workflow is recorded beside it in the registry, once per source, and every later build must match ([One key, one workflow](versions.md#one-key-one-workflow)). This writes the standard as the server runs it, by default to `$PONZI_HOME/standards/<id>@<hash8>.yaml` where the server of that home reads it (`--out` names any file; for another home, set `PONZI_HOME`; CR-080, CR-088), with the `specs:` block of every spec it names and of the bundle. `burst_map`, `slc_dir`, `orbit_dir`, `dem_dir`, `ghsl_dir` and `era5_dir` can be left out: a worker fills those it is not given from its PONZI home (`$PONZI_HOME/catalog/` and `downloads/`, on the cold tier when one is set, CR-099). The steps are:
 
 1. The coherence chain, either way:
     - `--source pipeline`: `discover`, `dem`, `coherence` (one job per pair), `assemble`;
@@ -54,6 +54,8 @@ The standard must be registered first: its workflow is recorded beside it in the
 5. `pvalues`.
 6. `detect`, with the detection spec's fields.
 7. `tile`, the same.
+
+The file's `final` is `[cells]`: a job delivers the `tile` step's `ponzi-events-cell` Items only, and `detect`'s per-burst events stay in the worker's cache (CR-100).
 
 Unless it was written there, copy the file into the server's `$PONZI_HOME/standards/` and restart the server; `ponzi-client standards` then lists it ([how the server reads it](versions.md#two-files-for-one-version)).
 

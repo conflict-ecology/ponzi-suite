@@ -2,7 +2,7 @@
 
 ## Change requests
 
-Every change to ponzi-core starts as a written request in this suite's `docs/history/requests/` (the template is there, [TEMPLATE.md](../history/requests/TEMPLATE.md)): why, what changes, whether results change, the tests, the version. The owner signs it off before it is implemented. A change ends with its tests green and a `CHANGELOG.md` entry.
+Every change to PONZI (ponzi-core, ponzi-service and ponzi-visual) starts as a written request in this suite's `docs/history/requests/` (the template is there, [TEMPLATE.md](../history/requests/TEMPLATE.md)): why, what changes, whether results change, the tests, the version. The owner signs it off before it is implemented. A change ends with its tests green and a `CHANGELOG.md` entry.
 
 ## Tests
 

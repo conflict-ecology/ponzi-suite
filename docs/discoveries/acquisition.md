@@ -10,7 +10,7 @@ Lessons about finding and fetching Sentinel-1 data. What PONZI fetches now is in
 - ASF's burst extraction returned VH only for some (burst, date) pairs whose scenes held VV too; confirmed on 5 bursts. Downloading the full scene and extracting the bursts locally worked (`meta/2026-09-25-coh-tbaseline-per-platform-stores`, `caveats.md`).
 - On Major TOM, of 4,747 uncovered dates, 4,380 were catalogued acquisitions the engine had failed to process; only 367 were real gaps (`meta/2026-09-08-coherence-store-qaqc-done-contract`).
 
-*In PONZI:* `discover` builds the expected set from both, and a gap counts as an availability gap only with catalogue evidence.
+*In PONZI:* not yet. `discover` searches ASF's burst products only (`SLC-BURST`); the full scenes and a CDSE fallback are open work ([CDSE download route](../contributing/roadmap.md#phase-8b-the-first-standard)).
 
 ## Membership by burst id, not by footprint
 

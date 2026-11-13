@@ -2,11 +2,11 @@
 
 > Change detection on Sentinel-1 SAR coherence time series: forecast the coherence of each new acquisition per burst, score the drop, calibrate it to p-values, date the changes as events. Four repositories: ponzi-core (computing), ponzi-service (server, worker, client), ponzi-visual (map front end), ponzi-suite (this site).
 
-Agents use PONZI through ponzi-client when a server is running (client mode), else through the ponzi-core commands and `ponzi-worker run` on the machine (local mode), submitting cluster jobs or moving data only with the owner's approval, which may cover many submissions or transfers at once within the scope it names. Agents change PONZI's code only under a signed-off change request, and do not commit or access clusters without the owner's approval.
+Agents use PONZI through two tools: ponzi-client asks a server for what it holds or will make; ponzi-worker runs a standard or any workflow on the machine, with or without a server, its outputs cached in the PONZI home by content id. Either way they work in the PONZI home, submit cluster jobs or move data only with the owner's approval (which may cover many submissions or transfers at once within the scope it names), and leave the registry and the suite's specs as they are. Agents change PONZI's code only under a signed-off change request, and do not commit or push without the owner's approval.
 
 ## For agents
 
-- [Using PONZI](contributing/agents/usage/): client mode and local mode, and how to read what PONZI makes
+- [Using PONZI](contributing/agents/usage/): the client and the worker, the rules for both, and how to read what PONZI makes
 - [Changing the code](contributing/agents/contributing/): checklists for code changes
 
 ## Getting started

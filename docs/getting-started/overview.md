@@ -22,7 +22,7 @@ Models and calibrations are made by `ponzi-models` from panels: sets of pixels o
 Who calls whom while PONZI runs, and which distribution depends on which. Solid arrows are package dependencies (`pyproject.toml`), dashed ones calls at run time, dotted ones files read by path. What a distribution gets through another is not drawn again: `ponzi-models` also declares `ponzi` and `ponzi-spec`, and `ponzi-worker` all of the computing distributions.
 
 <div class="pz-figure" markdown="0">
-<svg viewBox="0 0 830 720" role="img" aria-label="The dependencies of the PONZI distributions: ponzi-spec at the base; ponzi on it, ponzi-pipeline on ponzi, ponzi-models on ponzi-pipeline; ponzi-worker depends on ponzi-models; ponzi-server and ponzi-client depend only on ponzi-spec; ponzi-client calls the server over REST and runs ponzi-worker job; ponzi-visual calls the server over REST; agents and scripts call ponzi-client, or run ponzi-worker directly with no server; ponzi-models reads the specs and standards of ponzi-suite by path">
+<svg viewBox="0 0 830 720" role="img" aria-label="The dependencies of the PONZI distributions: ponzi-spec at the base; ponzi on it, ponzi-pipeline on ponzi, ponzi-models on ponzi-pipeline; ponzi-worker depends on ponzi-models; ponzi-server and ponzi-client depend only on ponzi-spec; ponzi-client calls the server over REST and runs ponzi-worker sweep or job; ponzi-visual calls the server over REST; agents and scripts call ponzi-client, or run ponzi-worker directly with no server; ponzi-models reads the specs and standards of ponzi-suite by path">
 <defs><marker id="pz-dep" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="pz-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
 <rect class="pz-box" x="610" y="6" width="170" height="44" rx="7"/>
 <text class="pz-title" x="622" y="25">agents, scripts</text>
@@ -40,7 +40,8 @@ Who calls whom while PONZI runs, and which distribution depends on which. Solid 
 <text class="pz-small" x="548" y="58" text-anchor="middle">REST</text>
 <path class="pz-dep-rest" d="M695,90 L695,148"/>
 <text class="pz-small" x="705" y="116">runs</text>
-<text class="pz-small" x="705" y="129">ponzi-worker job</text>
+<text class="pz-small" x="705" y="129">ponzi-worker</text>
+<text class="pz-small" x="705" y="142">sweep or job</text>
 <path class="pz-dep-line" d="M695,200 L695,258"/>
 <path class="pz-dep-file" d="M610,285 L572,285"/>
 <path class="pz-dep-line" d="M695,310 L695,368"/>
@@ -95,12 +96,12 @@ Who calls whom while PONZI runs, and which distribution depends on which. Solid 
 </svg>
 </div>
 
-- **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It depends only on `ponzi-spec` and never imports the computing distributions, and it never calls out: the clients always ask.
-- **ponzi-client** (Python, and the `ponzi-client` command) is the way to a running server: submitting runs, watching areas, reading outputs. As `ponzi-client serve` it is the one long-running process: it claims jobs, has the worker do them, delivers the final outputs (uploaded, or written into a folder the server also sees) and completes them (CR-063).
-- **ponzi-worker** never talks to the server and never stays running. `ponzi-worker job` is one short call on one job: it runs the job's workflow here, or submits and checks its SLURM jobs, and answers with what is done; the client calls it again until the job is finished. It keeps intermediate outputs in its own cache by content id, so each call goes on from where the last stopped. It is the only part that depends on the computing distributions.
+- **ponzi-server** holds requests, watched areas, jobs and the final outputs, and serves the catalog. It depends only on `ponzi-spec` and never imports the computing distributions, and it never calls a client or a worker: the clients always ask.
+- **ponzi-client** (Python, and the `ponzi-client` command) is the way to a running server: submitting runs, watching areas, reading outputs. As `ponzi-client serve` it is the one long-running process: it claims jobs, has the worker do them and deliver the final outputs (uploaded, or written into a folder the server also sees; CR-098), and completes them (CR-063).
+- **ponzi-worker** never stays running, and talks to the server only to upload a job's outputs with the one-time tickets the loop hands it (CR-098). With a SLURM worker the loop calls `ponzi-worker sweep`, one short call over every job it holds that checks the work in flight and submits the new work (CR-096), then `ponzi-worker package` for each job that is ready; with a local worker, `ponzi-worker job` runs one job here to the end. It keeps intermediate outputs in its own cache by content id, so each call goes on from where the last stopped. It is the only part that depends on the computing distributions.
 - **ponzi-visual** talks to the server directly over REST and depends on no PONZI package: its TypeScript client is generated from the server's committed `openapi.json` (`npm run gen`). It shows the watched areas and their outputs over time on a map, and makes new areas from Major TOM tiles (with their tags) over a span of days; the server chooses what runs them.
 - **ponzi-spec** is the one distribution every Python part depends on. It holds no computing code, so the server and the clients install it without the scientific stack.
-- **Without a server**, code uses the ponzi-core libraries and their commands directly (`ponzi run`, `ponzi-pipeline`, `ponzi-models`), or a worker on its own (`ponzi-worker run` runs a workflow on this machine or through SLURM, with its cache). An agent submits to SLURM this way only with the owner's approval ([Using PONZI](../contributing/agents/usage.md#local-mode)).
+- **Without a server**, code uses the ponzi-core libraries and their commands directly (`ponzi run`, `ponzi-pipeline`, `ponzi-models`), or a worker on its own (`ponzi-worker run` runs a workflow on this machine or through SLURM, with its cache). An agent submits to SLURM this way only with the owner's approval ([Using PONZI](../contributing/agents/usage.md#the-worker-running-workflows-yourself)).
 - **Optional parts:** `ponzi[tide]` and `ponzi-models[train]` add torch (the `ml` environment on the CPU; `ml-gpu`, conda-forge torch in its CUDA 12.9 build); ISCE3 comes from conda-forge only, in the `isce3` environment, as version 0.25.22 in its CUDA 12.9 build ([Install](install.md)).
 
 ## What holds it together

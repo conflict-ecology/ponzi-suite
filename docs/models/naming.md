@@ -11,14 +11,14 @@ The rules are code, `ponzi_spec.naming` (ponzi-core CR-052, CR-070), and ponzi-c
 | variant | `<training spec>-<change>...` | `tide-weather-fill-median` | `specs/training_specs/tide/candidates/tide-weather-fill-median.yaml` |
 | test case's training spec | `<training spec>-<case>-<change>` | `tide-weather-gaza-finetune` | `specs/training_specs/tide/tide-weather-gaza-finetune.yaml` |
 | fit at another seed | `<training spec>-seed<N>` | `tide-weather-fill-median-seed43` | `ponzi-models train --seed 43` |
-| model | `<training spec>@<hash8>--<panel spec>@<hash8>` | `tide-weather@59bfd3dc--majortom-global@77941f85` | the artifact `export` writes, the registry entry |
+| model | `<training spec>@<hash8>--<panel spec>@<hash8>` | `tide-weather@59bfd3dc--majortom-global@2436d8cb` | the artifact `export` writes, the registry entry |
 | scoring spec | `<forecaster>-<scoring>[-<change>]` | `rolling-ols-pyramid` | `specs/scoring_specs/rolling-ols-pyramid.yaml` (CR-058) |
 | coherence spec | `<backend>-<window>[-<change>]` | `isce3-gaussian` | `specs/coherence_specs/isce3-gaussian.yaml` |
 | onboarding spec | `<steps>[-<change>]` | `all-steps`, `mask-only` | `specs/onboarding_specs/all-steps.yaml` |
 | detection spec | `<method>[-<change>]` | `single-path`, `single-path-gaza-release` | `specs/detection_specs/single-path.yaml` |
 | standard | `<sensor>-<scope>` | `s1-general`, `s1-gaza` | `standards/s1-general.yaml`, cited `s1-general@<hash8>` ([Versions](versions.md#the-id-the-version-and-the-key); CR-089) |
 
-A word is letters and digits, and a name starts with a letter. The double hyphen of a model id separates the two spec versions it was made from, since each name may hold single hyphens. A registry reference ends in the artifact's digest and is read on its last `@sha256:`: `registry:tide-weather@59bfd3dc--majortom-global@77941f85@sha256:<digest>`.
+A word is letters and digits, and a name starts with a letter. The double hyphen of a model id separates the two spec versions it was made from, since each name may hold single hyphens. A registry reference ends in the artifact's digest and is read on its last `@sha256:`: `registry:tide-weather@59bfd3dc--majortom-global@2436d8cb@sha256:<digest>`.
 
 A spec is named by its file: `tide-weather-fill-median.yaml` is `tide-weather-fill-median`, and a panel spec by its folder. No spec file says its name (a `training_id` in a training spec or an `id` in a `panel.yaml` is refused), and a name is unique within its kind (ponzi-core CR-081). A spec is edited in place under its name, and a new name is for another spec, the old one with its change added (`majortom-global-dense`). The name is a label, not part of the spec's hash, its version ([Specs: a name and a hash](versions.md#specs-a-name-and-a-hash)).
 

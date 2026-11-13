@@ -7,7 +7,7 @@ It is built by walking the output's lineage links back to the external sources (
 ```yaml
 # the hash of the manifest's declaration (CR-085)
 manifest_version: b5e69bf8aca0dfcf87ae17458ca6d388
-subject: ponzi-events-t028_058198_iw3-9c1e4d2a7b10
+subject: ponzi-events-cell-393U_467R-9c1e4d2a7b10
 content_id: 9c1e4d2a7b10...
 standard: s1-general@3f9a12c4
 created: '2026-11-04T10:12:03Z'
@@ -26,8 +26,8 @@ steps:
   spec_hash: ...
   request: {staged: true}
   inputs: [51c0a9e2..., ...]
-- item: ponzi-events-t028_058198_iw3-9c1e4d2a7b10
-  stage: {name: detect, code: {ponzi: '0.0'}}
+- item: ponzi-events-cell-393U_467R-9c1e4d2a7b10
+  stage: {name: tile, code: {ponzi: '0.0'}}
 ```
 
 The server serves it at `/v1/manifests/{content_id}`, as JSON, or as this yaml with `?format=yaml`.

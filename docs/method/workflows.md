@@ -110,7 +110,7 @@ flowchart TB
   visual["ponzi-visual<br/>map: tiles, areas, outputs"]
   server[("ponzi-server<br/>areas, jobs, final outputs")]
   client["ponzi-client serve<br/>the long-running loop"]
-  worker["ponzi-worker job<br/>runs the stages, caches by content id"]
+  worker["ponzi-worker job, sweep<br/>runs the stages, caches by content id"]
   data[("ASF, Copernicus DEM,<br/>weather, GHSL")]
   suite["ponzi-suite<br/>specs, standards"]
   home[("PONZI home<br/>$PONZI_HOME")]
@@ -123,7 +123,7 @@ flowchart TB
   worker --- home
 ```
 
-The server keeps the watched areas, makes one job per burst at each area's cadence, and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims a job and has the worker carry it out in short calls (`ponzi-worker job`); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs. Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([Running the server](../service/server.md), [Workflows and the cache](../service/worker.md)).
+The server keeps the watched areas, makes one job per burst at each area's cadence, named by the burst's newest acquisition so that a look with nothing new makes no new job (CR-101), and stores the final outputs; it computes nothing. `ponzi-client serve`, the only long-running process, claims jobs and has the worker carry them out in short calls (`ponzi-worker job`; under SLURM, one `ponzi-worker sweep` over every job it holds, CR-096); the worker keeps every output in its cache by content id, so the same work is never done twice, and the client delivers the final outputs, sent straight from the worker's machine when it can reach the server (CR-098). Everything computed lives in the PONZI home; the repositories hold code and the files PONZI runs from ([Running the server](../service/server.md), [Workflows and the cache](../service/worker.md)).
 
 ## One burst under a standard
 
@@ -145,7 +145,7 @@ flowchart TB
   pvalues --> tile["tile, by the detection spec<br/>events per Major TOM cell"]
 ```
 
-`detect` and `tile` are the final steps whose Items the server keeps. A standard made from existing stores starts at `ingest-coherence` instead of the first four stages.
+`tile` is the final step: its `ponzi-events-cell` Items are the ones the server keeps. `detect` still runs, and its per-burst events stay in the worker's cache (CR-100). A standard made from existing stores starts at `ingest-coherence` instead of the first four stages.
 
 ## How the registered pieces are made
 
